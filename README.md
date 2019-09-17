@@ -21,6 +21,94 @@ Simply put the output DLL in your game directory and run zonetool.exe
 ``loadzone <zonename>`` - loads the specified zone into memory.\
 ``dumpzone <zonename>`` - dumps all assets from the specified zone.
 
+## Supported asset types
+The following asset types can be linked by ZoneTool:
+
+|             | IW4 | IW5 |
+|-------------|-----|-----|
+| PhysPreset  | ✔️    | ✔️    |
+| PhysCollmap | ✔️    | ✔️    |
+| XAnimParts  | ✔️    | ✔️    |
+| XModelSurfs | ✔️    | ✔️    |
+| XModel      | ✔️    | ✔️    |
+| Material    | ✔️    | ✔️    |
+| PixelShader | ✔️    | ✔️    |
+| VertexShader | ✔️    | ✔️    |
+| VertexDecl  | ✔️    | ✔️    |
+| Techset     | ✔️    | ✔️    |
+| Image       | ✔️    | ✔️    |
+| Sound       | ✔️    | ✔️    |
+| SndCurve    | ✔️    | ✔️    |
+| LoadedSound | ✔️    | ✔️    |
+| CollisionMap | ✔️    | ✔️    |
+| ComMap      | ✔️    | ✔️    |
+| GlassMap    | ✔️    | ✔️    |
+| MapEnts     | ✔️    | ✔️    |
+| FxMap       | ✔️    | ✔️    |
+| GfxMap      | ✔️    | ✔️    |
+| Font        | ✔️    | ✔️    |
+| MenuFile    | ❌    | ❌    |
+| Menu        | ❌    | ❌    |
+| Localize    | ✔️    | ✔️    |
+| Attachment  |  -  | ✔️    |
+| Weapon      | ✔️    | ✔️    |
+| FxEffectDef | ✔️    | ✔️    |
+| ImpactFx    | ✔️    | ✔️    |
+| RawFile     | ✔️    | ✔️    |
+| ScriptFile  |  -  | ✔️    |
+| StringTable | ✔️    | ✔️    |
+| LeaderBoardDef | ✔️    | ✔️    |
+| StructuredDataDef | ✔️    | ✔️    |
+| Tracer      | ✔️    | ✔️    |
+| Vehicle     | ❌    | ❌    |
+| AddonMapEnts | ❌    | ❌    |
+
+The following asset types can be ported across different games:
+|             | |
+|-------------|-----|
+| PhysPreset  | ✔️    |
+| PhysCollmap | ✔️    |
+| XAnimParts  | ✔️    |
+| XModelSurfs | ✔️    |
+| XModel      | ✔️    |
+| Material    | ✔️    |
+| PixelShader | ✔️    |
+| VertexShader | ✔️    |
+| VertexDecl  | ✔️    |
+| Techset     | ✔️    |
+| Image       | ✔️    |
+| Sound       | ✔️    |
+| SndCurve    | ✔️    |
+| LoadedSound | ✔️    |
+| CollisionMap | ✔️    |
+| ComMap      | ✔️    |
+| GlassMap    | ✔️    |
+| MapEnts     | ✔️    |
+| FxMap       | ✔️    |
+| GfxMap      | ✔️    |
+| Font        | ❌    |
+| MenuFile    | ❌    |
+| Menu        | ❌    |
+| Localize    | ✔️    |
+| Attachment  | ✔️    |
+| Weapon      | ✔️    |
+| FxEffectDef | ❌    |
+| ImpactFx    | ❌    |
+| RawFile     | ✔️    |
+| ScriptFile  | ✔️    |
+| StringTable | ✔️    |
+| LeaderBoardDef | ❌    |
+| StructuredDataDef | ✔️    |
+| Tracer      | ✔️    |
+| Vehicle     | ❌    |
+| AddonMapEnts | ❌    |
+
+## Supported clients
+ZoneTool generated fastfiles are compatible with the following clients:
+* IW4x (IW4 client)
+* Plutonium (IW5 client)
+* Oxygen (IW5 client)
+
 ## Credits
 Special thanks to the following people:
 * Laupetin

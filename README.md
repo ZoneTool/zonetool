@@ -4,4 +4,13 @@
 <p align="center"><img src="plutonium_logo.jpg" alt="Plutonium"/>
 
 # zonetool
-coming soon.
+zonetool, a fastfile linker for various Call of Duty titles.
+
+## Credits
+Special thanks to the following people:
+* Laupetin
+* NTAuthority
+* momo5502
+* TheApadayo
+* localhost
+* X3RX35

@@ -24,7 +24,7 @@ Simply put the output DLL in your game directory and run zonetool.exe
 ## Supported asset types
 The following asset types can be linked by ZoneTool:
 
-|             | IW4 | IW5 |
+| Asset Type  | IW4 | IW5 |
 |-------------|-----|-----|
 | PhysPreset  | ✔️    | ✔️    |
 | PhysCollmap | ✔️    | ✔️    |
@@ -64,7 +64,7 @@ The following asset types can be linked by ZoneTool:
 | AddonMapEnts | ❌    | ❌    |
 
 The following asset types can be ported across different games:
-|             | |
+| Asset Type  | |
 |-------------|-----|
 | PhysPreset  | ✔️    |
 | PhysCollmap | ✔️    |

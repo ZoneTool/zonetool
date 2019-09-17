@@ -3,6 +3,7 @@ workspace "zonetool"
 	objdir "%{wks.location}/obj"
 	targetdir "%{wks.location}/bin"
 	targetname "%{prj.name}-%{cfg.platform}-%{cfg.buildcfg}"
+	warnings "Off"
 
 	configurations {
 		"debug",
@@ -67,6 +68,9 @@ workspace "zonetool"
 		kind "SharedLib"
 		language "C++"
 		dependson "ZoneUtils"
+		dependson "IW3"
+		dependson "IW4"
+		dependson "IW5"
 
 		pchheader "stdafx.hpp"
 		pchsource "src/ZoneTool/stdafx.cpp"

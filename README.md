@@ -63,9 +63,11 @@ The following asset types can be linked by ZoneTool:
 | Vehicle     | ❌    | ❌    |
 | AddonMapEnts | ❌    | ❌    |
 
+## Supported assets for cross-engine porting
 The following asset types can be ported across different games:
+
 | Asset Type  | Supported? |
-|-------------|-----|
+|-------------|------------|
 | PhysPreset  | ✔️    |
 | PhysCollmap | ✔️    |
 | XAnimParts  | ✔️    |

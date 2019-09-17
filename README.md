@@ -6,6 +6,21 @@
 # zonetool
 zonetool, a fastfile linker for various Call of Duty titles.
 
+## Folder structure
+Call of Duty\
+| - zone_source\
+| - zonetool\
+| - zonetool.exe\
+| - zonetool.dll 
+
+## Usage
+Simply put the output DLL in your game directory and run zonetool.exe
+
+## Commands
+``buildzone <zonename>`` - builds the specified zone.\
+``loadzone <zonename>`` - loads the specified zone into memory.\
+``dumpzone <zonename>`` - dumps all assets from the specified zone.
+
 ## Credits
 Special thanks to the following people:
 * Laupetin

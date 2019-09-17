@@ -64,7 +64,7 @@ The following asset types can be linked by ZoneTool:
 | AddonMapEnts | ❌    | ❌    |
 
 The following asset types can be ported across different games:
-| Asset Type  |     |
+| Asset Type  | Supported? |
 |-------------|-----|
 | PhysPreset  | ✔️    |
 | PhysCollmap | ✔️    |

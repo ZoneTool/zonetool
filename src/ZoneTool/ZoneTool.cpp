@@ -321,7 +321,7 @@ namespace ZoneTool
 	{
 		ZONETOOL_INFO("ZoneTool initialization complete!");
 		ZONETOOL_INFO("Welcome to ZoneTool r%i written by RektInator.", ZONETOOL_VERSION);
-		ZONETOOL_INFO("Special thanks to: NTAuthority, momo5502, TheApadayo, localhost & X3RX35.");
+		ZONETOOL_INFO("Special thanks to: Laupetin, NTAuthority, momo5502, TheApadayo, localhost & X3RX35.");
 
 		if (linker)
 		{

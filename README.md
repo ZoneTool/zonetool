@@ -14,7 +14,7 @@ Call of Duty\
 | - zonetool.dll 
 
 ## Usage
-Simply put the output DLL in your game directory and run zonetool.exe
+Simply put the output DLL in your game directory and run zonetool.exe (For IW3, rename the DLL to zoneiw3.dll)
 
 ## Commands
 ``buildzone <zonename>`` - builds the specified zone.\
@@ -53,7 +53,7 @@ The following asset types can be linked by ZoneTool:
 | Attachment  |  -  | ✔️    |
 | Weapon      | ✔️    | ✔️    |
 | FxEffectDef | ✔️    | ✔️    |
-| ImpactFx    | ✔️    | ✔️    |
+| ImpactFx    | ❌    | ❌    |
 | RawFile     | ✔️    | ✔️    |
 | ScriptFile  |  -  | ✔️    |
 | StringTable | ✔️    | ✔️    |

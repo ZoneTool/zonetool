@@ -55,11 +55,11 @@ namespace ZoneTool
 				{
 					asset->soundFile->sound.loadSnd = mem->Alloc<LoadedSound>();
 					// (LoadedSound*)malloc(sizeof(LoadedSound*));
-					asset->soundFile->sound.loadSnd->name = _strdup(snddata["soundfile"].get<std::string>().c_str());
+					asset->soundFile->sound.loadSnd->name = mem->StrDup(snddata["soundfile"].get<std::string>().c_str());
 				}
 				else
 				{
-					char* fullpath = _strdup(snddata["soundfile"].get<std::string>().c_str());
+					char* fullpath = mem->StrDup(snddata["soundfile"].get<std::string>().c_str());
 					asset->soundFile->sound.streamSnd.dir = fullpath;
 					for (int i = strnlen(fullpath, 255) - 1; i >= 0; i--)
 					{
@@ -101,7 +101,7 @@ namespace ZoneTool
 				if (!snddata["volumeFalloffCurve"].is_null())
 				{
 					asset->volumeFalloffCurve = mem->Alloc<SndCurve>(); // (SndCurve*)calloc(1, sizeof(SndCurve));
-					asset->volumeFalloffCurve->filename = _strdup(
+					asset->volumeFalloffCurve->filename = mem->StrDup(
 						snddata["volumeFalloffCurve"].get<std::string>().c_str());
 				}
 
@@ -110,7 +110,7 @@ namespace ZoneTool
 					asset->speakerMap = mem->Alloc<SpeakerMap>(); // (SpeakerMap*)calloc(1, sizeof(SpeakerMap));
 					nlohmann::json speakerMap = snddata["speakerMap"];
 
-					asset->speakerMap->name = _strdup(speakerMap["name"].get<std::string>().c_str());
+					asset->speakerMap->name = mem->StrDup(speakerMap["name"].get<std::string>().c_str());
 					asset->speakerMap->isDefault = speakerMap["isDefault"].get<bool>();
 
 					if (!speakerMap["channelMaps"].is_null())

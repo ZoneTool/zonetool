@@ -178,7 +178,6 @@ char**>(0x00799278)[type]);
 				}
 			}
 
-			// dump shit gaylord
 			if (isDumping)
 			{
 				// dont dump empty assets

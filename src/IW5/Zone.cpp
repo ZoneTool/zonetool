@@ -260,9 +260,6 @@ namespace ZoneTool
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
-			// smirk face
-			fastfile.save("D:\\Plutonium\\Oxygen\\zone\\english\\" + this->m_name + ".ff");
-
 			// plutonium output paths
 			fastfile.save("zone\\pluto\\common\\" + this->m_name + ".ff");
 			fastfile.save("zone\\english\\" + this->m_name + ".ff");

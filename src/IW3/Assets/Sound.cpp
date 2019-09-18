@@ -23,10 +23,8 @@ namespace ZoneTool
 
 			for (auto i = 0; i < asset->count; i++)
 			{
-				memcpy(&iw4_asset->head[i], &asset->head[i], 36);
-				memcpy(&iw4_asset->head[i].pitchMin, &asset->head[i].pitchMin, 16);
-				iw4_asset->head[i].flags = asset->head[i].flags;
-				memcpy(&iw4_asset->head[i].slavePercentage, &asset->head[i].slavePercentage, 20);
+				memcpy(&iw4_asset->head[i], &asset->head[i], 16);
+				memcpy(&iw4_asset->head[i].soundFile, &asset->head[i].soundFile, sizeof snd_alias_t - 16 - 20);
 				memcpy(&iw4_asset->head[i].volumeFalloffCurve, &asset->head[i].volumeFalloffCurve, 20);
 			}
 

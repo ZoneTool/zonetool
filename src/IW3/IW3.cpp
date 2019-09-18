@@ -185,6 +185,8 @@ namespace ZoneTool
 				ReallocateAssetPoolM(col_map_mp, 5);
 				ReallocateAssetPoolM(gfx_map, 5);
 				ReallocateAssetPoolM(rawfile, 2);
+				ReallocateAssetPoolM(loaded_sound, 2);
+				ReallocateAssetPoolM(sound, 2);
 
 				// Asset dump hook
 				Memory(0x00489E72).Call(DB_AddXAsset);

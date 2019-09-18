@@ -7,6 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+// #include "ZoneTool.hpp"
 
 namespace ZoneTool
 {
@@ -124,6 +125,8 @@ namespace ZoneTool
 					DECLARE_ASSET(material, IMaterial);
 					DECLARE_ASSET(xanim, IXAnimParts);
 					DECLARE_ASSET(techset, ITechset);
+					DECLARE_ASSET(loaded_sound, ILoadedSound);
+					DECLARE_ASSET(sound, ISound);
 				}
 			}
 		}

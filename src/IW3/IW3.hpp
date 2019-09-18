@@ -19,6 +19,8 @@
 #include "Assets/GfxWorld.hpp"
 #include "Assets/GfxImage.hpp"
 #include "Assets/GameWorldMp.hpp"
+#include "Assets/LoadedSound.hpp"
+#include "Assets/Sound.hpp"
 
 // oh nee toch niet
 

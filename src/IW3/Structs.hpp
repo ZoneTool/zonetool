@@ -1749,6 +1749,149 @@ namespace ZoneTool
 			const char* name;
 		};
 
+		// Loaded sound
+#pragma pack(push, 4)
+		struct LoadedSoundStruct
+		{
+			int waveFormat;
+			int unknown1;
+			int dataLength;
+			int sampleRate;
+			int bitPerChannel;
+			int channelCount;
+			int unknown3;
+			int blockAlign;
+			int unknown5;
+			char* soundData;
+		};
+#pragma pack(pop)
+
+		struct LoadedSound
+		{
+			const char* name;
+			LoadedSoundStruct struct1;
+		};
+
+		// Sounds
+		struct SpeakerLevels
+		{
+			int speaker;
+			int numLevels;
+			float levels[2];
+		};
+		struct ChannelMap
+		{
+			int entryCount;	// how many entries are used
+			SpeakerLevels speakers[6];
+		};
+		struct SpeakerMap
+		{
+			bool isDefault;
+			char _pad[3];
+			const char* name;
+			ChannelMap channelMaps[2][2];
+		};
+		enum snd_alias_type_t : char
+		{
+			SAT_UNKNOWN = 0x0,
+			SAT_LOADED = 0x1,
+			SAT_STREAMED = 0x2,
+			SAT_PRIMED = 0x3,
+			SAT_COUNT = 0x4,
+		};
+		struct StreamFileNamePacked
+		{
+			unsigned __int64 offset;
+			unsigned __int64 length;
+		};
+		struct StreamFileNameRaw
+		{
+			const char* dir;
+			const char* name;
+		};
+		union StreamFileInfo
+		{
+			StreamFileNameRaw raw;
+			StreamFileNamePacked packed;
+		};
+		struct StreamFileName
+		{
+			unsigned __int16 isLocalized;
+			unsigned __int16 fileIndex;
+			StreamFileInfo info;
+		};
+		/*struct StreamedSound
+		{
+		StreamFileName filename;
+		unsigned int totalMsec;
+		};*/
+		struct StreamedSound
+		{
+			const char* dir;
+			const char* name;
+		};
+		struct PrimedSound
+		{
+			StreamFileName filename;
+			LoadedSound* loadedPart;
+			int dataOffset;
+			int totalSize;
+			unsigned int primedCrc;
+		};
+		union SoundData
+		{
+			LoadedSound* loadSnd;	// SoundFile->type == SAT_LOADED
+			StreamedSound streamSnd;	// SoundFile->type == SAT_STREAMED
+										//PrimedSound primedSnd;	// SoundFile->type == SAT_PRIMED
+		};
+		struct SoundFile	// 0x10
+		{
+			char type;
+			char _pad[2];
+			bool exists;
+			SoundData sound;
+		};
+#pragma pack(push, 4)
+		struct SndCurve
+		{
+			const char* filename;
+			unsigned __int16 knotCount;
+			vec2_t knots[16];
+		};
+		const struct snd_alias_t
+		{
+			const char* aliasName;
+			const char* subtitle;
+			const char* secondaryAliasName;
+			const char* chainAliasName;
+			SoundFile* soundFile;
+			int sequence;
+			float volMin;
+			float volMax;
+			float pitchMin;
+			float pitchMax;
+			float distMin;
+			float distMax;
+			int flags;
+			float slavePercentage;
+			float probability;
+			float lfePercentage;
+			float centerPercentage;
+			int startDelay;
+			SndCurve* volumeFalloffCurve;
+			float envelopMin;
+			float envelopMax;
+			float envelopPercentage;
+			SpeakerMap* speakerMap;
+		};
+#pragma push(pop)
+		struct snd_alias_list_t
+		{
+			const char* aliasName;
+			snd_alias_t* head;
+			int count;
+		};
+
 		union XAssetHeader
 		{
 			void* data;
@@ -1761,7 +1904,7 @@ namespace ZoneTool
 			// 			MaterialVertexShader *vertexShader;
 			MaterialTechniqueSet* techset;
 			GfxImage* gfximage;
-			// 			snd_alias_list_t *sound;
+			snd_alias_list_t *sound;
 			// 			SndCurve *sndCurve;
 			clipMap_t* clipMap;
 			ComWorld* comWorld;
@@ -1771,6 +1914,7 @@ namespace ZoneTool
 			GfxWorld* gfxWorld;
 			GfxWorld* gfx_map;
 			GfxLightDef* lightDef;
+			LoadedSound* loaded_sound;
 			// 			Font_s *font;
 			// 			MenuList *menuList;
 			// 			menuDef_t *menu;

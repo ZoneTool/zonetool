@@ -7,7 +7,6 @@
 // License: GNU GPL v3.0
 // ========================================================
 #pragma once
-#include <d3d9.h>
 
 namespace ZoneTool
 {
@@ -159,14 +158,14 @@ namespace ZoneTool
 			bool hasOptionalSource;
 			char pad[2];
 			MaterialStreamRouting streams[13];
-			IDirect3DVertexDeclaration9* declarations[16];
+			void* declarations[16];
 		};
 #pragma pack(pop)
 
 		struct PixelShader
 		{
 			const char* name;
-			IDirect3DPixelShader9* shader;
+			void* shader;
 			DWORD* bytecode;
 			short codeLen;
 		};
@@ -174,7 +173,7 @@ namespace ZoneTool
 		struct VertexShader
 		{
 			const char* name;
-			IDirect3DVertexShader9* shader;
+			void* shader;
 			DWORD* bytecode;
 			short codeLen;
 		};

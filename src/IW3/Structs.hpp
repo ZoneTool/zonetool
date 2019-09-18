@@ -7,7 +7,6 @@
 // License: GNU GPL v3.0
 // ========================================================
 #pragma once
-#include <d3d9.h>
 
 namespace ZoneTool
 {
@@ -248,7 +247,7 @@ namespace ZoneTool
 
 		struct MaterialVertexShaderProgram
 		{
-			IDirect3DVertexShader9* vs;
+			void* vs;
 			GfxVertexShaderLoadDef loadDef;
 		};
 
@@ -267,7 +266,7 @@ namespace ZoneTool
 
 		struct MaterialPixelShaderProgram
 		{
-			IDirect3DPixelShader9* ps;
+			void* ps;
 			GfxPixelShaderLoadDef loadDef;
 		};
 
@@ -308,7 +307,7 @@ namespace ZoneTool
 		struct MaterialVertexStreamRouting
 		{
 			MaterialStreamRouting data[16];
-			IDirect3DVertexDeclaration9* decl[16];
+			void* decl[16];
 		};
 
 		struct MaterialVertexDeclaration

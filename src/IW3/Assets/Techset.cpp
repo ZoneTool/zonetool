@@ -43,7 +43,7 @@ namespace ZoneTool
 			asset->streamCount = vertex->streamCount;
 
 			memcpy(asset->streams, vertex->routing.data, sizeof asset->streams);
-			memcpy(asset->declarations, vertex->routing.decl, sizeof(IDirect3DVertexDeclaration9*) * 16);
+			memcpy(asset->declarations, vertex->routing.decl, sizeof(void*) * 16);
 
 			for (int i = 0; i < asset->streamCount; i++)
 			{

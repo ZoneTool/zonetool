@@ -22,9 +22,10 @@ namespace ZoneTool
 
 	void ExecuteCommand(std::vector<std::string> args)
 	{
-		if (commands.find(args[0]) != commands.end())
+		const auto itr = commands.find(args[0]);
+		if (itr != commands.end())
 		{
-			commands[args[0]](args);
+			itr->second(args);
 		}
 		else
 		{

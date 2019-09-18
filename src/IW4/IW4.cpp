@@ -133,7 +133,6 @@ namespace ZoneTool
 				return header.rawfile->name;
 			}
 
-			// haHAAAAAAAAAAAAAAAAAA
 			return "";
 		}
 

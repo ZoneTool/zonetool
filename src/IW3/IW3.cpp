@@ -60,7 +60,6 @@ namespace ZoneTool
 				return asset->ptr.rawfile->name;
 			}
 
-			// haHAAAAAAAAAAAAAAAAAA
 			return "";
 		}
 
@@ -102,7 +101,7 @@ namespace ZoneTool
 				isVerifying = false;
 			}
 
-			// dump shit gaylord
+			// dump shit
 			if (isDumping)
 			{
 				FileSystem::SetFastFile(fastfile);
@@ -120,7 +119,6 @@ namespace ZoneTool
 				}
 				else
 				{
-					// DECLARE_ASSET(gfx_map, IGfxWorld);
 					DECLARE_ASSET(xmodel, IXModel);
 					DECLARE_ASSET(material, IMaterial);
 					DECLARE_ASSET(xanim, IXAnimParts);
@@ -222,8 +220,6 @@ namespace ZoneTool
 
 				// Disable console window
 				Memory(0x0046CE55).Nop(5);
-
-				sizeof(GfxWorld);
 			}
 		}
 

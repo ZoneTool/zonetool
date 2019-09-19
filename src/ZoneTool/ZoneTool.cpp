@@ -91,7 +91,7 @@ namespace ZoneTool
 		}
 	}
 
-	void BuildZone(std::shared_ptr<ILinker>& linker, std::string& fastfile)
+	void BuildZone(ILinker* linker, std::string& fastfile)
 	{
 		// make sure FS is correct.
 		FileSystem::SetFastFile(fastfile);
@@ -219,6 +219,8 @@ namespace ZoneTool
 		// linker->UnloadZones();
 	}
 
+	ILinker* currentLinker;
+
 	void CreateConsole()
 	{
 #ifdef USE_VMPROTECT
@@ -251,11 +253,9 @@ namespace ZoneTool
 				return;
 			}
 
-			// Pass build command on to linkers
-			for (auto& linker : linkers)
+			if (currentLinker)
 			{
-				if (!linker->InUse()) continue;
-				BuildZone(linker, args[1]);
+				BuildZone(currentLinker, args[1]);
 			}
 		});
 		RegisterCommand("loadzone"s, [](std::vector<std::string> args)
@@ -268,10 +268,9 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			for (auto& linker : linkers)
+			if (currentLinker)
 			{
-				if (!linker->InUse()) continue;
-				linker->LoadZone(args[1]);
+				currentLinker->LoadZone(args[1]);
 			}
 		});
 		RegisterCommand("verifyzone"s, [](std::vector<std::string> args)
@@ -284,10 +283,9 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			for (auto& linker : linkers)
+			if (currentLinker)
 			{
-				if (!linker->InUse()) continue;
-				linker->VerifyZone(args[1]);
+				currentLinker->VerifyZone(args[1]);
 			}
 		});
 		RegisterCommand("dumpzone"s, [](std::vector<std::string> args)
@@ -300,10 +298,9 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			for (auto& linker : linkers)
+			if (currentLinker)
 			{
-				if (!linker->InUse()) continue;
-				linker->DumpZone(args[1]);
+				currentLinker->DumpZone(args[1]);
 			}
 		});
 
@@ -351,8 +348,6 @@ namespace ZoneTool
 		return args;
 	}
 
-	std::shared_ptr<ILinker> currentLinker;
-
 	void HandleParams()
 	{
 		// Wait until the game is loaded
@@ -388,6 +383,11 @@ namespace ZoneTool
 		}
 	}
 
+	bool IsCustomLinkerPresent()
+	{
+		return std::filesystem::exists("linker.dll") && std::filesystem::is_regular_file("linker.dll");
+	}
+
 	void Startup()
 	{
 #ifdef USE_VMPROTECT
@@ -402,19 +402,38 @@ namespace ZoneTool
 		RegisterLinker<IW4::Linker>();
 		RegisterLinker<IW5::Linker>();
 
-		// Startup compatible linkers
-		for (auto& linker : linkers)
+		// check if a custom linker is present in the current game directory
+		if (IsCustomLinkerPresent())
 		{
-			linker->Startup();
+			auto linkerModule = LoadLibraryA("linker.dll");
 
-			if (linker->InUse())
+			if (linkerModule != nullptr && linkerModule != INVALID_HANDLE_VALUE)
 			{
-				currentLinker = linker;
+				auto getLinkerFunc = GetProcAddress(linkerModule, "GetLinker");
+
+				if (getLinkerFunc != nullptr && getLinkerFunc != INVALID_HANDLE_VALUE)
+				{
+					currentLinker = Function<ILinker * ()>(getLinkerFunc)();
+				}
+			}
+		}
+
+		if (!currentLinker)
+		{
+			// Startup compatible linkers
+			for (auto& linker : linkers)
+			{
+				linker->Startup();
+
+				if (linker->InUse())
+				{
+					currentLinker = linker.get();
+				}
 			}
 		}
 
 		// Startup complete, show branding
-		Branding(currentLinker.get());
+		Branding(currentLinker);
 
 		CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)HandleParams, nullptr, 0, nullptr);
 

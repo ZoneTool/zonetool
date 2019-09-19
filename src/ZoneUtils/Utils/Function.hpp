@@ -27,6 +27,7 @@ namespace ZoneTool
 		{
 			this->m_func = std::function<T>(reinterpret_cast<T*>(addr));
 		}
+		Function(FARPROC addr) : Function(std::uintptr_t(addr)) {}
 
 		// Operators
 		void operator=(const std::uintptr_t addr)

@@ -181,7 +181,7 @@ namespace ZoneTool
 			{IW3::CONST_SRC_CODE_NEARPLANE_ORG, CONST_SRC_CODE_NEARPLANE_ORG},
 			{IW3::CONST_SRC_CODE_NEARPLANE_DX, CONST_SRC_CODE_NEARPLANE_DX},
 			{IW3::CONST_SRC_CODE_NEARPLANE_DY, CONST_SRC_CODE_NEARPLANE_DY},
-			{IW3::CONST_SRC_CODE_SHADOW_PARMS, static_cast<std::int32_t>(code_constant::shadow_params)},
+			{IW3::CONST_SRC_CODE_SHADOW_PARMS, 0},
 			{IW3::CONST_SRC_CODE_SHADOWMAP_POLYGON_OFFSET, CONST_SRC_CODE_SHADOWMAP_POLYGON_OFFSET},
 			{IW3::CONST_SRC_CODE_RENDER_TARGET_SIZE, CONST_SRC_CODE_RENDER_TARGET_SIZE},
 			{IW3::CONST_SRC_CODE_LIGHT_FALLOFF_PLACEMENT, CONST_SRC_CODE_LIGHT_FALLOFF_PLACEMENT},
@@ -211,13 +211,12 @@ namespace ZoneTool
 			{IW3::CONST_SRC_CODE_COLOR_MATRIX_G, CONST_SRC_CODE_COLOR_MATRIX_G},
 			{IW3::CONST_SRC_CODE_COLOR_MATRIX_B, CONST_SRC_CODE_COLOR_MATRIX_B},
 			{IW3::CONST_SRC_CODE_ALWAYS_DIRTY_PS_END, CONST_SRC_CODE_ALWAYS_DIRTY_PS_END},
-			{IW3::CONST_SRC_CODE_NEVER_DIRTY_PS_BEGIN, static_cast<std::int32_t>(code_constant::never_dirty_ps_begin)},
 			{IW3::CONST_SRC_CODE_SHADOWMAP_SWITCH_PARTITION, CONST_SRC_CODE_SHADOWMAP_SWITCH_PARTITION},
 			{IW3::CONST_SRC_CODE_SHADOWMAP_SCALE, CONST_SRC_CODE_SHADOWMAP_SCALE},
 			{IW3::CONST_SRC_CODE_ZNEAR, CONST_SRC_CODE_ZNEAR},
-			{IW3::CONST_SRC_CODE_SUN_POSITION, static_cast<std::int32_t>(code_constant::sun_position)},
-			{IW3::CONST_SRC_CODE_SUN_DIFFUSE, static_cast<std::int32_t>(code_constant::sun_diffuse)},
-			{IW3::CONST_SRC_CODE_SUN_SPECULAR, static_cast<std::int32_t>(code_constant::sun_specular)},
+			{IW3::CONST_SRC_CODE_SUN_POSITION, CONST_SRC_CODE_LIGHT_POSITION},
+			{IW3::CONST_SRC_CODE_SUN_DIFFUSE, CONST_SRC_CODE_LIGHT_DIFFUSE},
+			{IW3::CONST_SRC_CODE_SUN_SPECULAR, CONST_SRC_CODE_LIGHT_SPECULAR},
 			{IW3::CONST_SRC_CODE_LIGHTING_LOOKUP_SCALE, CONST_SRC_CODE_LIGHTING_LOOKUP_SCALE},
 			{IW3::CONST_SRC_CODE_DEBUG_BUMPMAP, CONST_SRC_CODE_DEBUG_BUMPMAP},
 			{IW3::CONST_SRC_CODE_MATERIAL_COLOR, CONST_SRC_CODE_MATERIAL_COLOR},
@@ -239,7 +238,6 @@ namespace ZoneTool
 			{IW3::CONST_SRC_CODE_CODE_MESH_ARG_1, CONST_SRC_CODE_CODE_MESH_ARG_1},
 			{IW3::CONST_SRC_CODE_CODE_MESH_ARG_LAST, CONST_SRC_CODE_CODE_MESH_ARG_LAST},
 			{IW3::CONST_SRC_CODE_BASE_LIGHTING_COORDS, CONST_SRC_CODE_BASE_LIGHTING_COORDS},
-			{IW3::CONST_SRC_CODE_NEVER_DIRTY_PS_END, static_cast<std::int32_t>(code_constant::never_dirty_ps_end)},
 			{IW3::CONST_SRC_CODE_COUNT_FLOAT4, CONST_SRC_CODE_COUNT_FLOAT4},
 			{IW3::CONST_SRC_FIRST_CODE_MATRIX, CONST_SRC_FIRST_CODE_MATRIX},
 			{IW3::CONST_SRC_CODE_WORLD_MATRIX, CONST_SRC_CODE_WORLD_MATRIX0},
@@ -316,7 +314,6 @@ namespace ZoneTool
 			FileSystem::PreferLocalOverExternal(true);
 
 			auto path = "techsets\\" + name + ".technique";
-			//auto statePath = "techsets\\" + name + ".statebits";
 
 			if (!FileSystem::FileExists(path) /*|| !FileSystem::FileExists(statePath)*/)
 			{
@@ -362,11 +359,6 @@ namespace ZoneTool
 			asset->hdr.unk = json["hdr"]["flags"].get<short>();
 			asset->hdr.numPasses = numPasses;
 
-			if (m_name == "mc_l_flag_t0c0_sat"s)
-			{
-				// DebugBreak();
-			}
-
 			if (asset->hdr.numPasses > 1)
 			{
 				// MessageBoxA(NULL, asset->hdr.name, NULL, NULL);
@@ -376,60 +368,24 @@ namespace ZoneTool
 			{
 				auto& curpass = json["pass"][pass];
 
-				// allocate empty sub-assets, to tell the tool that we need
-				// to parse those as well
-				//if (isExternalTechnique[index])
-				//{
-				//	if (!curpass["PixelShader"].is_null())
-				//	{
-				//		asset->pass[pass].pixelShader = IPixelShader::parse(&curpass["PixelShader"].get<std::string>()[0], mem, false);// DB_FindXAssetHeader(XAssetType::pixelshader, &curpass["PixelShader"].get<std::string>()[0]).pixelshader;
-				//	}
-				//	if (!curpass["VertexDecl"].is_null())
-				//	{
-				//		asset->pass[pass].vertexDecl = IVertexDecl::parse(&curpass["VertexDecl"].get<std::string>()[0], mem, false); // DB_FindXAssetHeader(XAssetType::vertexdecl, &curpass["VertexDecl"].get<std::string>()[0]).vertexdecl;
-				//	}
-				//	if (!curpass["VertexShader"].is_null())
-				//	{
-				//		asset->pass[pass].vertexShader = IVertexShader::parse(&curpass["VertexShader"].get<std::string>()[0], mem, false); // DB_FindXAssetHeader(XAssetType::vertexshader, &curpass["VertexShader"].get<std::string>()[0]).vertexshader;
-				//	}
-				//}
-				//else
-				//{
 				if (!curpass["PixelShader"].is_null())
 				{
 					auto shaderName = curpass["PixelShader"].get<std::string>();
-					/*auto shader = mappedShaders.find(shaderName);
-					if (shader != mappedShaders.end())
-					{
-						shaderName = shader->second;
-					}*/
 
 					asset->pass[pass].pixelShader = DB_FindXAssetHeader(pixelshader, &shaderName[0]).pixelshader;
 				}
 				if (!curpass["VertexDecl"].is_null())
 				{
 					auto shaderName = curpass["VertexDecl"].get<std::string>();
-					/*auto shader = mappedShaders.find(shaderName);
-					if (shader != mappedShaders.end())
-					{
-						shaderName = shader->second;
-					}
-*/
+
 					asset->pass[pass].vertexDecl = DB_FindXAssetHeader(vertexdecl, &shaderName[0]).vertexdecl;
 				}
 				if (!curpass["VertexShader"].is_null())
 				{
 					auto shaderName = curpass["VertexShader"].get<std::string>();
-					/*auto shader = mappedShaders.find(shaderName);
-					if (shader != mappedShaders.end())
-					{
-						shaderName = shader->second;
-					}
-*/
+
 					asset->pass[pass].vertexShader = DB_FindXAssetHeader(vertexshader, &shaderName[0]).vertexshader;
 				}
-				//}
-
 
 				asset->pass[pass].perPrimArgCount = curpass["perPrimArgCount"].get<char>();
 				asset->pass[pass].perObjArgCount = curpass["perObjArgCount"].get<char>();
@@ -486,11 +442,6 @@ namespace ZoneTool
 							{
 								argdef->u.codeConst.index -= 8;
 							}
-								// this is wrong
-								//else if (argdef->u.codeConst.index == 44)
-								//{
-								//	argdef->u.codeConst.index -= 3;
-								//}
 							else if (argdef->u.codeConst.index >= 37)
 							{
 								argdef->u.codeConst.index -= 6;
@@ -502,28 +453,13 @@ namespace ZoneTool
 						}
 						else if (techtype == techniqueSetType::iw3)
 						{
-							//// todo, find codeConst conversions
-							//if (argdef->u.codeConst.index >= 54)
-							//{
-							//	argdef->u.codeConst.index += 19;
-							//}
-							//else if (argdef->u.codeConst.index >= 60)
-							//{
-							//	argdef->u.codeConst.index += 26;
-							//}
-							//else if (argdef->u.codeConst.index >= 76)
-							//{
-							//	argdef->u.codeConst.index += 22;
-							//}
-
 							if (iw3CodeConstMap.find(argdef->u.codeConst.index) != iw3CodeConstMap.end())
 							{
 								argdef->u.codeConst.index = iw3CodeConstMap[argdef->u.codeConst.index];
 							}
 							else
 							{
-								ZONETOOL_FATAL("codeConst %u is not mapped in technique %s!", argdef->u.codeConst.index,
- asset->hdr.name);
+								ZONETOOL_FATAL("codeConst %u is not mapped in technique %s!", argdef->u.codeConst.index, asset->hdr.name);
 							}
 						}
 					}
@@ -534,8 +470,6 @@ namespace ZoneTool
 				}
 			}
 
-			// thats it, I guess
-			// return parsed technique
 			return asset;
 		}
 
@@ -707,23 +641,13 @@ namespace ZoneTool
 
 			if (!this->m_asset)
 			{
-				ZONETOOL_ERROR("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name
-.data());
-
-				auto log = fopen("techsets.txt", "a");
-				if (log)
-				{
-					fprintf(log, "Missing techset %s", &name[0]);
-					fclose(log);
-				}
+				ZONETOOL_ERROR("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
 
 				this->m_parsed = false;
 				this->m_asset = DB_FindXAssetHeader(this->type(), &this->name()[0]).techset;
 			}
 			else
 			{
-				// ENABLE ME WHEN MAPPING TECHSETS!
-				// this->m_name = techset;
 				this->m_parsed = true;
 			}
 		}
@@ -744,23 +668,6 @@ namespace ZoneTool
 					{
 						auto& techniquePass = data->techniques[technique]->pass[pass];
 
-						/*if (isExternalTechnique[technique])
-						{
-							if (techniquePass.vertexDecl)
-							{
-								zone->AddAssetOfTypePtr(vertexdecl, techniquePass.vertexDecl);
-							}
-							if (techniquePass.vertexShader)
-							{
-								zone->AddAssetOfTypePtr(vertexshader, techniquePass.vertexShader);
-							}
-							if (techniquePass.pixelShader)
-							{
-								zone->AddAssetOfTypePtr(pixelshader, techniquePass.pixelShader);
-							}
-						}
-						else
-						{*/
 						if (techniquePass.vertexDecl)
 						{
 							zone->AddAssetOfType(vertexdecl, techniquePass.vertexDecl->name);
@@ -773,7 +680,6 @@ namespace ZoneTool
 						{
 							zone->AddAssetOfType(pixelshader, techniquePass.pixelShader->name);
 						}
-						//}
 					}
 				}
 			}
@@ -812,12 +718,6 @@ namespace ZoneTool
 
 				auto techniqueHeader = buf->write(&data->techniques[technique]->hdr);
 				auto techniquePasses = buf->write(data->techniques[technique]->pass, techniqueHeader->numPasses);
-
-				if (techniqueHeader->numPasses > 1)
-				{
-					// DebugBreak();
-					//					ZONETOOL_INFO("Technique %s has %u passes.", data->techniques[technique]->hdr.name, techniqueHeader->numPasses);
-				}
 
 				for (std::int32_t pass = 0; pass < techniqueHeader->numPasses; pass++)
 				{

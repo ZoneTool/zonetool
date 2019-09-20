@@ -454,7 +454,7 @@ namespace ZoneTool
 		// Startup complete, show branding
 		Branding(currentLinker);
 
-		CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)HandleParams, nullptr, 0, nullptr);
+		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(HandleParams), nullptr, 0, nullptr);
 
 #ifdef USE_VMPROTECT
 		VMProtectEnd();

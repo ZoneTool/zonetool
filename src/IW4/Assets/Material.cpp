@@ -329,23 +329,23 @@ namespace ZoneTool
 				mat->techniqueSet = DB_FindXAssetHeader(XAssetType::techset, techset.data()).techset;
 			}
 
-			nlohmann::json maps = matdata["maps"];
-			if (maps.size())
+			auto maps = matdata["maps"];
+			if (!maps.empty())
 			{
 				mat->maps = Material_ParseMaps(mat->name, maps, mem);
 			}
 
 			mat->numMaps = maps.size();
 
-			nlohmann::json constantTable = matdata["constantTable"];
-			if (constantTable.size() > 0)
+			auto constantTable = matdata["constantTable"];
+			if (!constantTable.empty())
 			{
 				auto constant_def = mem->Alloc<MaterialConstantDef>(constantTable.size());
-				for (int i = 0; i < constantTable.size(); i++)
+				for (auto i = 0; i < constantTable.size(); i++)
 				{
 					strncpy(constant_def[i].name, constantTable[i]["name"].get<std::string>().c_str(), 11);
 					constant_def[i].name[11] = '\0';
-					constant_def[i].nameHash = constantTable[i]["nameHash"].get<int>();
+					constant_def[i].nameHash = constantTable[i]["nameHash"].get<unsigned int>();
 					constant_def[i].literal[0] = constantTable[i]["literal"][0].get<float>();
 					constant_def[i].literal[1] = constantTable[i]["literal"][1].get<float>();
 					constant_def[i].literal[2] = constantTable[i]["literal"][2].get<float>();
@@ -359,12 +359,11 @@ namespace ZoneTool
 			}
 			mat->constantCount = constantTable.size();
 
-
-			nlohmann::json stateMap = matdata["stateMap"];
-			if (stateMap.size() > 0)
+			auto stateMap = matdata["stateMap"];
+			if (!stateMap.empty())
 			{
 				auto stateBits = mem->Alloc<GfxStateBits>(stateMap.size());
-				for (int i = 0; i < stateMap.size(); i++)
+				for (auto i = 0; i < stateMap.size(); i++)
 				{
 					stateBits[i].loadBits[0] = stateMap[i][0].get<unsigned int>();
 					stateBits[i].loadBits[1] = stateMap[i][1].get<unsigned int>();
@@ -408,26 +407,12 @@ namespace ZoneTool
 				{
 					for (auto& state_bit : iw3TechniqueMap)
 					{
-						mat->stateBitsEntry[state_bit.second] = stateBits[state_bit.first];
-					}
-				}
-
-				// check if there exists a statebit dump for the techset thats being used
-				/*auto statebitsPath = "techsets\\"s + techset + ".statebits"s;
-				FileSystem::PreferLocalOverExternal(true);
-				if (FileSystem::FileExists(statebitsPath))
-				{
-					auto file = FileSystem::FileOpen(statebitsPath, "rb");
-					if (file)
-					{
-						if (FileSystem::FileSize(file) == sizeof mat->stateBitsEntry)
+						if (state_bit.second < sizeof mat->stateBitsEntry)
 						{
-							fread(&mat->stateBitsEntry[0], sizeof mat->stateBitsEntry, 1, file);
+							mat->stateBitsEntry[state_bit.second] = stateBits[state_bit.first];
 						}
-						FileSystem::FileClose(file);
 					}
 				}
-				FileSystem::PreferLocalOverExternal(false);*/
 			}
 
 			return mat;

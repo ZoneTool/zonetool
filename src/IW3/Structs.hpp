@@ -151,7 +151,7 @@ namespace ZoneTool
 
 		struct MaterialConstantDef
 		{
-			int nameHash;
+			unsigned int nameHash;
 			char name[12];
 			vec4_t literal;
 		};

@@ -62,7 +62,7 @@ workspace "zonetool"
 		}
 	configuration {}
 
-	startproject "zonetool"
+	startproject "ZoneTool"
 
 	project "ZoneTool"
 		kind "SharedLib"
@@ -108,6 +108,14 @@ workspace "zonetool"
 			"./src/IW5",
 			"./dep/include",
 		}
+
+		filter "toolset:msc*"
+			postbuildcommands {
+				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty 4\\zoneiw3.dll\" )",
+				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"F:\\iw4x_full_game\\zonetool.dll\" )",
+				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty Modern Warfare 3\\zonetool.dll\" )",
+			}
+		filter {}
 
 	project "ZoneUtils"
 		kind "StaticLib"

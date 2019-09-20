@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/wknvjcd9nsn29dep?svg=true)](https://ci.appveyor.com/project/RektInator/zonetool)
 ![license](https://img.shields.io/github/license/ZoneTool/zonetool.svg)
 ![stars](https://img.shields.io/github/stars/ZoneTool/zonetool.svg)
 ![GitHub forks](https://img.shields.io/github/forks/ZoneTool/zonetool)

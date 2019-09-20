@@ -1,0 +1,12 @@
+version: 1.0.{build}
+image: Visual Studio 2019
+configuration: release
+before_build:
+- ps: ./generate.bat
+build:
+  project: build/zonetool.sln
+  verbosity: minimal
+test: off
+artifacts:
+- path: build/bin/*.dll
+- path: build/bin/*.pdb

@@ -105,8 +105,8 @@ namespace ZoneTool
 			return;
 		}
 
-		std::string path = "zone_source\\" + fastfile + ".csv";
-		auto parser = CsvParser_new(path.data(), ",", false);
+		auto path = "zone_source\\" + fastfile + ".csv";
+		const auto parser = CsvParser_new(path.data(), ",", false);
 
 		if (!parser)
 		{
@@ -145,12 +145,16 @@ namespace ZoneTool
 				// this will use a directory iterator to automatically add assets
 			else if (row->fields_[0] == "iterate"s)
 			{
-				AddAssetsUsingIterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
-				AddAssetsUsingIterator(fastfile, "xanimparts", "XAnim", ".xae", true, zone.get());
-				AddAssetsUsingIterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
-
-				// debugging purposes
-				// AddAssetsUsingIterator(fastfile, "techset", "techsets", ".techset", true, zone.get());
+				try
+				{
+					AddAssetsUsingIterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
+					AddAssetsUsingIterator(fastfile, "xanimparts", "XAnim", ".xae", true, zone.get());
+					AddAssetsUsingIterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
+				}
+				catch (std::exception& ex)
+				{
+					ZONETOOL_FATAL("A fatal exception occured while building zone \"%s\", exception was: %s\n", fastfile.data(), ex.what());
+				}
 			}
 				// this will force external assets to be used
 			else if (row->fields_[0] == "forceExternalAssets"s)
@@ -180,7 +184,15 @@ namespace ZoneTool
 					{
 						ZONETOOL_ERROR("Could not translate typename %s to an integer!", row->fields_[0]);
 					}
-					zone->AddAssetOfTypePtr(type, loc);
+
+					try
+					{
+						zone->AddAssetOfTypePtr(type, loc);
+					}
+					catch (std::exception& ex)
+					{
+						ZONETOOL_FATAL("A fatal exception occured while building zone \"%s\", exception was: %s\n", fastfile.data(), ex.what());
+					}
 				}
 				else
 				{
@@ -188,10 +200,17 @@ namespace ZoneTool
 					{
 						if (linker->IsValidAssetType(std::string(row->fields_[0])))
 						{
-							zone->AddAssetOfType(
-								row->fields_[0],
-								((isReferencing) ? ","s : ""s) + row->fields_[1]
-							);
+							try
+							{
+								zone->AddAssetOfType(
+									row->fields_[0],
+									((isReferencing) ? ","s : ""s) + row->fields_[1]
+								);
+							}
+							catch (std::exception& ex)
+							{
+								ZONETOOL_FATAL("A fatal exception occured while building zone \"%s\", exception was: %s\n", fastfile.data(), ex.what());
+							}
 						}
 					}
 				}

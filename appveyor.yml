@@ -10,3 +10,9 @@ test: off
 artifacts:
 - path: build/bin/*.dll
 - path: build/bin/*.pdb
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: IyUTCaq8tOpcOwDfqa2bH2UCEgPNoLpgqZtJOetSchzZcs1rJT8b/oQ/DTq2ecwc
+  on:
+    branch: master

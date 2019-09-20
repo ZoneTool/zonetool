@@ -345,16 +345,7 @@ namespace ZoneTool
 				{
 					strncpy(constant_def[i].name, constantTable[i]["name"].get<std::string>().c_str(), 11);
 					constant_def[i].name[11] = '\0';
-					if (constantTable[i].find("nameHash") == constantTable[i].end())
-					{
-						ZONETOOL_WARNING(
-"IT APPEARS THAT YOU ARE PARSING A MATERIAL FROM AN OLDER VERSION OF ZONETOOL. CONSIDER REDUMPING YOUR MATERIALS.");
-						constant_def[i].nameHash = R_HashString(constant_def[i].name);
-					}
-					else
-					{
-						constant_def[i].nameHash = constantTable[i]["nameHash"].get<int>();
-					}
+					constant_def[i].nameHash = constantTable[i]["nameHash"].get<int>();
 					constant_def[i].literal[0] = constantTable[i]["literal"][0].get<float>();
 					constant_def[i].literal[1] = constantTable[i]["literal"][1].get<float>();
 					constant_def[i].literal[2] = constantTable[i]["literal"][2].get<float>();

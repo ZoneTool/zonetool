@@ -44,6 +44,7 @@
 		centliteral##entry[1] = mat->entry[i].literal[1]; \
 		centliteral##entry[2] = mat->entry[i].literal[2]; \
 		centliteral##entry[3] = mat->entry[i].literal[3]; \
+		cent##entry["nameHash"] = mat->entry[i].nameHash; \
 		cent##entry["literal"] = centliteral##entry; \
 		carr##entry[i] = cent##entry; \
 	} \

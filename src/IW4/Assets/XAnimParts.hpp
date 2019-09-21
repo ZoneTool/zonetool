@@ -21,11 +21,6 @@ namespace ZoneTool
 			XAnimParts* m_asset;
 
 		public:
-			IXAnimParts();
-			~IXAnimParts();
-
-			XAnimParts* ParseXAE(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
-
 			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
 			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
 			void load_depending(IZone* zone) override;

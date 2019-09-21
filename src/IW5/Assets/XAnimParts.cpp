@@ -15,17 +15,18 @@ namespace ZoneTool
 		void fwritestr(FILE* file, const char* str);
 		void fwriteint(FILE* file, int value);
 
-		XAnimParts* IXAnimParts::ParseXAE(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		XAnimParts* IXAnimParts::parse_xae(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			const auto path = "XAnim\\"s + name + ".xae"s;
 
-			const auto file = FileSystem::FileOpen(path, "rb"); // fopen(name.c_str(), "rb");
+			const auto file = FileSystem::FileOpen(path, "rb");
 			if (!file)
 			{
 				return nullptr;
 			}
 
 			ZONETOOL_INFO("Parsing XAE file \"%s\"...", name.c_str());
+			ZONETOOL_WARNING("You are using an outdated animation! Redump the animations using a newer version of zonetool!");
 
 			auto* anim = mem->Alloc<XAnimParts>(); // new XAnimParts;
 			fread(anim, sizeof(XAnimParts), 1, file);
@@ -96,10 +97,41 @@ namespace ZoneTool
 			return anim;
 		}
 
+		XAnimParts* IXAnimParts::parse_xae2(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		{
+			const auto path = "XAnim\\"s + name + ".xae2";
+
+			AssetReader reader(mem);
+			if (!reader.Open(path))
+			{
+				return nullptr;
+			}
+
+			auto asset = reader.Single<XAnimParts>();
+
+			// TODO: parse remaining data...
+
+			reader.Close();
+
+			return asset;
+		}
+
+		XAnimParts* IXAnimParts::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		{
+			auto parsed = IXAnimParts::parse_xae2(name, mem);
+
+			if (!parsed)
+			{
+				parsed = IXAnimParts::parse_xae(name, mem);
+			}
+
+			return parsed;
+		}
+
 		void IXAnimParts::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			this->m_name = name;
-			this->m_asset = this->ParseXAE(name, mem); // 
+			this->m_asset = IXAnimParts::parse(name, mem);
 
 			if (!this->m_asset)
 			{
@@ -339,83 +371,8 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-		void IXAnimParts::dump(XAnimParts* asset, const std::function<const char*(std::uint16_t)>& convertToString)
+		void IXAnimParts::dump_xae(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)
 		{
-			//auto path = "XAnim\\"s + asset->name + ".xae2";
-
-			//AssetDumper dump;
-			//if (!dump.Open(path))
-			//{
-			//	return;
-			//}
-
-			//dump.Array(asset, 1);
-			//dump.String(asset->name);
-
-			//for (int i = 0; i < asset->boneCount[9]; i++)
-			//{
-			//	dump.String(convertToString(asset->tagnames[i]));
-			//}
-
-			//if (asset->notetracks)
-			//{
-			//	dump.Array(asset->notetracks, asset->notetrackCount);
-			//	
-			//	for (int i = 0; i < asset->notetrackCount; i++)
-			//	{
-			//		dump.String(convertToString(asset->notetracks[i].name));
-			//	}
-			//}
-
-			///*if (asset->delta)
-			//{
-			//	dump.Array(asset->delta, 1);
-
-			//	if (asset->delta->quat)
-			//	{
-
-			//	}
-			//}*/
-
-			//if (asset->dataByte)
-			//{
-			//	dump.Array(asset->dataByte, asset->dataByteCount);
-			//}
-			//if (asset->dataShort)
-			//{
-			//	dump.Array(asset->dataShort, asset->dataShortCount);
-			//}
-			//if (asset->dataInt)
-			//{
-			//	dump.Array(asset->dataInt, asset->dataIntCount);
-			//}
-			//if (asset->randomDataShort)
-			//{
-			//	dump.Array(asset->randomDataShort, asset->randomDataShortCount);
-			//}
-			//if (asset->randomDataByte)
-			//{
-			//	dump.Array(asset->randomDataByte, asset->randomDataByteCount);
-			//}
-			//if (asset->randomDataInt)
-			//{
-			//	dump.Array(asset->randomDataInt, asset->randomDataIntCount);
-			//}
-
-			//if (asset->indices.data)
-			//{
-			//	if (asset->framecount > 255)
-			//	{
-			//		dump.Array(asset->indices._2, asset->framecount);
-			//	}
-			//	else
-			//	{
-			//		dump.Array(asset->indices._1, asset->framecount);
-			//	}
-			//}
-			//
-			//dump.Close();
-
 			const auto path = "XAnim\\"s + asset->name + ".xae";
 
 			if (FileSystem::FileExists(path))
@@ -475,6 +432,31 @@ namespace ZoneTool
 			}
 
 			FileSystem::FileClose(file);
+		}
+
+		void IXAnimParts::dump_xae2(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)
+		{
+			const auto path = "XAnim\\"s + asset->name + ".xae2";
+
+			AssetDumper dump;
+			if (!dump.Open(path))
+			{
+				return;
+			}
+
+			dump.Single(asset);
+
+			// TODO: dump remaining data..
+
+			dump.Close();
+		}
+
+		void IXAnimParts::dump(XAnimParts* asset, const std::function<const char*(std::uint16_t)>& convertToString)
+		{
+			// TODO: enable me for XAE2 support!
+			// IXAnimParts::dump_xae2(asset, convertToString);
+
+			IXAnimParts::dump_xae(asset, convertToString);
 		}
 	}
 }

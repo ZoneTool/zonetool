@@ -44,5 +44,8 @@ namespace ZoneTool
 		static void FileClose(FILE* fp);
 		static std::vector<std::uint8_t> ReadBytes(FILE* fp, std::size_t size);
 		static std::shared_ptr<FileReader> ToReader(FILE* fp);
+		static char* ReadString(FILE* fp, ZoneMemory* mem = nullptr);
+		static int ReadInt(FILE* fp);
+
 	};
 }

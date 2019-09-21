@@ -260,4 +260,50 @@ namespace ZoneTool
 	{
 		preferLocal = state;
 	}
+
+	char* FileSystem::ReadString(FILE* fp, ZoneMemory* mem)
+	{
+		char tempBuf[1024];
+		char ch = 0;
+		int i = 0;
+
+		do
+		{
+			fread(&ch, 1, 1, fp);
+
+			tempBuf[i++] = ch;
+
+			if (i >= sizeof(tempBuf))
+			{
+				throw std::exception("this is wrong");
+			}
+		} while (ch);
+
+		if (!mem)
+		{
+			char* retval = new char[i];
+			strcpy(retval, tempBuf);
+
+			return retval;
+		}
+
+		auto retval = mem->Alloc<char>(i);
+		strcpy(retval, tempBuf);
+
+		return retval;
+	}
+
+	int FileSystem::ReadInt(FILE* fp)
+	{
+		int data = 0;
+
+		if (fp)
+		{
+			fread(&data, sizeof(int), 1, fp);
+		}
+
+		return data;
+	}
+
+
 }

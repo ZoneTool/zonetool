@@ -13,33 +13,6 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		char* freadstr(FILE* file)
-		{
-			char tempBuf[1024];
-			char ch = 0;
-			int i = 0;
-
-			do
-			{
-				fread(&ch, 1, 1, file);
-
-				tempBuf[i++] = ch;
-
-				if (i >= sizeof(tempBuf))
-				{
-					throw std::exception("this is wrong");
-				}
-			}
-			while (ch);
-
-			char* retval = new char[i];
-			strcpy(retval, tempBuf);
-
-			return retval;
-		}
-
-		int freadint(FILE* file);
-
 		IXAnimParts::IXAnimParts()
 		{
 		}
@@ -50,39 +23,43 @@ namespace ZoneTool
 
 		XAnimParts* IXAnimParts::ParseXAE(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
-			auto path = "XAnim\\"s + name + ".xae"s;
+			const auto path = "XAnim\\"s + name + ".xae"s;
 
-			auto file = FileSystem::FileOpen(path, "rb"); // fopen(name.c_str(), "rb");
-			if (!file) return nullptr;
+			const auto file = FileSystem::FileOpen(path, "rb");
+			if (!file)
+			{
+				return nullptr;
+			}
 
 			ZONETOOL_INFO("Parsing XAE file \"%s\"...", name.c_str());
 
-			XAnimParts* anim = mem->Alloc<XAnimParts>(); // new XAnimParts;
+			auto anim = mem->Alloc<XAnimParts>();
 			fread(anim, sizeof(XAnimParts), 1, file);
 
-			anim->name = freadstr(file);
-			anim->tagnames = mem->Alloc<unsigned short>(anim->boneCount[9]); // new unsigned short[anim->boneCount[9]];
+			anim->name = FileSystem::ReadString(file, mem.get());
+			anim->tagnames = mem->Alloc<unsigned short>(anim->boneCount[9]);
 
-			for (int i = 0; i < anim->boneCount[9]; i++)
-				anim->tagnames[i] = SL_AllocString(freadstr(file));
+			for (auto i = 0; i < anim->boneCount[9]; i++)
+			{
+				anim->tagnames[i] = SL_AllocString(FileSystem::ReadString(file, mem.get()));
+			}
 
-			if (freadint(file))
+			if (FileSystem::ReadInt(file))
 			{
 				anim->notetracks = mem->Alloc<XAnimNotifyInfo>(anim->notetrackCount);
-				//new XAnimNotifyInfo[anim->notetrackCount];
 
-				for (int i = 0; i < (anim->notetrackCount); i++)
+				for (auto i = 0; i < (anim->notetrackCount); i++)
 				{
 					fread(&anim->notetracks[i], sizeof(XAnimNotifyInfo), 1, file);
 
-					const char* str = freadstr(file);
+					const char* str = FileSystem::ReadString(file, mem.get());
 					anim->notetracks[i].name = SL_AllocString(str);
 				}
 			}
 
 			if (anim->dataByte)
 			{
-				anim->dataByte = mem->Alloc<char>(anim->dataByteCount); // new char[anim->dataByteCount];
+				anim->dataByte = mem->Alloc<char>(anim->dataByteCount);
 				fread(anim->dataByte, 1, anim->dataByteCount, file);
 			}
 			if (anim->dataShort)
@@ -128,7 +105,7 @@ namespace ZoneTool
 		void IXAnimParts::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			this->m_name = name;
-			this->m_asset = this->ParseXAE(name, mem); // 
+			this->m_asset = reinterpret_cast<IW4::XAnimParts*>(IW5::IXAnimParts::ParseXAE(name, mem)); // 
 
 			if (!this->m_asset)
 			{
@@ -148,11 +125,11 @@ namespace ZoneTool
 				xanim->tagnames = mem->Alloc<unsigned short>(xanim->boneCount[9]);
 				memcpy(xanim->tagnames, this->m_asset->tagnames, sizeof(unsigned short) * xanim->boneCount[9]);
 
-				for (int i = 0; i < xanim->boneCount[9]; i++)
+				for (auto i = 0; i < xanim->boneCount[9]; i++)
 				{
 					if (xanim->tagnames[i])
 					{
-						std::string bone = SL_ConvertToString(this->m_asset->tagnames[i]);
+						const std::string bone = SL_ConvertToString(this->m_asset->tagnames[i]);
 						xanim->tagnames[i] = buf->write_scriptstring(bone);
 					}
 				}
@@ -163,9 +140,9 @@ namespace ZoneTool
 			memcpy(xanim->notetracks, this->m_asset->notetracks, sizeof XAnimNotifyInfo * xanim->notetrackCount);
 
 			// touch XAnimNotifyInfo, realloc tagnames
-			for (int i = 0; i < xanim->notetrackCount; i++)
+			for (auto i = 0; i < xanim->notetrackCount; i++)
 			{
-				std::string bone = SL_ConvertToString(this->m_asset->notetracks[i].name);
+				const std::string bone = SL_ConvertToString(this->m_asset->notetracks[i].name);
 				xanim->notetracks[i].name = buf->write_scriptstring(bone);
 			}
 
@@ -190,7 +167,7 @@ namespace ZoneTool
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
-
+			
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
@@ -200,21 +177,21 @@ namespace ZoneTool
 			{
 				buf->align(1);
 				buf->write_stream(data->tagnames, sizeof(short), data->boneCount[9]);
-				dest->tagnames = (unsigned short*)-1;
+				dest->tagnames = reinterpret_cast<unsigned short*>(-1);
 			}
 			if (data->notetracks) // notetracks
 			{
 				buf->align(3);
 				buf->write_stream(data->notetracks, sizeof(XAnimNotifyInfo), data->notetrackCount);
-				dest->tagnames = (unsigned short*)-1;
+				dest->tagnames = reinterpret_cast<unsigned short*>(-1);
 			}
 
 			if (data->delta) // XAnimDeltaParts
 			{
 				buf->align(3);
 
-				XAnimDeltaPart* partdata = data->delta;
-				XAnimDeltaPart* partdest = (XAnimDeltaPart*)buf->at();
+				auto partdata = data->delta;
+				auto partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
 				buf->write_stream(data, sizeof(XAnimDeltaPart), 1);
 
 				if (partdata->trans)
@@ -250,7 +227,7 @@ namespace ZoneTool
 						}
 					}
 					else buf->write_stream(partdata->trans->u.frame0, sizeof(float), 3);
-					partdest->trans = (XAnimPartTrans*)-1;
+					partdest->trans = reinterpret_cast<XAnimPartTrans*>(-1);
 				}
 
 				if (partdata->quat2)
@@ -276,7 +253,7 @@ namespace ZoneTool
 						}
 					}
 					else buf->write_stream(partdata->quat2->u.frame0, sizeof(short) * 2, 1);
-					partdest->quat2 = (XAnimDeltaPartQuat2*)-1;
+					partdest->quat2 = reinterpret_cast<XAnimDeltaPartQuat2*>(-1);
 				}
 
 				if (partdata->quat)
@@ -299,53 +276,52 @@ namespace ZoneTool
 							buf->align(3);
 							buf->write_stream(partdata->quat->u.frames.frames, sizeof(short) * 4,
 							                  partdata->quat->size + 1);
-							//dest->quat->u.frames.frames = (short*)-1;
 						}
 					}
 					else
 						buf->write_stream(partdata->quat->u.frame0, sizeof(short) * 4, 1);
 
-					partdest->quat = (XAnimDeltaPartQuat*)-1;
+					partdest->quat = reinterpret_cast<XAnimDeltaPartQuat*>(-1);
 				}
 
-				dest->delta = (XAnimDeltaPart*)-1;
+				dest->delta = reinterpret_cast<XAnimDeltaPart*>(-1);
 			}
 
 			if (data->dataByte) // dataByte
 			{
 				buf->align(0);
 				buf->write_stream(data->dataByte, sizeof(char), data->dataByteCount);
-				dest->dataByte = (char*)-1;
+				dest->dataByte = reinterpret_cast<char*>(-1);
 			}
 			if (data->dataShort) // dataShort
 			{
 				buf->align(1);
 				buf->write_stream(data->dataShort, sizeof(short), data->dataShortCount);
-				dest->dataShort = (short*)-1;
+				dest->dataShort = reinterpret_cast<short*>(-1);
 			}
 			if (data->dataInt) // dataInt
 			{
 				buf->align(3);
 				buf->write_stream(data->dataInt, sizeof(int), data->dataIntCount);
-				dest->dataInt = (int*)-1;
+				dest->dataInt = reinterpret_cast<int*>(-1);
 			}
 			if (data->randomDataShort) // randomDataShort
 			{
 				buf->align(1);
 				buf->write_stream(data->randomDataShort, sizeof(short), data->randomDataShortCount);
-				dest->randomDataShort = (short*)-1;
+				dest->randomDataShort = reinterpret_cast<short*>(-1);
 			}
 			if (data->randomDataByte) // randomDataByte
 			{
 				buf->align(0);
 				buf->write_stream(data->randomDataByte, sizeof(char), data->randomDataByteCount);
-				dest->randomDataByte = (char*)-1;
+				dest->randomDataByte = reinterpret_cast<char*>(-1);
 			}
 			if (data->randomDataInt) // randomDataInt
 			{
 				buf->align(3);
 				buf->write_stream(data->randomDataInt, sizeof(int), data->randomDataIntCount);
-				dest->randomDataInt = (int*)-1;
+				dest->randomDataInt = reinterpret_cast<int*>(-1);
 			}
 
 			// XAnim indice data
@@ -362,7 +338,7 @@ namespace ZoneTool
 					buf->write_stream(data->indices.data, data->indexcount, 1);
 				}
 
-				dest->indices.data = (void*)-1;
+				dest->indices.data = reinterpret_cast<void*>(-1);
 			}
 
 			END_LOG_STREAM;
@@ -371,7 +347,7 @@ namespace ZoneTool
 
 		void IXAnimParts::dump(XAnimParts* asset, const std::function<const char*(std::uint16_t)>& convertToString)
 		{
-			IW5::IXAnimParts::dump((IW5::XAnimParts*)asset, convertToString);
+			IW5::IXAnimParts::dump(reinterpret_cast<IW5::XAnimParts*>(asset), convertToString);
 		}
 	}
 }

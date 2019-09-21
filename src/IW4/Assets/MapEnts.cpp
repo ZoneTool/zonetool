@@ -14,18 +14,6 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		int freadint(FILE* file)
-		{
-			int data = 0;
-
-			if (file)
-			{
-				fread(&data, sizeof(int), 1, file);
-			}
-
-			return data;
-		}
-
 		std::unordered_map<std::string, std::string> keyConversion =
 		{
 			{"1", "pl#"},

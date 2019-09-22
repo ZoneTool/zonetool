@@ -101,7 +101,7 @@ namespace ZoneTool::IW4
 
 			auto partdata = data->delta;
 			auto partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
-			buf->write_stream(data, sizeof(XAnimDeltaPart), 1);
+			buf->write_stream(partdata, sizeof(XAnimDeltaPart), 1);
 
 			if (partdata->trans)
 			{

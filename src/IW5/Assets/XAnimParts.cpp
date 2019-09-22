@@ -656,9 +656,7 @@ namespace ZoneTool
 
 		void IXAnimParts::dump(XAnimParts* asset, const std::function<const char*(std::uint16_t)>& convertToString)
 		{
-			// TODO: enable me for XAE2 support!
 			IXAnimParts::dump_xae2(asset, convertToString);
-			// IXAnimParts::dump_xae(asset, convertToString);
 		}
 	}
 }

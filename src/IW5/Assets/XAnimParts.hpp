@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		std::uint16_t SL_AllocString(const std::string& str);
+		short SL_AllocString(const std::string& str);
 		const char* SL_ConvertToString(std::uint16_t index);
 
 		class IXAnimParts : public IAsset

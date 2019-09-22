@@ -1,3 +1,8 @@
+newoption {
+	trigger = "set-version",
+	description = "Sets the version information of zonetool",
+}
+
 workspace "zonetool"
 	location "./build"
 	objdir "%{wks.location}/obj"
@@ -108,6 +113,12 @@ workspace "zonetool"
 			"./src/IW5",
 			"./dep/include",
 		}
+
+		if _OPTIONS["set-version"] then
+			defines {
+				"ZONETOOL_VERSION=\"" .. _OPTIONS["set-version"] .. "\""
+			}
+		end
 
 		filter "toolset:msc*"
 			postbuildcommands {

@@ -37,9 +37,9 @@ using namespace string_literals;
 // #include <steam\steam_api.h>
 
 // Project Definitions
-#define ZONETOOL_VERSION		100
-#define ZONETOOL_VERSION_STR	"r100"
-#define ZONETOOL_BRANCH			"master-public"
+#ifndef ZONETOOL_VERSION
+#define ZONETOOL_VERSION "0.0.0"
+#endif
 
 // Project Includes
 #include "ZoneTool.hpp"

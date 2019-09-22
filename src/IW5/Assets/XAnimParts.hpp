@@ -12,6 +12,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
+		short SL_AllocString(const std::string& str);
 		const char* SL_ConvertToString(std::uint16_t index);
 
 		class IXAnimParts : public IAsset
@@ -21,9 +22,9 @@ namespace ZoneTool
 			XAnimParts* m_asset;
 
 		public:
-			static XAnimParts* parse_xae(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
-			static XAnimParts* parse_xae2(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
-			static XAnimParts* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
+			static XAnimParts* parse_xae(const std::string& name, std::shared_ptr<ZoneMemory>& mem, const std::function<std::uint16_t(const std::string&)>& allocString);
+			static XAnimParts* parse_xae2(const std::string& name, std::shared_ptr<ZoneMemory>& mem, const std::function<std::uint16_t(const std::string&)>& allocString);
+			static XAnimParts* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);
 
 			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
 			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;

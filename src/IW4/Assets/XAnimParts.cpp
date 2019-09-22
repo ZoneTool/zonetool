@@ -14,7 +14,7 @@ namespace ZoneTool::IW4
 	void IXAnimParts::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 	{
 		this->m_name = name;
-		this->m_asset = reinterpret_cast<IW4::XAnimParts*>(IW5::IXAnimParts::parse(name, mem)); // 
+		this->m_asset = reinterpret_cast<IW4::XAnimParts*>(IW5::IXAnimParts::parse(name, mem, SL_AllocString)); // 
 
 		if (!this->m_asset)
 		{
@@ -101,7 +101,7 @@ namespace ZoneTool::IW4
 
 			auto partdata = data->delta;
 			auto partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
-			buf->write_stream(data, sizeof(XAnimDeltaPart), 1);
+			buf->write_stream(partdata, sizeof(XAnimDeltaPart), 1);
 
 			if (partdata->trans)
 			{

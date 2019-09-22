@@ -1417,33 +1417,6 @@ namespace ZoneTool
 
 		struct XAnimParts
 		{
-			/*const char *name;
-			unsigned __int16 dataByteCount;
-			unsigned __int16 dataShortCount;
-			unsigned __int16 dataIntCount;
-			unsigned __int16 randomDataByteCount;
-			unsigned __int16 randomDataIntCount;
-			unsigned __int16 numframes;
-			bool bLoop;
-			bool bDelta;
-			char boneCount[12];
-			char notifyCount;
-			char assetType;
-			bool pad;
-			unsigned int randomDataShortCount;
-			unsigned int indexCount;
-			float framerate;
-			float frequency;
-			short *names;
-			char *dataByte;
-			__int16 *dataShort;
-			int *dataInt;
-			__int16 *randomDataShort;
-			char *randomDataByte;
-			int *randomDataInt;
-			XAnimIndices indices;
-			XAnimNotifyInfo *notify;
-			XAnimDeltaPart *deltaPart;*/
 			char* name; // 0
 			unsigned short dataByteCount; // 4
 			unsigned short dataShortCount; // 6

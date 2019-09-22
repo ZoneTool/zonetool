@@ -122,6 +122,7 @@ Special thanks to the following people:
 * TheApadayo
 * localhost
 * X3RX35
+* homura
 
 ## Donate
 If you like my work, feel free to contribute!

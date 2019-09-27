@@ -64,11 +64,11 @@ namespace ZoneTool::CODO
 		}
 
 		// declare asset interfaces
-		DECLARE_ASSET(xmodelsurfs, IXSurface);
-		DECLARE_ASSET(image, IGfxImage);
-		DECLARE_ASSET(pixelshader, IPixelShader);
-		DECLARE_ASSET(vertexshader, IVertexShader);
-		DECLARE_ASSET(vertexdecl, IVertexDecl);
+		// DECLARE_ASSET(xmodelsurfs, IXSurface);
+		// DECLARE_ASSET(image, IGfxImage);
+		// DECLARE_ASSET(pixelshader, IPixelShader);
+		// DECLARE_ASSET(vertexshader, IVertexShader);
+		// DECLARE_ASSET(vertexdecl, IVertexDecl);
 
 #ifdef USE_VMPROTECT
 		VMProtectEnd();
@@ -97,35 +97,34 @@ namespace ZoneTool::CODO
 		}
 
 		// declare asset interfaces
-		DECLARE_ASSET(xanim, IXAnimParts);
-		DECLARE_ASSET(pixelshader, IPixelShader);
-		DECLARE_ASSET(vertexdecl, IVertexDecl);
-		DECLARE_ASSET(vertexshader, IVertexShader);
-		DECLARE_ASSET(techset, ITechset);
-		DECLARE_ASSET(image, IGfxImage);
-		DECLARE_ASSET(material, IMaterial)
-		DECLARE_ASSET(xmodelsurfs, IXSurface);
-		DECLARE_ASSET(xmodel, IXModel);
-		DECLARE_ASSET(map_ents, IMapEnts);
-		DECLARE_ASSET(rawfile, IRawFile);
-		DECLARE_ASSET(com_map, IComWorld);
-		DECLARE_ASSET(font, IFontDef);
+		// DECLARE_ASSET(xanim, IXAnimParts);
+		// DECLARE_ASSET(pixelshader, IPixelShader);
+		// DECLARE_ASSET(vertexdecl, IVertexDecl);
+		// DECLARE_ASSET(vertexshader, IVertexShader);
+		// DECLARE_ASSET(techset, ITechset);
+		// DECLARE_ASSET(image, IGfxImage);
+		// DECLARE_ASSET(material, IMaterial)
+		// DECLARE_ASSET(xmodelsurfs, IXSurface);
+		// DECLARE_ASSET(xmodel, IXModel);
+		// DECLARE_ASSET(map_ents, IMapEnts);
+		// DECLARE_ASSET(rawfile, IRawFile);
+		// DECLARE_ASSET(com_map, IComWorld);
+		// DECLARE_ASSET(font, IFontDef);
 		DECLARE_ASSET(localize, ILocalizeEntry);
-		DECLARE_ASSET(physpreset, IPhysPreset);
-		DECLARE_ASSET(phys_collmap, IPhysCollmap);
+		// DECLARE_ASSET(physpreset, IPhysPreset);
+		// DECLARE_ASSET(phys_collmap, IPhysCollmap);
 		DECLARE_ASSET(stringtable, IStringTable);
-		DECLARE_ASSET(sound, ISound);
-		DECLARE_ASSET(loaded_sound, ILoadedSound);
-		DECLARE_ASSET(sndcurve, ISoundCurve);
-		DECLARE_ASSET(game_map_mp, IGameWorldMp);
-		DECLARE_ASSET(game_map_sp, IGameWorldSp);
-		DECLARE_ASSET(fx_map, IFxWorld);
-		DECLARE_ASSET(tracer, ITracerDef);
-		DECLARE_ASSET(gfx_map, IGfxWorld);
-		DECLARE_ASSET(col_map_mp, IClipMap);
-		DECLARE_ASSET(fx, IFxEffectDef);
-		DECLARE_ASSET(lightdef, ILightDef);
-
+		// DECLARE_ASSET(sound, ISound);
+		// DECLARE_ASSET(loaded_sound, ILoadedSound);
+		// DECLARE_ASSET(sndcurve, ISoundCurve);
+		// DECLARE_ASSET(game_map_mp, IGameWorldMp);
+		// DECLARE_ASSET(game_map_sp, IGameWorldSp);
+		// DECLARE_ASSET(fx_map, IFxWorld);
+		// DECLARE_ASSET(tracer, ITracerDef);
+		// DECLARE_ASSET(gfx_map, IGfxWorld);
+		// DECLARE_ASSET(col_map_mp, IClipMap);
+		// DECLARE_ASSET(fx, IFxEffectDef);
+		// DECLARE_ASSET(lightdef, ILightDef);
 		//DECLARE_ASSET(weapon, IWeaponDef); //still a work in progress, the CPP file isnt complete
 		//DECLARE_ASSET(structureddatadef, IStructuredDataDef);
 
@@ -212,7 +211,6 @@ namespace ZoneTool::CODO
 
 		// set asset ptr base
 		this->m_assetbase = buf->stream_offset(3);
-		// ZONETOOL_INFO("m_assetbase: %u", this->m_assetbase);
 
 		// write asset types to header
 		for (auto i = 0u; i < asset_count; i++)

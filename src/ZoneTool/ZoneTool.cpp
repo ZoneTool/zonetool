@@ -424,6 +424,7 @@ namespace ZoneTool
 		RegisterLinker<IW3::Linker>();
 		RegisterLinker<IW4::Linker>();
 		RegisterLinker<IW5::Linker>();
+		RegisterLinker<CODO::Linker>();
 
 		// check if a custom linker is present in the current game directory
 		if (IsCustomLinkerPresent())

@@ -258,7 +258,7 @@ namespace ZoneTool::CODO
 		// Generate FF header
 		auto header = this->m_zonemem->Alloc<XFileHeader>();
 		strcpy(header->header, "IWffu100");
-		header->version = 276;
+		header->version = 423;
 		header->allowOnlineUpdate = 0;
 
 		// Encrypt fastfile

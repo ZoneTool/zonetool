@@ -272,8 +272,6 @@ namespace ZoneTool::CODO
 
 		fastfile.write(buf_compressed.data(), buf_compressed.size());
 
-		// rekto
-		// fastfile.save("zone\\pluto\\common\\" + this->m_name + ".ff");
 		fastfile.save("zone\\english\\" + this->m_name + ".ff");
 
 		ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->m_name.data());

@@ -23,22 +23,21 @@ namespace ZoneTool::CODO
 
 	const char* Linker::GetAssetName(XAssetType type, XAssetHeader header)
 	{
-		// // todo
-		// if (type == image)
-		// {
-		// 	return header.gfximage->name;
-		// }
-		// if (type == menu)
-		// {
-		// 	// 
-		// }
-		// else
-		// {
-		// 	return header.rawfile->name;
-		// }
+		 // todo
+		 if (type == image)
+		 {
+		 	return header.gfximage->name;
+		 }
+		 if (type == menu)
+		 {
+		 	// 
+		 }
+		 else
+		 {
+		 	return header.rawfile->name;
+		 }
 
-		// return "";
-		return "";
+		 return "";
 	}
 
 	void Linker::Startup()
@@ -103,21 +102,21 @@ namespace ZoneTool::CODO
 
 	void Linker::DumpZone(std::string& name)
 	{
-		isDumpingComplete = false;
-		isDumping = true;
-		currentDumpingZone = name;
+		//isDumpingComplete = false;
+		//isDumping = true;
+		//currentDumpingZone = name;
 		LoadZone(name);
 
-		while (!isDumpingComplete)
-		{
-			Sleep(1);
-		}
+		//while (!isDumpingComplete)
+		//{
+		//	Sleep(1);
+		//}
 	}
 
 	void Linker::VerifyZone(std::string& name)
 	{
-		isVerifying = true;
-		currentDumpingZone = name;
+		//isVerifying = true;
+		//currentDumpingZone = name;
 		LoadZone(name);
 	}
 

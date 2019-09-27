@@ -37,5 +37,7 @@ namespace ZoneTool::CODO
 
 		void DumpZone(std::string& name) override;
 		void VerifyZone(std::string& name) override;
+
+		static const char* GetAssetName(XAssetType type, XAssetHeader header);
 	};
 }

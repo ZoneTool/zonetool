@@ -15,6 +15,7 @@
 #include <IW3/IW3.hpp>
 #include <IW4/IW4.hpp>
 #include <IW5/IW5.hpp>
+#include <CODO/CODO.hpp>
 
 extern std::string currentzone;
 

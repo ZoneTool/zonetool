@@ -8,18 +8,22 @@
 // ========================================================
 #pragma once
 
-// include zonetool utilities
-#include <ZoneUtils/ZoneUtils.hpp>
+#define WIN32_LEAN_AND_MEAN
+#define _CRT_SECURE_NO_WARNINGS
 
-// include zonetool linkers
-#include <IW3/IW3.hpp>
-#include <IW4/IW4.hpp>
-#include <IW5/IW5.hpp>
-#include <CODO/CODO.hpp>
+#include <windows.h>
 
-extern std::string currentzone;
+#undef min
+#undef max
+#undef add
 
-namespace ZoneTool
-{
-	void Startup();
-}
+#include <iostream>
+#include <sstream>
+#include <memory>
+#include <vector>
+
+// Namespaces
+using namespace std::literals;
+using namespace string_literals;
+
+#include "CODO.hpp"

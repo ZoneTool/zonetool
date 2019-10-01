@@ -61,9 +61,9 @@ namespace ZoneTool
 	void AddAssetsUsingIterator(const std::string& fastfile, const std::string& type, const std::string& folder,
 	                            const std::string& extension, bool skip_reference, IZone* zone)
 	{
-		if (std::experimental::filesystem::is_directory("zonetool\\" + fastfile + "\\" + folder))
+		if (std::filesystem::is_directory("zonetool\\" + fastfile + "\\" + folder))
 		{
-			for (auto& file : std::experimental::filesystem::recursive_directory_iterator(
+			for (auto& file : std::filesystem::recursive_directory_iterator(
 				     "zonetool\\" + fastfile + "\\" + folder))
 			{
 				if (is_regular_file(file))

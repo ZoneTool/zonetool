@@ -26,13 +26,13 @@ namespace ZoneTool
 		if (forceExternalAssets || !preferLocal)
 		{
 			std::string path = "zonetool\\" + m_fastfile + "\\" + name;
-			if (std::experimental::filesystem::exists(path))
+			if (std::filesystem::exists(path))
 			{
 				return "zonetool\\" + m_fastfile + "\\";
 			}
 
 			path = "zonetool\\" + name;
-			if (std::experimental::filesystem::exists(path))
+			if (std::filesystem::exists(path))
 			{
 				return "zonetool\\";
 			}
@@ -40,13 +40,13 @@ namespace ZoneTool
 		else
 		{
 			path = "zonetool\\" + name;
-			if (std::experimental::filesystem::exists(path))
+			if (std::filesystem::exists(path))
 			{
 				return "zonetool\\";
 			}
 
 			std::string path = "zonetool\\" + m_fastfile + "\\" + name;
-			if (std::experimental::filesystem::exists(path))
+			if (std::filesystem::exists(path))
 			{
 				return "zonetool\\" + m_fastfile + "\\";
 			}
@@ -54,13 +54,13 @@ namespace ZoneTool
 
 
 		path = "zonetool\\images\\" + name;
-		if (std::experimental::filesystem::exists(path))
+		if (std::filesystem::exists(path))
 		{
 			return "zonetool\\images\\";
 		}
 
 		/*path = "dump\\" + m_fastfile + "\\" + name;
-		if (std::experimental::filesystem::exists(path))
+		if (std::filesystem::exists(path))
 		{
 			return "dump\\" + m_fastfile + "\\";
 		}*/
@@ -96,7 +96,7 @@ namespace ZoneTool
 
 	void FileSystem::CreateDirectory(const std::string& name)
 	{
-		std::experimental::filesystem::create_directories(name);
+		std::filesystem::create_directories(name);
 	}
 
 	std::unordered_map<FILE*, std::string> filePaths;

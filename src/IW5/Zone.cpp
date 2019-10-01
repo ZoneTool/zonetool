@@ -140,7 +140,7 @@ namespace ZoneTool
 			auto startTime = GetTickCount64();
 
 			// make a folder in main, for the map images
-			std::experimental::filesystem::create_directories("main\\" + this->m_name + "\\images");
+			std::filesystem::create_directories("main\\" + this->m_name + "\\images");
 
 			ZONETOOL_INFO("Compiling fastfile \"%s\"...", this->m_name.data());
 

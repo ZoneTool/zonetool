@@ -157,7 +157,7 @@ namespace ZoneTool
 
 		void IGfxImage::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
 		{
-			if (FileSystem::FileExists(this->name() + ".iwi") && !std::experimental::filesystem::exists(
+			if (FileSystem::FileExists(this->name() + ".iwi") && !std::filesystem::exists(
 				"main\\iw5_images\\" + this->name() + ".iwi"))
 			{
 				auto fp = fopen(

@@ -76,6 +76,7 @@ workspace "zonetool"
 		dependson "IW3"
 		dependson "IW4"
 		dependson "IW5"
+		dependson "CODO"
 
 		pchheader "stdafx.hpp"
 		pchsource "src/ZoneTool/stdafx.cpp"

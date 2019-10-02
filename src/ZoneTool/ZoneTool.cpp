@@ -114,7 +114,7 @@ namespace ZoneTool
 			return;
 		}
 
-		bool isReferencing = false;
+		auto isReferencing = false;
 		auto row = CsvParser_getRow(parser);
 		while (row != nullptr)
 		{
@@ -139,7 +139,7 @@ namespace ZoneTool
 			{
 				if (row->numOfFields_ >= 2)
 				{
-					isReferencing = (row->fields_[1] == "true"s) ? true : false;
+					isReferencing = row->fields_[1] == "true"s;
 				}
 			}
 				// this will use a directory iterator to automatically add assets
@@ -148,7 +148,7 @@ namespace ZoneTool
 				try
 				{
 					AddAssetsUsingIterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
-					AddAssetsUsingIterator(fastfile, "xanimparts", "XAnim", ".xae", true, zone.get());
+					AddAssetsUsingIterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone.get());
 					AddAssetsUsingIterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
 				}
 				catch (std::exception& ex)
@@ -220,6 +220,11 @@ namespace ZoneTool
 			// destroy row and alloc next one.
 			CsvParser_destroy_row(row);
 			row = CsvParser_getRow(parser);
+		}
+
+		if (linker->Version() == "IW4"s || linker->Version() == "IW5"s)
+		{
+			zone->AddAssetOfType("techset", ",wc_l_hsm_r0c0n0s0");
 		}
 
 		// free csv parser

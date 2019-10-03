@@ -224,7 +224,7 @@ namespace ZoneTool
 
 		if (linker->Version() == "IW4"s || linker->Version() == "IW5"s)
 		{
-			zone->AddAssetOfType("techset", ",wc_l_hsm_r0c0n0s0");
+			zone->AddAssetOfType("techset", "wc_l_hsm_r0c0n0s0");
 		}
 
 		// free csv parser

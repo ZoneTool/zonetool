@@ -3,6 +3,7 @@ skip_tags: true
 image: Visual Studio 2019
 configuration: release
 before_build:
+- git submodule update --init --recursive
 - ps: tools\premake5.exe vs2019 --set-version="$env:APPVEYOR_BUILD_VERSION"
 build:
   project: build/zonetool.sln

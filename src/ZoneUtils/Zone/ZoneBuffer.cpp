@@ -9,7 +9,7 @@
 #include "stdafx.hpp"
 
 #include <zstd.h>
-#include <zlib/zlib.h>
+#include <zlib.h>
 #include <tomcrypt.h>
 
 #include "PrivateKey.hpp"

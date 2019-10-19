@@ -7,7 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 #define ZONETOOL_BRANDING		"Compiled using ZoneTool by RektInator, localhost & X3RX35."
 

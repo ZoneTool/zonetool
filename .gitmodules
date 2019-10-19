@@ -1,0 +1,16 @@
+[submodule "dep/libtomcrypt"]
+	path = dep/libtomcrypt
+	url = https://github.com/libtom/libtomcrypt
+	branch = master
+[submodule "dep/libtommath"]
+	path = dep/libtommath
+	url = https://github.com/libtom/libtommath
+	branch = master
+[submodule "dep/zlib"]
+	path = dep/zlib
+	url = https://github.com/madler/zlib.git
+	branch = master
+[submodule "dep/zstd"]
+	path = dep/zstd
+	url = https://github.com/facebook/zstd.git
+	branch = master

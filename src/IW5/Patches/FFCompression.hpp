@@ -9,7 +9,7 @@
 #pragma once
 
 #include <zstd.h>
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 namespace ZoneTool
 {

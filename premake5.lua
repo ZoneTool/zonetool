@@ -3,6 +3,20 @@ newoption {
 	description = "Sets the version information of zonetool",
 }
 
+-- Functions for locating commonly used folders
+local _DependencyFolder = path.getabsolute("dep")
+function DependencyFolder()
+	return path.getrelative(os.getcwd(), _DependencyFolder)
+end
+
+local _ProjectFolder = path.getabsolute("src")
+function ProjectFolder()
+	return path.getrelative(os.getcwd(), _ProjectFolder)
+end
+
+-- ========================
+-- Workspace
+-- ========================
 workspace "zonetool"
 	location "./build"
 	objdir "%{wks.location}/obj"
@@ -15,17 +29,17 @@ workspace "zonetool"
 		"release",
 	}
 
-	platforms { 
-		"win32",
-		"win64",
+	platforms {
+		"x86",
+		"x64"
 	}
 
-	filter "platforms:win32"
+	filter "platforms:x86"
 		architecture "x86"
 		defines "CPU_32BIT"
 	filter {}
 
-	filter "platforms:win64"
+	filter "platforms:x64"
 		architecture "x86_64"
 		defines "CPU_64BIT"
 	filter {}
@@ -42,14 +56,15 @@ workspace "zonetool"
 		"No64BitChecks"
 	}
 
-	configuration "windows"
+	filter "configurations:debug"
+		optimize "Debug"
 		defines {
-			"_WINDOWS",
-			"WIN32",
+			"DEBUG",
+			"_DEBUG",
 		}
-	configuration{}
+	filter {}
 
-	configuration "release"
+	filter "configurations:release"
 		optimize "Full"
 		defines {
 			"NDEBUG",
@@ -57,220 +72,45 @@ workspace "zonetool"
 		flags {
 			"FatalCompileWarnings",
 		}
-	configuration{}
-
-	configuration "debug"
-		optimize "Debug"
-		defines {
-			"DEBUG",
-			"_DEBUG",
-		}
-	configuration {}
+	filter{}
 
 	startproject "ZoneTool"
 
-	project "ZoneTool"
-		kind "SharedLib"
-		language "C++"
-		dependson "ZoneUtils"
-		dependson "IW3"
-		dependson "IW4"
-		dependson "IW5"
-		dependson "CODO"
+	-- ========================
+	-- Dependencies
+	-- ========================
 
-		pchheader "stdafx.hpp"
-		pchsource "src/ZoneTool/stdafx.cpp"
+	include "dep/libtomcrypt.lua"
+	include "dep/libtommath.lua"
+	include "dep/steam_api.lua"
+	include "dep/zlib.lua"
+	include "dep/zstd.lua"
 
-		files {
-			"./src/ZoneTool/**.h",
-			"./src/ZoneTool/**.hpp",
-			"./src/ZoneTool/**.cpp",
-		}
+	-- All projects here should be in the thirdparty folder
+	group "thirdparty"
 
-		links {
-			"IW3-%{cfg.platform}-%{cfg.buildcfg}",
-			"IW4-%{cfg.platform}-%{cfg.buildcfg}",
-			"IW5-%{cfg.platform}-%{cfg.buildcfg}",
-			"CODO-%{cfg.platform}-%{cfg.buildcfg}",
-			"ZoneUtils-%{cfg.platform}-%{cfg.buildcfg}",
-			"steam_api",
-			"tomcrypt",
-			"tommath",
-			"zlib",
-			"zstd",
-		}
+	libtommath:project()
+	libtomcrypt:project()
+	zlib:project()
+	zstd:project()
 
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
+	-- Reset group
+	group ""
 
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./src/IW3",
-			"./src/IW4",
-			"./src/IW5",
-			"./dep/include",
-		}
+	-- ========================
+	-- Projects
+	-- ========================
 
-		if _OPTIONS["set-version"] then
-			defines {
-				"ZONETOOL_VERSION=\"" .. _OPTIONS["set-version"] .. "\""
-			}
-		end
+	include "src/ZoneTool.lua"
+	include "src/ZoneUtils.lua"
+	include "src/IW3.lua"
+	include "src/IW4.lua"
+	include "src/IW5.lua"
+	include "src/CODO.lua"
 
-		filter "toolset:msc*"
-			postbuildcommands {
-				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty 4\\zoneiw3.dll\" )",
-				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"F:\\iw4x_full_game\\zonetool.dll\" )",
-				"if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty Modern Warfare 3\\zonetool.dll\" )",
-			}
-		filter {}
-
-	project "ZoneUtils"
-		kind "StaticLib"
-		language "C++"
-		
-		pchheader "stdafx.hpp"
-		pchsource "src/ZoneUtils/stdafx.cpp"
-
-		files {
-			"./src/ZoneUtils/**.h",
-			"./src/ZoneUtils/**.hpp",
-			"./src/ZoneUtils/**.cpp",
-		}
-
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
-
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./dep/include",
-		}
-
-	project "IW3"
-		kind "StaticLib"
-		language "C++"
-		dependson "IW4"
-		
-		pchheader "stdafx.hpp"
-		pchsource "src/IW3/stdafx.cpp"
-
-		files {
-			"./src/IW3/**.h",
-			"./src/IW3/**.hpp",
-			"./src/IW3/**.cpp",
-		}
-
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
-
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./src/IW3",
-			"./src/IW4",
-			"./dep/include",
-		}
-
-	project "IW4"
-		kind "StaticLib"
-		language "C++"
-		dependson "IW5"
-		
-		pchheader "stdafx.hpp"
-		pchsource "src/IW4/stdafx.cpp"
-
-		files {
-			"./src/IW4/**.h",
-			"./src/IW4/**.hpp",
-			"./src/IW4/**.cpp",
-		}
-
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
-
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./src/IW3",
-			"./src/IW5",
-			"./dep/include",
-		}
-
-	project "IW5"
-		kind "StaticLib"
-		language "C++"
-
-		pchheader "stdafx.hpp"
-		pchsource "src/IW5/stdafx.cpp"
-
-		files {
-			"./src/IW5/**.h",
-			"./src/IW5/**.hpp",
-			"./src/IW5/**.cpp",
-		}
-
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
-
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./src/IW3",
-			"./src/IW4",
-			"./src/IW5",
-			"./dep/include",
-		}
-
-	project "CODO"
-		kind "StaticLib"
-		language "C++"
-		dependson "IW5"
-		dependson "IW4"
-		
-		pchheader "stdafx.hpp"
-		pchsource "src/CODO/stdafx.cpp"
-
-		files {
-			"./src/CODO/**.h",
-			"./src/CODO/**.hpp",
-			"./src/CODO/**.cpp",
-		}
-
-		syslibdirs {
-			"./build/bin",
-			"./dep/bin",
-		}
-
-		includedirs {
-			"./src",
-			"%{prj.location}/src",
-			"./src/ZoneTool",
-			"./src/ZoneUtils",
-			"./src/CODO",
-			"./src/IW3",
-			"./src/IW4",
-			"./src/IW5",
-			"./dep/include",
-		}
+	ZoneTool:project()
+	ZoneUtils:project()
+	IW3:project()
+	IW4:project()
+	IW5:project()
+	CODO:project()

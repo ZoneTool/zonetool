@@ -8,7 +8,7 @@
 // ========================================================
 #pragma once
 
-#include <ZoneUtils/ZoneUtils.hpp>
+#include <ZoneUtils.hpp>
 #include "Functions.hpp"
 #include "Structs.hpp"
 #include "../IW5/Structs.hpp"

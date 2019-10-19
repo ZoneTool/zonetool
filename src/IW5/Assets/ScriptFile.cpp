@@ -7,7 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
-#include <zlib/zlib.h>
+#include <zlib.h>
 
 namespace ZoneTool
 {

@@ -708,33 +708,37 @@ namespace ZoneTool
 		struct SndCurve
 		{
 			const char* filename;
-			const char* name;
 			unsigned __int16 knotCount;
 			vec2_t knots[16];
 		};
 #pragma pack(pop)
 
+        struct _AILSOUNDINFO
+        {
+            int format;
+            const void* data_ptr;
+            unsigned int data_len;
+            unsigned int rate;
+            int bits;
+            int channels;
+            unsigned int samples;
+            unsigned int block_size;
+            const void* initial_ptr;
+        };
+
 		// Loaded sound
 #pragma pack(push, 4)
-		struct LoadedSoundStruct
+		struct MssSound
 		{
-			int waveFormat;
-			int unknown1;
-			int dataLength;
-			int sampleRate;
-			int bitPerChannel;
-			int channelCount;
-			int unknown3;
-			int blockAlign;
-			int unknown5;
-			char* soundData;
+            _AILSOUNDINFO info;
+            char* data;
 		};
 #pragma pack(pop)
 
 		struct LoadedSound
 		{
 			const char* name;
-			LoadedSoundStruct sound;
+            MssSound sound;
 		};
 
 		// Sounds

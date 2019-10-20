@@ -57,7 +57,7 @@ namespace ZoneTool
 
 			char* data;
 
-			while (!result->sound.soundData && !feof(fp))
+			while (!result->sound.data && !feof(fp))
 			{
 				fread(&chunkIDBuffer, 4, 1, fp);
 				fread(&chunkSize, 4, 1, fp);
@@ -74,26 +74,26 @@ namespace ZoneTool
 							/*fclose(fp);
 							return nullptr;*/
 						}
-						result->sound.waveFormat = format;
+						result->sound.info.format = format;
 
 						short numChannels;
 						fread(&numChannels, 2, 1, fp);
-						result->sound.channelCount = numChannels;
+						result->sound.info.channels = numChannels;
 
 						int sampleRate;
 						fread(&sampleRate, 4, 1, fp);
-						result->sound.sampleRate = sampleRate;
+						result->sound.info.rate = sampleRate;
 
 						int byteRate;
 						fread(&byteRate, 4, 1, fp);
 
 						short blockAlign;
 						fread(&blockAlign, 2, 1, fp);
-						result->sound.blockAlign = blockAlign;
+						result->sound.info.block_size = blockAlign;
 
 						short bitPerSample;
 						fread(&bitPerSample, 2, 1, fp);
-						result->sound.bitPerChannel = bitPerSample;
+						result->sound.info.bits = bitPerSample;
 
 						if (chunkSize > 16)
 						{
@@ -103,10 +103,10 @@ namespace ZoneTool
 					break;
 
 				case 0x61746164: // data
-					result->sound.dataLength = chunkSize;
-					data = (char*)malloc(result->sound.dataLength);
-					fread(data, 1, result->sound.dataLength, fp);
-					result->sound.soundData = data;
+					result->sound.info.data_len = chunkSize;
+					data = (char*)malloc(result->sound.info.data_len);
+					fread(data, 1, result->sound.info.data_len, fp);
+					result->sound.data = data;
 					break;
 
 				default:
@@ -118,7 +118,7 @@ namespace ZoneTool
 				}
 			}
 
-			if (!result->sound.soundData)
+			if (!result->sound.data)
 			{
 				ZONETOOL_FATAL("%s: Could not read sounddata.", name.c_str());
 				//fclose(fp);
@@ -173,11 +173,11 @@ namespace ZoneTool
 
 			buf->push_stream(0);
 
-			if (data->sound.soundData)
+			if (data->sound.data)
 			{
 				buf->align(0);
-				buf->write(data->sound.soundData, data->sound.dataLength);
-				ZoneBuffer::ClearPointer(&dest->sound.soundData);
+				buf->write(data->sound.data, data->sound.info.data_len);
+				ZoneBuffer::ClearPointer(&dest->sound.data);
 			}
 
 			buf->pop_stream();
@@ -198,7 +198,7 @@ namespace ZoneTool
 
 				// ChunkSize
 				int subchunk1Size = 16;
-				int subchunk2Size = sound->sound.dataLength;
+				int subchunk2Size = sound->sound.info.data_len;
 				int chunkSize = 4 + (8 + subchunk1Size) + (8 + subchunk2Size);
 				fwrite(&chunkSize, 4, 1, fp);
 
@@ -216,27 +216,27 @@ namespace ZoneTool
 				fwrite(&subchunk1Size, 4, 1, fp);
 
 				// AudioFormat
-				short audioFormat = sound->sound.waveFormat;
+				short audioFormat = sound->sound.info.format;
 				fwrite(&audioFormat, 2, 1, fp);
 
 				// NumChannels
-				short numChannels = sound->sound.channelCount;
+				short numChannels = sound->sound.info.channels;
 				fwrite(&numChannels, 2, 1, fp);
 
 				// SampleRate
-				int sampleRate = sound->sound.sampleRate;
+				int sampleRate = sound->sound.info.rate;
 				fwrite(&sampleRate, 4, 1, fp);
 
 				// ByteRate
-				int byteRate = sound->sound.sampleRate * sound->sound.channelCount * sound->sound.bitPerChannel / 8;
+				int byteRate = sound->sound.info.rate * sound->sound.info.channels * sound->sound.info.bits / 8;
 				fwrite(&byteRate, 4, 1, fp);
 
 				// BlockAlign
-				short blockAlign = sound->sound.blockAlign;
+				short blockAlign = sound->sound.info.block_size;
 				fwrite(&blockAlign, 2, 1, fp);
 
 				// BitsPerSample
-				short bitsPerSample = sound->sound.bitPerChannel;
+				short bitsPerSample = sound->sound.info.bits;
 				fwrite(&bitsPerSample, 2, 1, fp);
 
 
@@ -249,7 +249,7 @@ namespace ZoneTool
 				fwrite(&subchunk2Size, 4, 1, fp);
 
 				// Data
-				fwrite(sound->sound.soundData, sound->sound.dataLength, 1, fp);
+				fwrite(sound->sound.data, sound->sound.info.data_len, 1, fp);
 			}
 
 			FileSystem::FileClose(fp);

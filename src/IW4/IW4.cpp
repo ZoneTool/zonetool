@@ -395,6 +395,41 @@ char**>(0x00799278)[type]);
 			return Memory::Func<void(int, int)>(0x004925B0)(shouldLoad, surface->xSurficiesCount);
 		}
 
+        const char* Linker::GetZonePath(const char* zoneName)
+        {
+            static std::string lastZonePath;
+            static std::vector<std::string> zonePaths =
+            {
+                "zone\\dlc\\",
+                "zone\\patch\\"
+            };
+
+            const std::string zoneFileName = zoneName;
+            const char* languageName = Memory::Func<const char* ()>(0x45CBA0)();
+
+            // Priority 1: localized zone folder
+            const std::string localizedZonePath = va("zone\\%s\\", languageName, zoneName);
+            if(std::filesystem::exists(localizedZonePath + zoneFileName))
+            {
+                lastZonePath = localizedZonePath;
+                return lastZonePath.c_str();
+            }
+
+            // Priority 2: custom zone paths
+            for(auto customZonePath : zonePaths)
+            {
+                if (std::filesystem::exists(customZonePath + zoneFileName))
+                {
+                    lastZonePath = customZonePath;
+                    return lastZonePath.c_str();
+                }
+            }
+
+            // If no file could be found return the default location. The game will notice itself that there is no fastfile.
+            lastZonePath = localizedZonePath;
+            return lastZonePath.c_str();
+        }
+
 		void ExitZoneTool()
 		{
 			std::exit(0);
@@ -533,6 +568,9 @@ char**>(0x00799278)[type]);
 				Memory(0x0044546D).Jump(IncreaseReadPointer);
 				Memory(0x00470E51).Jump(IncreaseReadPointer2);
 				Memory(0x004159E2).Call(ReadHeader);
+
+                // Load fastfiles from custom zone folders
+                Memory(0x44DA90).Jump(GetZonePath);
 			}
 		}
 

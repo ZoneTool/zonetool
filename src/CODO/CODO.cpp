@@ -100,7 +100,12 @@ namespace ZoneTool::CODO
 		return xassettypes[type];
 	}
 
-	void Linker::DumpZone(std::string& name)
+    bool Linker::SupportsBuilding()
+    {
+        return false;
+    }
+
+    void Linker::DumpZone(std::string& name)
 	{
 		//isDumpingComplete = false;
 		//isDumping = true;

@@ -34,6 +34,7 @@ namespace ZoneTool::CODO
 		bool IsValidAssetType(std::string& type) override;
 		std::int32_t TypeToInt(std::string type) override;
 		std::string TypeToString(std::int32_t type) override;
+        bool SupportsBuilding() override;
 
 		void DumpZone(std::string& name) override;
 		void VerifyZone(std::string& name) override;

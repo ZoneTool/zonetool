@@ -214,7 +214,7 @@ namespace ZoneTool
 
 				if (head->volumeFalloffCurve)
 				{
-					zone->AddAssetOfType(sndcurve, head->volumeFalloffCurve->name);
+					zone->AddAssetOfType(sndcurve, head->volumeFalloffCurve->filename);
 				}
 
 				if (head->soundFile)
@@ -302,7 +302,7 @@ namespace ZoneTool
 			if (data->volumeFalloffCurve)
 			{
 				dest->volumeFalloffCurve = reinterpret_cast<SndCurve*>(zone->GetAssetPointer(
-					sndcurve, data->volumeFalloffCurve->name));
+					sndcurve, data->volumeFalloffCurve->filename));
 			}
 
 			if (data->speakerMap)

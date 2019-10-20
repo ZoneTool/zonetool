@@ -1058,19 +1058,24 @@ namespace ZoneTool
 #pragma pack(pop)
 
 		// Loaded sound
+        struct _AILSOUNDINFO
+        {
+            int format;
+            const void* data_ptr;
+            unsigned int data_len;
+            unsigned int rate;
+            int bits;
+            int channels;
+            unsigned int samples;
+            unsigned int block_size;
+            const void* initial_ptr;
+        };
+
 #pragma pack(push, 4)
 		struct MssSound
 		{
-			int waveFormat; // +0
-			int unknown1; // +4
-			int dataLength; // +8
-			int sampleRate; // +12
-			int bitPerChannel; // +16
-			int channelCount; // +20
-			int unknown3; // +24
-			int blockAlign; // +28
-			int unknown5; // +32
-			char* soundData; // +36
+            _AILSOUNDINFO info;
+            char* data;
 		};
 #pragma pack(pop)
 

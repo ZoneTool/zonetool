@@ -92,6 +92,7 @@ namespace ZoneTool
 					XAsset assetData{asset.first, DB_FindXAssetHeader(asset.first, &asset.second[1])};
 					HandleAsset(&assetData);
 				}
+                ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
 
 				// clear referenced assets array because we are done dumping
 				referencedAssets.clear();
@@ -105,12 +106,6 @@ namespace ZoneTool
 			if (isDumping)
 			{
 				FileSystem::SetFastFile(fastfile);
-
-				// check if we're done loading the fastfile
-				if (asset->type == rawfile && GetAssetName(asset) == fastfile)
-				{
-					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
-				}
 
 				// check if the asset is a reference asset
 				if (GetAssetName(asset)[0] == ',')

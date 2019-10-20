@@ -49,6 +49,7 @@ namespace ZoneTool
 			static void IncreaseReadPointer2();
 			static void ReadHeader(void* ptr, int size);
 			static void Load_XSurfaceArray(int shouldLoad, int count);
+            static const char* GetZonePath(const char* zoneName);
 		};
 	}
 }

@@ -20,8 +20,9 @@ namespace ZoneTool
 			bool m_parsed;
 			
 		public:
-			MaterialTechniqueSet* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
-
+			static MaterialTechniqueSet* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
+			static char* parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem);
+			
 			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
 			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
 			void load_depending(IZone* zone) override;
@@ -31,6 +32,7 @@ namespace ZoneTool
 			std::int32_t type() override;
 			void write(IZone* zone, std::shared_ptr<ZoneBuffer>& buffer) override;
 
+			static void dump_statebits(const std::string& techset, char* statebits);
 			static void dump(MaterialTechniqueSet* asset);
 		};
 	}

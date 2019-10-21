@@ -334,45 +334,11 @@ namespace ZoneTool
 			}
 			mat->stateBitsCount = stateMap.size();
 
-			//auto stateBitsEntry = matdata["stateBitsEntry"];
-			//if (!stateBitsEntry.empty())
-			//{
-			//	// statebits array
-			//	char stateBits[128];
-			//	ZeroMemory(stateBits, sizeof stateBits);
-
-			//	// read statebits into array
-			//	for (auto i = 0u; i < stateBitsEntry.size(); i++)
-			//	{
-			//		stateBits[i] = stateBitsEntry[i].get<char>();
-			//	}
-
-			//	// check if statebits need to be converted
-			//	ZeroMemory(mat->stateBitsEntry, sizeof mat->stateBitsEntry);
-			//	if (stateBitsEntry.size() == 54) // iw5 -> iw4
-			//	{
-			//		memcpy(&mat->stateBitsEntry[19], &stateBits[19 + 2], 48 - 19);
-			//		memcpy(&mat->stateBitsEntry[31], &stateBits[31 + 4], 48 - 31);
-			//		memcpy(&mat->stateBitsEntry[44], &stateBits[44 + 5], 48 - 44);
-			//		memcpy(&mat->stateBitsEntry[46], &stateBits[46 + 6], 48 - 46);
-			//	}
-			//	else if (stateBitsEntry.size() == 48) // iw4 -> iw4, no conversion required
-			//	{
-			//		memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
-			//	}
-			//		// port iw3 statebits
-			//	else if (stateBitsEntry.size() == 34)
-			//	{
-			//		for (auto& state_bit : iw3TechniqueMap)
-			//		{
-			//			if (state_bit.second < sizeof mat->stateBitsEntry)
-			//			{
-			//				mat->stateBitsEntry[state_bit.second] = stateBits[state_bit.first];
-			//			}
-			//		}
-			//	}
-			//}
-			// PARSE STATEBITS BASED ON FILE, NOT BASED ON MATERIAL DATA
+			if (mat->techniqueSet)
+			{
+				auto statebits = ITechset::parse_statebits(mat->techniqueSet->name, mem);
+				memcpy(mat->stateBitsEntry, statebits, sizeof mat->stateBitsEntry);
+			}
 
 			return mat;
 		}
@@ -619,16 +585,7 @@ namespace ZoneTool
 		{
 			if (asset && asset->techniqueSet)
 			{
-				auto file = FileSystem::FileOpen(
-					"techsets\\"s +
-					asset->techniqueSet->name +
-					".statebits"s, "wb");
-
-				if (file)
-				{
-					fwrite(&asset->stateBitsEntry[0], sizeof asset->stateBitsEntry, 1, file);
-					FileSystem::FileClose(file);
-				}
+				ITechset::dump_statebits(asset->techniqueSet->name, asset->stateBitsEntry);
 			}
 
 			nlohmann::json matdata;

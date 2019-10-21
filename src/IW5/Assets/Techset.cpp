@@ -262,8 +262,10 @@ namespace ZoneTool
 
 		void ITechset::dump_technique(MaterialTechnique* asset)
 		{
+			auto path = "techsets\\"s + asset->hdr.name + ".technique";
+			
 			AssetDumper dumper;
-			if (!dumper.Open(asset->hdr.name))
+			if (!dumper.Open(path))
 			{
 				return;
 			}
@@ -302,10 +304,42 @@ namespace ZoneTool
 			}
 		}
 
+		char* ITechset::parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem)
+		{
+			auto statebits = mem->Alloc<char>(54);
+			
+			auto path = "techsets\\" + techset + ".statebits";
+			auto fp = FileSystem::FileOpen(path, "rb");
+
+			if (fp)
+			{
+				fread(statebits, 54, 1, fp);
+				FileSystem::FileClose(fp);
+
+				return statebits;
+			}
+			
+			return nullptr;
+		}
+		
+		void ITechset::dump_statebits(const std::string& techset, char* statebits)
+		{
+			auto path = "techsets\\" + techset + ".statebits";
+			auto fp = FileSystem::FileOpen(path, "wb");
+			
+			if (fp)
+			{
+				fwrite(statebits, 54, 1, fp);
+				FileSystem::FileClose(fp);
+			}
+		}
+		
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
+			auto path = "techsets\\"s + asset->name + ".techset";
+			
 			AssetDumper dumper;
-			if (!dumper.Open(asset->name))
+			if (!dumper.Open(path))
 			{
 				return;
 			}

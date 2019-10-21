@@ -227,6 +227,71 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
+		char* ITechset::parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem)
+		{
+			auto iw5_statebits = IW5::ITechset::parse_statebits(techset, mem);
+			auto statebits = mem->Alloc<char>(48);
+
+			for (int i = 0; i < 54; i++)
+			{
+				auto dest_index = i;
+				if (i >= 46)
+				{
+					dest_index -= 6;
+				}
+				else if (i >= 44)
+				{
+					dest_index -= 5;
+				}
+				else if (i >= 31)
+				{
+					dest_index -= 4;
+				}
+				else if (i >= 19)
+				{
+					dest_index -= 2;
+				}
+
+				statebits[i] = iw5_statebits[dest_index];
+			}
+			
+			return statebits;
+		}
+		
+		void ITechset::dump_statebits(const std::string& techset, char* statebits)
+		{
+			auto iw5_statebits = new char[54];
+			memset(iw5_statebits, 0, sizeof iw5_statebits);
+
+			for (int i = 0; i < 48; i++)
+			{
+				auto dest_index = i;
+
+				if (i >= 46)
+				{
+					dest_index += 6;
+				}
+				else if (i >= 44)
+				{
+					dest_index += 5;
+				}
+				else if (i >= 31)
+				{
+					dest_index += 4;
+				}
+				else if (i >= 19)
+				{
+					dest_index += 2;
+				}
+
+				iw5_statebits[dest_index] = statebits[i];
+			}
+			
+			IW5::ITechset::dump_statebits(techset, iw5_statebits);
+
+			delete iw5_statebits;
+		}
+		
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
 			auto iw5_techset = new IW5::MaterialTechniqueSet;

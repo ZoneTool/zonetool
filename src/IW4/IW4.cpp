@@ -629,7 +629,12 @@ char**>(0x00799278)[type]);
 			return xassettypes[type];
 		}
 
-		void Linker::DumpZone(std::string& name)
+        bool Linker::SupportsBuilding()
+        {
+            return true;
+        }
+
+        void Linker::DumpZone(std::string& name)
 		{
 			isDumpingComplete = false;
 			isDumping = true;

@@ -275,7 +275,12 @@ namespace ZoneTool
 			return xassettypes[type];
 		}
 
-		void Linker::DumpZone(std::string& name)
+        bool Linker::SupportsBuilding()
+        {
+            return false;
+        }
+
+        void Linker::DumpZone(std::string& name)
 		{
 			isDumping = true;
 			currentDumpingZone = name;

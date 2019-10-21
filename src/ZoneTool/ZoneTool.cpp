@@ -279,7 +279,14 @@ namespace ZoneTool
 
 			if (currentLinker)
 			{
-				BuildZone(currentLinker, args[1]);
+                if(currentLinker->SupportsBuilding())
+                {
+                    BuildZone(currentLinker, args[1]);
+                }
+                else
+                {
+                    ZONETOOL_ERROR("Current linker does not support zone building.");
+                }
 			}
 		});
 		RegisterCommand("loadzone"s, [](std::vector<std::string> args)

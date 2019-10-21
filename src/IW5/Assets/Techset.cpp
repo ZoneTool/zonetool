@@ -13,7 +13,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		MaterialTechnique* ITechset::parse_technique_pass(const std::string& name, std::shared_ptr<ZoneMemory>& mem,
+		MaterialTechnique* ITechset::parse_technique(const std::string& name, std::shared_ptr<ZoneMemory>& mem,
 		                                                std::uint32_t index)
 		{
 			const auto path = "techsets\\" + name + ".technique";
@@ -22,7 +22,51 @@ namespace ZoneTool
 				return nullptr;
 			}
 
-			return nullptr;
+			AssetReader reader(mem);
+			if (!reader.Open(path))
+			{
+				return nullptr;
+			}
+
+			const auto header = reader.Single<MaterialTechniqueHeader>();
+			const auto passes = reader.Array<MaterialPass>();
+
+			const auto asset = mem->ManualAlloc<MaterialTechnique>(sizeof(MaterialTechniqueHeader) + (sizeof(MaterialPass) * header->numPasses));
+			memcpy(&asset->hdr, header, sizeof MaterialTechniqueHeader);
+			memcpy(asset->pass, passes, sizeof(MaterialPass) * header->numPasses);
+
+			for (short i = 0; i < header->numPasses; i++)
+			{
+				if (passes[i].pixelShader)
+				{
+					passes[i].pixelShader = reader.Asset<PixelShader>();
+				}
+
+				if (passes[i].vertexShader)
+				{
+					passes[i].vertexShader = reader.Asset<VertexShader>();
+				}
+
+				if (passes[i].vertexDecl)
+				{
+					passes[i].vertexDecl = reader.Asset<VertexDecl>();
+				}
+
+				if (passes[i].argumentDef)
+				{
+					passes[i].argumentDef = reader.Array<ShaderArgumentDef>();
+
+					for (auto arg = 0; arg < passes[i].perObjArgCount + passes[i].perPrimArgCount + passes[i].stableArgCount; arg++)
+					{
+						if (passes[i].argumentDef[arg].type == 1 || passes[i].argumentDef[arg].type == 8)
+						{
+							passes[i].argumentDef[arg].u.literalConst = reader.Array<float>();
+						}
+					}
+				}
+			}
+			
+			return asset;
 		}
 
 		MaterialTechniqueSet* ITechset::parse(const std::string& name,
@@ -34,9 +78,26 @@ namespace ZoneTool
 				return nullptr;
 			}
 
-			
+			AssetReader reader(mem);
+			if (!reader.Open(path))
+			{
+				return nullptr;
+			}
 
-			return nullptr;
+			ZONETOOL_INFO("Parsing techset \"%s\"...", name.data());
+
+			const auto asset = reader.Single<MaterialTechniqueSet>();
+			asset->name = reader.String();
+
+			for (auto i = 0u; i < 54; i++)
+			{
+				if (asset->techniques[i])
+				{
+					asset->techniques[i] = ITechset::parse_technique(reader.String(), mem, i);
+				}
+			}
+			
+			return asset;
 		}
 
 		void ITechset::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
@@ -65,13 +126,6 @@ namespace ZoneTool
 		void ITechset::load_depending(IZone* zone)
 		{
 			auto data = this->m_asset;
-
-			// if we didn't parse a custom asset and the asset is common: there is no point in writing it.
-			// make a reference to the original asset instead.
-			/*if (!this->m_parsed && AssetHandler::IsCommonAsset(this->type(), this->name()))
-			{
-				return;
-			}*/
 
 			for (std::int32_t technique = 0; technique < 54; technique++)
 			{
@@ -119,8 +173,6 @@ namespace ZoneTool
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
-
-			sizeof MaterialTechniqueSet;
 
 			dest->name = buf->write_str(this->name());
 
@@ -208,14 +260,67 @@ namespace ZoneTool
 			encrypt_data(dest, sizeof MaterialTechniqueSet);
 		}
 
-		void ITechset::dump_technique_pass(MaterialTechnique* asset)
+		void ITechset::dump_technique(MaterialTechnique* asset)
 		{
-			
+			AssetDumper dumper;
+			if (!dumper.Open(asset->hdr.name))
+			{
+				return;
+			}
+
+			dumper.Single(&asset->hdr);
+			dumper.Array(asset->pass, asset->hdr.numPasses);
+
+			for (short i = 0; i < asset->hdr.numPasses; i++)
+			{
+				if (asset->pass[i].pixelShader)
+				{
+					dumper.Asset(asset->pass[i].pixelShader);
+				}
+
+				if (asset->pass[i].vertexShader)
+				{
+					dumper.Asset(asset->pass[i].vertexShader);
+				}
+
+				if (asset->pass[i].vertexDecl)
+				{
+					dumper.Asset(asset->pass[i].vertexDecl);
+				}
+
+				if (asset->pass[i].argumentDef)
+				{
+					dumper.Array(asset->pass[i].argumentDef, asset->pass[i].perObjArgCount + asset->pass[i].perPrimArgCount + asset->pass[i].stableArgCount);
+					for (auto arg = 0; arg < asset->pass[i].perObjArgCount + asset->pass[i].perPrimArgCount + asset->pass[i].stableArgCount; arg++)
+					{
+						if (asset->pass[i].argumentDef[arg].type == 1 || asset->pass[i].argumentDef[arg].type == 8)
+						{
+							dumper.Array(asset->pass[i].argumentDef[arg].u.literalConst, 4);
+						}
+					}
+				}
+			}
 		}
 
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
-			
+			AssetDumper dumper;
+			if (!dumper.Open(asset->name))
+			{
+				return;
+			}
+
+			dumper.Single(asset);
+			dumper.String(asset->name);
+
+			for (auto i = 0u; i < 54; i++)
+			{
+				if (asset->techniques[i])
+				{
+					dumper.String(asset->techniques[i]->hdr.name);
+					ITechset::dump_technique(asset->techniques[i]);
+				}
+			}
 		}
 	}
 }

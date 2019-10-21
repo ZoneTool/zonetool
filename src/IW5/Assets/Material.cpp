@@ -23,7 +23,6 @@ namespace ZoneTool
 			{"wc_l_ua_b0c0_nocast", "wc_l_ua_b0c0p0_nocast"},
 			{"wc_distortion_scale_ua_zfeather", "wc_distortion_scale_ua"},
 			{"wc_l_sm_t0c0d0n0s0p0", "wc_l_sm_t0c0n0s0p0"},
-
 		};
 
 		struct WaterWritable
@@ -355,46 +354,47 @@ namespace ZoneTool
 			}
 			mat->stateBitsCount = stateMap.size();
 
-			// port statebits properly
-			auto stateBitsEntry = matdata["stateBitsEntry"];
-			if (!stateBitsEntry.empty())
-			{
-				auto stateBits = new char[128];
+			//// port statebits properly
+			//auto stateBitsEntry = matdata["stateBitsEntry"];
+			//if (!stateBitsEntry.empty())
+			//{
+			//	auto stateBits = new char[128];
 
-				for (auto i = 0u; i < stateBitsEntry.size(); i++)
-				{
-					stateBits[i] = stateBitsEntry[i].get<char>();
-				}
+			//	for (auto i = 0u; i < stateBitsEntry.size(); i++)
+			//	{
+			//		stateBits[i] = stateBitsEntry[i].get<char>();
+			//	}
 
-				// do this by default
-				memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
+			//	// do this by default
+			//	memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
 
-				// convert IW3 -> IW4 statebits
-				if (stateBitsEntry.size() == 34)
-				{
-					for (int i = 0; i < 34; i++)
-					{
-						for (auto techmap : iw3TechniqueMap)
-						{
-							if (techmap.first == i)
-							{
-								stateBits[techmap.second] = stateBits[i];
-							}
-						}
-					}
-				}
+			//	// convert IW3 -> IW4 statebits
+			//	if (stateBitsEntry.size() == 34)
+			//	{
+			//		for (int i = 0; i < 34; i++)
+			//		{
+			//			for (auto techmap : iw3TechniqueMap)
+			//			{
+			//				if (techmap.first == i)
+			//				{
+			//					stateBits[techmap.second] = stateBits[i];
+			//				}
+			//			}
+			//		}
+			//	}
 
-				// convert IW4 -> IW5 statebits if needed (IW4 should now export in IW5 format)
-				if (stateBitsEntry.size() == 48 || stateBitsEntry.size() == 34)
-				{
-					memcpy(&mat->stateBitsEntry[19 + 2], &stateBits[19], (54 - (19 + 2)));
-					memcpy(&mat->stateBitsEntry[31 + 4], &stateBits[31], (54 - (31 + 4)));
-					memcpy(&mat->stateBitsEntry[44 + 5], &stateBits[44], (54 - (44 + 5)));
-					memcpy(&mat->stateBitsEntry[46 + 6], &stateBits[46], (54 - (46 + 6)));
-				}
+			//	// convert IW4 -> IW5 statebits if needed (IW4 should now export in IW5 format)
+			//	if (stateBitsEntry.size() == 48 || stateBitsEntry.size() == 34)
+			//	{
+			//		memcpy(&mat->stateBitsEntry[19 + 2], &stateBits[19], (54 - (19 + 2)));
+			//		memcpy(&mat->stateBitsEntry[31 + 4], &stateBits[31], (54 - (31 + 4)));
+			//		memcpy(&mat->stateBitsEntry[44 + 5], &stateBits[44], (54 - (44 + 5)));
+			//		memcpy(&mat->stateBitsEntry[46 + 6], &stateBits[46], (54 - (46 + 6)));
+			//	}
 
-				// delete[] stateBits;
-			}
+			//	// delete[] stateBits;
+			//}
+			// PARSE STATEBITS BASED ON FILE, NOT BASED ON MATERIAL DATA
 
 			// why???
 			mat->NiceMemeIW = 0;

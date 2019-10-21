@@ -251,48 +251,6 @@ namespace ZoneTool
 			return hash;
 		}
 
-		std::string DetermineTechsetName(const std::string& _techset)
-		{
-			// map the techset (if needed)
-			bool isIW5Techset = false;
-			std::string techset = ITechset::GetMappedTechset(_techset);
-
-			// remove _sat from the name
-			if (techset.length() > 4 && techset.substr(techset.length() - 4) == "_sat"s)
-			{
-				isIW5Techset = true;
-				techset = techset.substr(0, techset.length() - 4);
-			}
-
-			// find the techset name without _sat
-			FileSystem::PreferLocalOverExternal(true);
-			if (FileSystem::FileExists("techsets\\"s + techset + ".techset"s))
-			{
-				auto file = FileSystem::FileOpen("techsets\\"s + techset + ".techset"s, "rb");
-				if (file/* && !FileSystem::IsExternalFile(file)*/)
-				{
-					FileSystem::FileClose(file);
-					FileSystem::PreferLocalOverExternal(false);
-					return techset;
-				}
-			}
-
-			// find the techset with _sat (if it came from IW5 originally)
-			if (isIW5Techset)
-			{
-				FileSystem::PreferLocalOverExternal(false);
-				if (FileSystem::FileExists("techsets\\"s + techset + "_sat.techset"))
-				{
-					return techset + "_sat";
-				}
-			}
-
-			// return techset name referenced in file
-			return _techset;
-		}
-
-		extern std::unordered_map<std::int32_t, std::int32_t> iw3TechniqueMap;
-
 		__declspec(noinline) Material* IMaterial::parse(std::string name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			auto path = "materials\\" + name;
@@ -322,7 +280,7 @@ namespace ZoneTool
 			mat->stateFlags = matdata["stateFlags"].get<char>();
 			mat->cameraRegion = matdata["cameraRegion"].get<unsigned short>();
 
-			std::string techset = DetermineTechsetName(matdata["techniqueSet->name"]);
+			std::string techset = matdata["techniqueSet->name"].get<std::string>();
 
 			if (!techset.empty())
 			{
@@ -376,44 +334,45 @@ namespace ZoneTool
 			}
 			mat->stateBitsCount = stateMap.size();
 
-			auto stateBitsEntry = matdata["stateBitsEntry"];
-			if (!stateBitsEntry.empty())
-			{
-				// statebits array
-				char stateBits[128];
-				ZeroMemory(stateBits, sizeof stateBits);
+			//auto stateBitsEntry = matdata["stateBitsEntry"];
+			//if (!stateBitsEntry.empty())
+			//{
+			//	// statebits array
+			//	char stateBits[128];
+			//	ZeroMemory(stateBits, sizeof stateBits);
 
-				// read statebits into array
-				for (auto i = 0u; i < stateBitsEntry.size(); i++)
-				{
-					stateBits[i] = stateBitsEntry[i].get<char>();
-				}
+			//	// read statebits into array
+			//	for (auto i = 0u; i < stateBitsEntry.size(); i++)
+			//	{
+			//		stateBits[i] = stateBitsEntry[i].get<char>();
+			//	}
 
-				// check if statebits need to be converted
-				ZeroMemory(mat->stateBitsEntry, sizeof mat->stateBitsEntry);
-				if (stateBitsEntry.size() == 54) // iw5 -> iw4
-				{
-					memcpy(&mat->stateBitsEntry[19], &stateBits[19 + 2], 48 - 19);
-					memcpy(&mat->stateBitsEntry[31], &stateBits[31 + 4], 48 - 31);
-					memcpy(&mat->stateBitsEntry[44], &stateBits[44 + 5], 48 - 44);
-					memcpy(&mat->stateBitsEntry[46], &stateBits[46 + 6], 48 - 46);
-				}
-				else if (stateBitsEntry.size() == 48) // iw4 -> iw4, no conversion required
-				{
-					memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
-				}
-					// port iw3 statebits
-				else if (stateBitsEntry.size() == 34)
-				{
-					for (auto& state_bit : iw3TechniqueMap)
-					{
-						if (state_bit.second < sizeof mat->stateBitsEntry)
-						{
-							mat->stateBitsEntry[state_bit.second] = stateBits[state_bit.first];
-						}
-					}
-				}
-			}
+			//	// check if statebits need to be converted
+			//	ZeroMemory(mat->stateBitsEntry, sizeof mat->stateBitsEntry);
+			//	if (stateBitsEntry.size() == 54) // iw5 -> iw4
+			//	{
+			//		memcpy(&mat->stateBitsEntry[19], &stateBits[19 + 2], 48 - 19);
+			//		memcpy(&mat->stateBitsEntry[31], &stateBits[31 + 4], 48 - 31);
+			//		memcpy(&mat->stateBitsEntry[44], &stateBits[44 + 5], 48 - 44);
+			//		memcpy(&mat->stateBitsEntry[46], &stateBits[46 + 6], 48 - 46);
+			//	}
+			//	else if (stateBitsEntry.size() == 48) // iw4 -> iw4, no conversion required
+			//	{
+			//		memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
+			//	}
+			//		// port iw3 statebits
+			//	else if (stateBitsEntry.size() == 34)
+			//	{
+			//		for (auto& state_bit : iw3TechniqueMap)
+			//		{
+			//			if (state_bit.second < sizeof mat->stateBitsEntry)
+			//			{
+			//				mat->stateBitsEntry[state_bit.second] = stateBits[state_bit.first];
+			//			}
+			//		}
+			//	}
+			//}
+			// PARSE STATEBITS BASED ON FILE, NOT BASED ON MATERIAL DATA
 
 			return mat;
 		}

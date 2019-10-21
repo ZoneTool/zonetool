@@ -17,7 +17,68 @@ namespace ZoneTool
 		MaterialTechniqueSet* ITechset::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			const auto iw5_techset = IW5::ITechset::parse(name, mem);
-			return nullptr;
+			auto asset = mem->Alloc<MaterialTechniqueSet>();
+			memcpy(asset, iw5_techset, sizeof MaterialTechniqueSet);
+			
+			// port techniques to the correct index
+			for (int i = 0; i < 54; i++)
+			{
+				auto dest_index = i;
+				if (i >= 46)
+				{
+					dest_index -= 6;
+				}
+				else if (i >= 44)
+				{
+					dest_index -= 5;
+				}
+				else if (i >= 31)
+				{
+					dest_index -= 4;
+				}
+				else if (i >= 19)
+				{
+					dest_index -= 2;
+				}
+
+				asset->techniques[dest_index] = reinterpret_cast<MaterialTechnique*>(iw5_techset->techniques[i]);
+
+				if (asset->techniques[dest_index])
+				{
+					auto& technique = asset->techniques[dest_index];
+					for (short pass = 0; pass < technique->hdr.numPasses; pass++)
+					{
+						auto passDef = &technique->pass[pass];
+						for (int arg = 0; arg < passDef->perObjArgCount + passDef->perPrimArgCount + passDef->stableArgCount; arg++)
+						{
+							auto argDef = &passDef->argumentDef[arg];
+							
+							if (argDef->type > 2)
+							{
+								argDef->type--;
+							}
+
+							if (argDef->type == 3 || argDef->type == 5)
+							{
+								if (argDef->u.codeConst.index >= 66)
+								{
+									argDef->u.codeConst.index -= 8;
+								}
+								else if (argDef->u.codeConst.index >= 37)
+								{
+									argDef->u.codeConst.index -= 6;
+								}
+								else if (argDef->u.codeConst.index >= 26)
+								{
+									argDef->u.codeConst.index -= 5;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			return asset;
 		}
 
 		void ITechset::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
@@ -169,9 +230,70 @@ namespace ZoneTool
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
 			auto iw5_techset = new IW5::MaterialTechniqueSet;
+			memset(iw5_techset, 0, sizeof IW5::MaterialTechniqueSet);
 
-			// IW5::ITechset::dump(iw5_techset);
+			iw5_techset->name = asset->name;
+			iw5_techset->pad = asset->pad;
 			
+			for (int i = 0; i < 48; i++)
+			{
+				auto dest_index = i;
+				
+				if (i >= 46)
+				{
+					dest_index += 6;
+				}
+				else if (i >= 44)
+				{
+					dest_index += 5;
+				}
+				else if (i >= 31)
+				{
+					dest_index += 4;
+				}
+				else if (i >= 19)
+				{
+					dest_index += 2;
+				}
+
+				iw5_techset->techniques[dest_index] = reinterpret_cast<IW5::MaterialTechnique*>(iw5_techset->techniques[i]);
+
+				if (iw5_techset->techniques[dest_index])
+				{
+					auto& technique = iw5_techset->techniques[dest_index];
+					for (short pass = 0; pass < technique->hdr.numPasses; pass++)
+					{
+						auto passDef = &technique->pass[pass];
+						for (auto arg = 0; arg < passDef->perPrimArgCount + passDef->perObjArgCount + passDef->stableArgCount; arg++)
+						{
+							auto argDef = &passDef->argumentDef[arg];
+
+							if (argDef->type > 1)
+							{
+								argDef->type++;
+							}
+
+							if (argDef->type == 4 || argDef->type == 6)
+							{
+								if (argDef->u.codeConst.index >= 58)
+								{
+									argDef->u.codeConst.index += 8;
+								}
+								else if (argDef->u.codeConst.index >= 31)
+								{
+									argDef->u.codeConst.index += 6;
+								}
+								else if (argDef->u.codeConst.index >= 21)
+								{
+									argDef->u.codeConst.index += 5;
+								}
+							}
+						}
+					}
+				}
+			}
+
+			IW5::ITechset::dump(iw5_techset);
 			delete iw5_techset;
 		}
 	}

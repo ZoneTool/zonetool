@@ -37,30 +37,30 @@ namespace ZoneTool
 
 			for (short i = 0; i < header->numPasses; i++)
 			{
-				if (passes[i].pixelShader)
+				if (asset->pass[i].pixelShader)
 				{
-					passes[i].pixelShader = reader.Asset<PixelShader>();
+					asset->pass[i].pixelShader = reader.Asset<PixelShader>();
 				}
 
-				if (passes[i].vertexShader)
+				if (asset->pass[i].vertexShader)
 				{
-					passes[i].vertexShader = reader.Asset<VertexShader>();
+					asset->pass[i].vertexShader = reader.Asset<VertexShader>();
 				}
 
-				if (passes[i].vertexDecl)
+				if (asset->pass[i].vertexDecl)
 				{
-					passes[i].vertexDecl = reader.Asset<VertexDecl>();
+					asset->pass[i].vertexDecl = reader.Asset<VertexDecl>();
 				}
 
-				if (passes[i].argumentDef)
+				if (asset->pass[i].argumentDef)
 				{
-					passes[i].argumentDef = reader.Array<ShaderArgumentDef>();
+					asset->pass[i].argumentDef = reader.Array<ShaderArgumentDef>();
 
-					for (auto arg = 0; arg < passes[i].perObjArgCount + passes[i].perPrimArgCount + passes[i].stableArgCount; arg++)
+					for (auto arg = 0; arg < asset->pass[i].perObjArgCount + asset->pass[i].perPrimArgCount + asset->pass[i].stableArgCount; arg++)
 					{
-						if (passes[i].argumentDef[arg].type == 1 || passes[i].argumentDef[arg].type == 8)
+						if (asset->pass[i].argumentDef[arg].type == 1 || asset->pass[i].argumentDef[arg].type == 8)
 						{
-							passes[i].argumentDef[arg].u.literalConst = reader.Array<float>();
+							asset->pass[i].argumentDef[arg].u.literalConst = reader.Array<float>();
 						}
 					}
 				}

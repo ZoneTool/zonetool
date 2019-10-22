@@ -19,12 +19,14 @@ namespace ZoneTool
 			const auto path = "techsets\\" + name + ".technique";
 			if (!FileSystem::FileExists(path))
 			{
+				ZONETOOL_FATAL("technique \"%s\" is missing.", name.data());
 				return nullptr;
 			}
 
 			AssetReader reader(mem);
 			if (!reader.Open(path))
 			{
+				ZONETOOL_FATAL("technique \"%s\" is missing.", name.data());
 				return nullptr;
 			}
 

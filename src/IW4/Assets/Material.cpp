@@ -395,80 +395,8 @@ namespace ZoneTool
 			return material;
 		}
 
-		//void IMaterial::FixStatebits(IZone* zone)
-		//{
-		//	//auto getCleanedTechniqueName = [](const std::string& name) -> std::string
-		//	//{
-		//	//	if (name.length() > 4 && name.substr(name.length() - 4) == "_sat")
-		//	//	{
-		//	//		return name.substr(0, name.length() - 4);
-		//	//	}
-
-		//	//	return name;
-		//	//};
-
-		//	//auto techName = getCleanedTechniqueName(this->m_asset->techniqueSet->name);
-		//	auto techName = static_cast<std::string>(this->m_asset->techniqueSet->name);
-
-		//	// find techset asset used for current material
-		//	auto techsetInterface = zone->FindAsset(XAssetType::techset, techName);
-
-		//	// show fatal error if the techset interface cannot be found.
-		//	if (!techsetInterface)
-		//	{
-		//		// techsetInterface = zone->FindAsset(XAssetType::techset, techName + "_sat");
-
-		//		if (!techsetInterface)
-		//		{
-		//			/*if (ITechset::IsMappedTechset(this->m_asset->techniqueSet->name))
-		//			{
-		//				techsetInterface = zone->FindAsset(XAssetType::techset, ITechset::GetMappedTechset(this->m_asset->techniqueSet->name));
-
-		//				if (!techsetInterface)
-		//				{
-		//					ZONETOOL_FATAL("Could not find the techset asset pointer linked to material %s!", &this->name()[0]);
-		//				}
-		//			}
-		//			else*/
-		//			{
-		//				ZONETOOL_FATAL("Could not find the techset asset pointer linked to material %s!", &this->name()[0]);
-		//			}
-		//		}
-		//	}
-
-		//	auto techset = reinterpret_cast<MaterialTechniqueSet*>(techsetInterface->pointer());
-		//	if (!techset)
-		//	{
-		//		ZONETOOL_FATAL("Techset %s could not be parsed properly!", this->m_asset->techniqueSet->name);
-		//	}
-
-		//	// fixup statebits (0xFF is no technique)
-		//	memset(this->m_asset->stateBitsEntry, 0xFF, sizeof this->m_asset->stateBitsEntry);
-
-		//	// parse statebits
-		//	FileSystem::PreferLocalOverExternal(true);
-		//	for (int i = 0; i < sizeof this->m_asset->stateBitsEntry; i++)
-		//	{
-		//		if (techset->techniques[i])
-		//		{
-		//			auto fp = FileSystem::FileOpen("techsets\\"s + techset->techniques[i]->hdr.name + ".statebits"s, "rb");
-		//			if (fp)
-		//			{
-		//				fread(&this->m_asset->stateBitsEntry[i], 1, 1, fp);
-		//				FileSystem::FileClose(fp);
-		//			}
-		//			else if (strlen(techset->techniques[i]->hdr.name))
-		//			{
-		//				ZONETOOL_FATAL("Could not find the statebits for technique %s!", techset->techniques[i]->hdr.name);
-		//			}
-		//		}
-		//	}
-		//	FileSystem::PreferLocalOverExternal(false);
-		//}
 		void IMaterial::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
 		{
-			//this->FixStatebits(zone);
-
 			auto dest = buf->at<Material>();
 			auto data = this->m_asset;
 
@@ -486,8 +414,6 @@ namespace ZoneTool
 
 			if (data->maps)
 			{
-				MaterialImage;
-
 				buf->align(3);
 				auto destmaps = buf->write(data->maps, data->numMaps);
 
@@ -525,62 +451,6 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-		//void IMaterial::dump(Material* asset)
-		//{
-		//	if (asset && asset->techniqueSet)
-		//	{
-		//		auto path = "techsets\\"s + asset->techniqueSet->name + ".statebits"s;
-		//		if (FileSystem::FileExists(path))
-		//		{
-		//			return;
-		//		}
-
-		//		auto file = FileSystem::FileOpen(path, "wb");
-		//		if (file)
-		//		{
-		//			fwrite(asset->stateBitsEntry, 54, 1, file);
-		//			FileSystem::FileClose(file);
-		//		}
-
-		//		// dump constant table
-		//		/*auto cpath = "techsets\\"s + asset->techniqueSet->name + ".constant"s;
-		//		AssetDumper constants;
-		//		if (constants.Open(cpath))
-		//		{
-		//			// write amount of constants
-		//			constants.Uint(asset->constantCount);
-
-		//			// write all constants
-		//			constants.Array(asset->constantTable, asset->constantCount);
-
-		//			// write all strings
-		//			for (int i = 0; i < asset->constantCount; i++)
-		//			{
-		//				constants.String(asset->constantTable[i].name);
-		//			}
-
-		//			// abort
-		//			constants.Close();
-		//		}
-
-		//		// dump state map
-		//		auto spath = "techsets\\"s + asset->techniqueSet->name + ".statemap"s;
-		//		AssetDumper statemap;
-		//		if (statemap.Open(spath))
-		//		{
-		//			// write amount of constants
-		//			statemap.Uint(asset->stateBitsCount);
-		//			statemap.Uint(asset->stateFlags);
-
-		//			// write all constants
-		//			statemap.Array<GfxStateBits>(asset->stateMap, asset->stateBitsCount);
-
-		//			// abort
-		//			statemap.Close();
-		//		}*/
-		//	}
-		// }
-
 		void IMaterial::dump(Material* asset)
 		{
 			if (asset && asset->techniqueSet)
@@ -607,8 +477,6 @@ namespace ZoneTool
 			MATERIAL_DUMP_INT(stateFlags);
 			MATERIAL_DUMP_INT(cameraRegion);
 
-			MATERIAL_DUMP_BITS_ENTRY(stateBitsEntry, STATEBITENTRYNUM);
-			// MATERIAL_DUMP_MATIMG_ARRAY(maps, mat->numMaps);
 			MATERIAL_DUMP_CONST_ARRAY(constantTable, asset->constantCount);
 			MATERIAL_DUMP_STATE_MAP(stateMap, asset->stateBitsCount);
 

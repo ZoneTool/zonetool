@@ -366,14 +366,6 @@ namespace ZoneTool
 			return mat;
 		}
 
-		IMaterial::IMaterial()
-		{
-		}
-
-		IMaterial::~IMaterial()
-		{
-		}
-
 		void IMaterial::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			this->m_name = name;
@@ -423,13 +415,10 @@ namespace ZoneTool
 			auto dest = buf->at<Material>();
 			auto data = this->m_asset;
 
-			sizeof Material;
-
 			buf->write(data);
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			// dest->fakePointer = -1;
 			dest->name = buf->write_str(this->name());
 
 			if (data->techniqueSet)
@@ -480,62 +469,6 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-		//void IMaterial::dump(Material* asset)
-		//{
-		//	if (asset && asset->techniqueSet)
-		//	{
-		//		auto path = "techsets\\"s + asset->techniqueSet->name + ".statebits"s;
-		//		if (FileSystem::FileExists(path))
-		//		{
-		//			return;
-		//		}
-
-		//		auto file = FileSystem::FileOpen(path, "wb");
-		//		if (file)
-		//		{
-		//			fwrite(asset->stateBitsEntry, 54, 1, file);
-		//			FileSystem::FileClose(file);
-		//		}
-
-		//		// dump constant table
-		//		/*auto cpath = "techsets\\"s + asset->techniqueSet->name + ".constant"s;
-		//		AssetDumper constants;
-		//		if (constants.Open(cpath))
-		//		{
-		//			// write amount of constants
-		//			constants.Uint(asset->constantCount);
-
-		//			// write all constants
-		//			constants.Array(asset->constantTable, asset->constantCount);
-
-		//			// write all strings
-		//			for (int i = 0; i < asset->constantCount; i++)
-		//			{
-		//				constants.String(asset->constantTable[i].name);
-		//			}
-
-		//			// abort
-		//			constants.Close();
-		//		}
-
-		//		// dump state map
-		//		auto spath = "techsets\\"s + asset->techniqueSet->name + ".statemap"s;
-		//		AssetDumper statemap;
-		//		if (statemap.Open(spath))
-		//		{
-		//			// write amount of constants
-		//			statemap.Uint(asset->stateBitsCount);
-		//			statemap.Uint(asset->stateFlags);
-
-		//			// write all constants
-		//			statemap.Array<GfxStateBits>(asset->stateMap, asset->stateBitsCount);
-
-		//			// abort
-		//			statemap.Close();
-		//		}*/
-		//	}
-		//}
-
 		void IMaterial::dump(Material* asset)
 		{
 			if (asset && asset->techniqueSet)
@@ -562,8 +495,6 @@ namespace ZoneTool
 			MATERIAL_DUMP_INT(stateFlags);
 			MATERIAL_DUMP_INT(cameraRegion);
 
-			MATERIAL_DUMP_BITS_ENTRY(stateBitsEntry, STATEBITENTRYNUM);
-			// MATERIAL_DUMP_MATIMG_ARRAY(maps, mat->numMaps);
 			MATERIAL_DUMP_CONST_ARRAY(constantTable, asset->constantCount);
 			MATERIAL_DUMP_STATE_MAP(stateMap, asset->stateBitsCount);
 

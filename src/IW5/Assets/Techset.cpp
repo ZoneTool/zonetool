@@ -31,6 +31,8 @@ namespace ZoneTool
 			const auto header = reader.Single<MaterialTechniqueHeader>();
 			const auto passes = reader.Array<MaterialPass>();
 
+			header->name = reader.String();
+
 			const auto asset = mem->ManualAlloc<MaterialTechnique>(sizeof(MaterialTechniqueHeader) + (sizeof(MaterialPass) * header->numPasses));
 			memcpy(&asset->hdr, header, sizeof MaterialTechniqueHeader);
 			memcpy(asset->pass, passes, sizeof(MaterialPass) * header->numPasses);
@@ -273,6 +275,8 @@ namespace ZoneTool
 			dumper.Single(&asset->hdr);
 			dumper.Array(asset->pass, asset->hdr.numPasses);
 
+			dumper.String(asset->hdr.name);
+			
 			for (short i = 0; i < asset->hdr.numPasses; i++)
 			{
 				if (asset->pass[i].pixelShader)

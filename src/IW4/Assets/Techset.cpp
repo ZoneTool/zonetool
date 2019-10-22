@@ -17,6 +17,12 @@ namespace ZoneTool
 		MaterialTechniqueSet* ITechset::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
 		{
 			const auto iw5_techset = IW5::ITechset::parse(name, mem);
+
+			if (!iw5_techset)
+			{
+				return nullptr;
+			}
+			
 			auto asset = mem->Alloc<MaterialTechniqueSet>();
 			memcpy(asset, iw5_techset, sizeof MaterialTechniqueSet);
 			

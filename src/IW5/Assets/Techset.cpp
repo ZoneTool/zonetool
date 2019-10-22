@@ -324,7 +324,8 @@ namespace ZoneTool
 
 				return statebits;
 			}
-			
+
+			ZONETOOL_FATAL("statebits for techset \"%s\" are missing!", techset.data());
 			return nullptr;
 		}
 		

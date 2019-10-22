@@ -70,7 +70,7 @@ namespace ZoneTool
 
 			if (!this->m_asset)
 			{
-				ZONETOOL_ERROR("VertexDecl %s not found.", &name[0]);
+				ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
 				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).vertexdecl;
 			}
 

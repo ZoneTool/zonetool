@@ -67,7 +67,7 @@ namespace ZoneTool
 
 			if (!this->m_asset)
 			{
-				ZONETOOL_ERROR("PixelShader %s not found.", &name[0]);
+				ZONETOOL_FATAL("PixelShader %s not found.", &name[0]);
 				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).pixelshader;
 			}
 		}

@@ -69,6 +69,8 @@ namespace ZoneTool
 					}
 				}
 			}
+
+			reader.Close();
 			
 			return asset;
 		}
@@ -100,6 +102,8 @@ namespace ZoneTool
 					asset->techniques[i] = ITechset::parse_technique(reader.String(), mem, i);
 				}
 			}
+
+			reader.Close();
 			
 			return asset;
 		}
@@ -308,6 +312,8 @@ namespace ZoneTool
 					}
 				}
 			}
+
+			dumper.Close();
 		}
 
 		char* ITechset::parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem)
@@ -362,6 +368,8 @@ namespace ZoneTool
 					ITechset::dump_technique(asset->techniques[i]);
 				}
 			}
+
+			dumper.Close();
 		}
 	}
 }

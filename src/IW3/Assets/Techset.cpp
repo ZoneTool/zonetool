@@ -82,7 +82,7 @@ namespace ZoneTool
 		{
 			// base name + crc32
 			auto name = "iw3_vertexdecl_"s;
-			auto crc32 = Crc32(vertexDecl->routing.data, sizeof(MaterialStreamRouting) * vertexDecl->streamCount, 0);
+			auto crc32 = Crc32(vertexDecl->routing.data, sizeof MaterialVertexDeclaration, 0);
 
 			// append crc32 to vertexdecl name
 			name += std::to_string(crc32);

@@ -2,9 +2,7 @@ IW3 = {}
 
 function IW3:include()
     includedirs {
-        -- Due to files having the same name in the game projects
-        -- the source folder cannot be included directly
-        ProjectFolder()
+        path.join(ProjectFolder(), "IW3")
     }
 end
 
@@ -32,5 +30,6 @@ function IW3:project()
         }
 
         self:include()
+        IW4:include()
         ZoneUtils:include()
 end

@@ -70,7 +70,7 @@ namespace ZoneTool
 
 			if (!this->m_asset)
 			{
-				ZONETOOL_ERROR("VertexDecl %s not found.", &name[0]);
+				ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
 				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).vertexdecl;
 			}
 
@@ -108,12 +108,6 @@ namespace ZoneTool
 			START_LOG_STREAM;
 
 			dest->name = buf->write_str(this->name());
-
-			ZONETOOL_INFO("vertexdecl %s has %u streams.", data->name, data->streamCount);
-			for (int i = 0; i < data->streamCount; i++)
-			{
-				ZONETOOL_INFO("stream %u: maps 0x%02X to 0x%02X", i, data->streams[i].source, data->streams[i].dest);
-			}
 
 			END_LOG_STREAM;
 			buf->pop_stream();

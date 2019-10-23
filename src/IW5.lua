@@ -2,9 +2,7 @@ IW5 = {}
 
 function IW5:include()
     includedirs {
-        -- Due to files having the same name in the game projects
-        -- the source folder cannot be included directly
-        ProjectFolder()
+        path.join(ProjectFolder(), "IW5")
     }
 end
 

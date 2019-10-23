@@ -74,6 +74,10 @@ workspace "zonetool"
 		}
 	filter{}
 
+	includedirs {
+		ProjectFolder()
+	}
+
 	startproject "ZoneTool"
 
 	-- ========================

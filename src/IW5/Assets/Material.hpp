@@ -21,9 +21,6 @@ namespace ZoneTool
 			Material* parse(std::string name, std::shared_ptr<ZoneMemory>& mem);
 
 		public:
-			IMaterial();
-			~IMaterial();
-
 			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
 			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
 			void load_depending(IZone* zone) override;

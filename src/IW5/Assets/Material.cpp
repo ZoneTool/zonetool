@@ -23,7 +23,6 @@ namespace ZoneTool
 			{"wc_l_ua_b0c0_nocast", "wc_l_ua_b0c0p0_nocast"},
 			{"wc_distortion_scale_ua_zfeather", "wc_distortion_scale_ua"},
 			{"wc_l_sm_t0c0d0n0s0p0", "wc_l_sm_t0c0n0s0p0"},
-
 		};
 
 		struct WaterWritable
@@ -355,59 +354,16 @@ namespace ZoneTool
 			}
 			mat->stateBitsCount = stateMap.size();
 
-			// port statebits properly
-			auto stateBitsEntry = matdata["stateBitsEntry"];
-			if (!stateBitsEntry.empty())
+			if (mat->techniqueSet)
 			{
-				auto stateBits = new char[128];
-
-				for (auto i = 0u; i < stateBitsEntry.size(); i++)
-				{
-					stateBits[i] = stateBitsEntry[i].get<char>();
-				}
-
-				// do this by default
-				memcpy(&mat->stateBitsEntry[0], &stateBits[0], sizeof mat->stateBitsEntry);
-
-				// convert IW3 -> IW4 statebits
-				if (stateBitsEntry.size() == 34)
-				{
-					for (int i = 0; i < 34; i++)
-					{
-						for (auto techmap : iw3TechniqueMap)
-						{
-							if (techmap.first == i)
-							{
-								stateBits[techmap.second] = stateBits[i];
-							}
-						}
-					}
-				}
-
-				// convert IW4 -> IW5 statebits if needed (IW4 should now export in IW5 format)
-				if (stateBitsEntry.size() == 48 || stateBitsEntry.size() == 34)
-				{
-					memcpy(&mat->stateBitsEntry[19 + 2], &stateBits[19], (54 - (19 + 2)));
-					memcpy(&mat->stateBitsEntry[31 + 4], &stateBits[31], (54 - (31 + 4)));
-					memcpy(&mat->stateBitsEntry[44 + 5], &stateBits[44], (54 - (44 + 5)));
-					memcpy(&mat->stateBitsEntry[46 + 6], &stateBits[46], (54 - (46 + 6)));
-				}
-
-				// delete[] stateBits;
+				auto statebits = ITechset::parse_statebits(mat->techniqueSet->name, mem);
+				memcpy(mat->stateBitsEntry, statebits, sizeof mat->stateBitsEntry);
 			}
 
 			// why???
 			mat->NiceMemeIW = 0;
 
 			return mat;
-		}
-
-		IMaterial::IMaterial()
-		{
-		}
-
-		IMaterial::~IMaterial()
-		{
 		}
 
 		void IMaterial::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
@@ -459,13 +415,10 @@ namespace ZoneTool
 			auto dest = buf->at<Material>();
 			auto data = this->m_asset;
 
-			sizeof Material;
-
 			buf->write(data);
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			// dest->fakePointer = -1;
 			dest->name = buf->write_str(this->name());
 
 			if (data->techniqueSet)
@@ -516,76 +469,11 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-		//void IMaterial::dump(Material* asset)
-		//{
-		//	if (asset && asset->techniqueSet)
-		//	{
-		//		auto path = "techsets\\"s + asset->techniqueSet->name + ".statebits"s;
-		//		if (FileSystem::FileExists(path))
-		//		{
-		//			return;
-		//		}
-
-		//		auto file = FileSystem::FileOpen(path, "wb");
-		//		if (file)
-		//		{
-		//			fwrite(asset->stateBitsEntry, 54, 1, file);
-		//			FileSystem::FileClose(file);
-		//		}
-
-		//		// dump constant table
-		//		/*auto cpath = "techsets\\"s + asset->techniqueSet->name + ".constant"s;
-		//		AssetDumper constants;
-		//		if (constants.Open(cpath))
-		//		{
-		//			// write amount of constants
-		//			constants.Uint(asset->constantCount);
-
-		//			// write all constants
-		//			constants.Array(asset->constantTable, asset->constantCount);
-
-		//			// write all strings
-		//			for (int i = 0; i < asset->constantCount; i++)
-		//			{
-		//				constants.String(asset->constantTable[i].name);
-		//			}
-
-		//			// abort
-		//			constants.Close();
-		//		}
-
-		//		// dump state map
-		//		auto spath = "techsets\\"s + asset->techniqueSet->name + ".statemap"s;
-		//		AssetDumper statemap;
-		//		if (statemap.Open(spath))
-		//		{
-		//			// write amount of constants
-		//			statemap.Uint(asset->stateBitsCount);
-		//			statemap.Uint(asset->stateFlags);
-
-		//			// write all constants
-		//			statemap.Array<GfxStateBits>(asset->stateMap, asset->stateBitsCount);
-
-		//			// abort
-		//			statemap.Close();
-		//		}*/
-		//	}
-		//}
-
 		void IMaterial::dump(Material* asset)
 		{
 			if (asset && asset->techniqueSet)
 			{
-				auto file = FileSystem::FileOpen(
-					"techsets\\"s +
-					asset->techniqueSet->name +
-					".statebits"s, "wb");
-
-				if (file)
-				{
-					fwrite(&asset->stateBitsEntry[0], sizeof asset->stateBitsEntry, 1, file);
-					FileSystem::FileClose(file);
-				}
+				ITechset::dump_statebits(asset->techniqueSet->name, asset->stateBitsEntry);
 			}
 
 			nlohmann::json matdata;
@@ -607,8 +495,6 @@ namespace ZoneTool
 			MATERIAL_DUMP_INT(stateFlags);
 			MATERIAL_DUMP_INT(cameraRegion);
 
-			MATERIAL_DUMP_BITS_ENTRY(stateBitsEntry, STATEBITENTRYNUM);
-			// MATERIAL_DUMP_MATIMG_ARRAY(maps, mat->numMaps);
 			MATERIAL_DUMP_CONST_ARRAY(constantTable, asset->constantCount);
 			MATERIAL_DUMP_STATE_MAP(stateMap, asset->stateBitsCount);
 

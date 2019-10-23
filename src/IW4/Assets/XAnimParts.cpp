@@ -45,14 +45,14 @@ namespace ZoneTool::IW4
 		}
 
 		// allocate notetracks
-		xanim->notetracks = mem->Alloc<XAnimNotifyInfo>(xanim->notetrackCount);
-		memcpy(xanim->notetracks, this->m_asset->notetracks, sizeof XAnimNotifyInfo * xanim->notetrackCount);
+		xanim->notify = mem->Alloc<XAnimNotifyInfo>(xanim->notifyCount);
+		memcpy(xanim->notify, this->m_asset->notify, sizeof XAnimNotifyInfo * xanim->notifyCount);
 
 		// touch XAnimNotifyInfo, realloc tagnames
-		for (auto i = 0; i < xanim->notetrackCount; i++)
+		for (auto i = 0; i < xanim->notifyCount; i++)
 		{
-			const std::string bone = SL_ConvertToString(this->m_asset->notetracks[i].name);
-			xanim->notetracks[i].name = buf->write_scriptstring(bone);
+			const std::string bone = SL_ConvertToString(this->m_asset->notify[i].name);
+			xanim->notify[i].name = buf->write_scriptstring(bone);
 		}
 
 		this->m_asset = xanim;
@@ -88,10 +88,10 @@ namespace ZoneTool::IW4
 			buf->write_stream(data->tagnames, sizeof(short), data->boneCount[9]);
 			dest->tagnames = reinterpret_cast<unsigned short*>(-1);
 		}
-		if (data->notetracks) // notetracks
+		if (data->notify) // notify
 		{
 			buf->align(3);
-			buf->write_stream(data->notetracks, sizeof(XAnimNotifyInfo), data->notetrackCount);
+			buf->write_stream(data->notify, sizeof(XAnimNotifyInfo), data->notifyCount);
 			dest->tagnames = reinterpret_cast<unsigned short*>(-1);
 		}
 

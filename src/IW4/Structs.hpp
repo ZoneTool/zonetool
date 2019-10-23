@@ -1941,6 +1941,13 @@ namespace ZoneTool
 			float time;
 		};
 
+        enum XAnimPartsFlags
+        {
+            ANIM_LOOP = 0x1,
+            ANIM_DELTA = 0x2,
+            ANIM_DELTA_3D = 0x4,
+        };
+
 		struct XAnimParts
 		{
 			char* name; // 0
@@ -1952,11 +1959,9 @@ namespace ZoneTool
 			unsigned short framecount; // 14 - 0xE
 			char flags; // 16
 			unsigned char boneCount[10]; // 17
-			char notetrackCount; // 27
-			bool bLoop; // 28
-			bool bDelta; // 29
+			char notifyCount; // 27
 			char assetType; // 30
-			char ikType; // 31
+			bool isDefault; // 31
 			unsigned int randomDataShortCount; // 32 - 0x20
 			unsigned int indexcount; // 36 - 0x24
 			float framerate; // 40 - 0x28
@@ -1969,7 +1974,7 @@ namespace ZoneTool
 			char* randomDataByte; // 68 - 0x44
 			int* randomDataInt; // 72 - 0x48
 			XAnimIndices indices; // 76 - 0x4C
-			XAnimNotifyInfo* notetracks; // 80 - 0x50
+			XAnimNotifyInfo* notify; // 80 - 0x50
 			XAnimDeltaPart* delta; // 84 - 0x54
 		};
 #pragma pack(pop)

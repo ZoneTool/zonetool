@@ -803,13 +803,12 @@ namespace ZoneTool
 			unsigned short randomDataByteCount; // 10 - 0xA
 			unsigned short randomDataIntCount; // 12 - 0xC
 			unsigned short framecount; // 14 - 0xE
-			char pad1; // 16
-			char pad2; // 31
-			char boneCount[10]; // 17
-			char notetrackCount; // 27
-			bool bLoop; // 28
-			bool bDelta; // 29
+			char bLoop; // 16
+			char bDelta; // 31
+			unsigned char boneCount[10]; // 17
+			char notifyCount; // 27
 			char assetType; // 30
+            bool isDefault;
 			unsigned int randomDataShortCount; // 32 - 0x20
 			unsigned int indexcount; // 36 - 0x24
 			float framerate; // 40 - 0x28
@@ -822,7 +821,7 @@ namespace ZoneTool
 			char* randomDataByte; // 68 - 0x44
 			int* randomDataInt; // 72 - 0x48
 			XAnimIndices indices; // 76 - 0x4C
-			XAnimNotifyInfo* notetracks; // 80 - 0x50
+			XAnimNotifyInfo* notify; // 80 - 0x50
 			XAnimDeltaPart* delta; // 84 - 0x54
 		};
 

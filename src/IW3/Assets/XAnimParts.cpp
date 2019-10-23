@@ -29,14 +29,18 @@ namespace ZoneTool
 				XAE_CopyElement(randomDataByteCount);
 				XAE_CopyElement(randomDataIntCount);
 				XAE_CopyElement(framecount);
-				// XAE_CopyElement(pad1);
+
+                asset->flags = 0;
+                if (anim->bLoop)
+                    asset->flags |= IW4::ANIM_LOOP;
+                if (anim->bDelta)
+                    asset->flags |= IW4::ANIM_DELTA;
+
 				for (int i = 0; i < 10; i++)
 					XAE_CopyElement(boneCount[i]);
-				XAE_CopyElement(notetrackCount);
-				XAE_CopyElement(bLoop);
-				XAE_CopyElement(bDelta);
+				XAE_CopyElement(notifyCount);
 				XAE_CopyElement(assetType);
-				// XAE_CopyElement(pad2);
+				XAE_CopyElement(isDefault);
 				XAE_CopyElement(randomDataShortCount);
 				XAE_CopyElement(indexcount);
 				XAE_CopyElement(framerate);
@@ -49,7 +53,7 @@ namespace ZoneTool
 				XAE_CopyElement(randomDataByte);
 				XAE_CopyElement(randomDataInt);
 				XAE_CopyElement(indices.data);
-				asset->notetracks = (IW4::XAnimNotifyInfo*)anim->notetracks;
+				asset->notify = (IW4::XAnimNotifyInfo*)anim->notify;
 				asset->delta = (IW4::XAnimDeltaPart*)anim->delta;
 
 				// dump asset

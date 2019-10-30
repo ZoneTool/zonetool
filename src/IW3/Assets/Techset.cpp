@@ -344,7 +344,7 @@ namespace ZoneTool
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
 			auto iw4_techset = new IW4::MaterialTechniqueSet;
-			memset(iw4_techset, 0, sizeof MaterialTechniqueSet);
+			memset(iw4_techset, 0, sizeof IW4::MaterialTechniqueSet);
 
 			iw4_techset->name = asset->name;
 			iw4_techset->pad = asset->pad;
@@ -354,10 +354,11 @@ namespace ZoneTool
 				const auto itr = iw3_technique_map.find(i);
 				if (itr != iw3_technique_map.end())
 				{
-					iw4_techset->techniques[itr->second] = reinterpret_cast<IW4::MaterialTechnique*>(asset->techniques[i]);
-
-					if (iw4_techset->techniques[itr->second])
+					if (asset->techniques[i])
 					{
+						iw4_techset->techniques[itr->second] = new IW4::MaterialTechnique; // reinterpret_cast<IW4::MaterialTechnique*>(asset->techniques[i]);
+						memcpy(iw4_techset->techniques[itr->second], asset->techniques[i], sizeof IW4::MaterialTechnique);
+
 						auto& iw3_technique = asset->techniques[i];
 						auto& technique = iw4_techset->techniques[itr->second];
 						
@@ -371,6 +372,10 @@ namespace ZoneTool
 							if (iw3_passDef->pixelShader) passDef->pixelShader = dump_pixel_shader(iw3_passDef->pixelShader);
 							if (iw3_passDef->vertexDecl) passDef->vertexDecl = dump_vertex_decl(vertex_decl_name.data(), iw3_passDef->vertexDecl);
 							if (iw3_passDef->vertexShader) passDef->vertexShader = dump_vertex_shader(iw3_passDef->vertexShader);
+
+							if (passDef->pixelShader) delete passDef->pixelShader;
+							if (passDef->vertexDecl) delete passDef->vertexDecl;
+							if (passDef->vertexShader) delete passDef->vertexShader;
 							
 							for (auto arg = 0; arg < passDef->perPrimArgCount + passDef->perObjArgCount + passDef->stableArgCount; arg++)
 							{
@@ -389,6 +394,14 @@ namespace ZoneTool
 			}
 
 			IW4::ITechset::dump(iw4_techset);
+
+			for (int i = 0; i < 48; i++)
+			{
+				if (iw4_techset->techniques[i])
+				{
+					delete iw4_techset->techniques[i];
+				}
+			}
 			
 			delete iw4_techset;
 		}

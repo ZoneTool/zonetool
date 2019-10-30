@@ -99,7 +99,11 @@ namespace ZoneTool
 				}
 
 				auto file = FileSystem::FileOpen(path, "wb");
-
+				if (!file)
+				{
+					return;
+				}
+				
 				nlohmann::json matdata;
 
 				MATERIAL_DUMP_STRING(name);
@@ -120,7 +124,6 @@ namespace ZoneTool
 				MATERIAL_DUMP_INT(stateFlags);
 				MATERIAL_DUMP_INT(cameraRegion);
 
-				MATERIAL_DUMP_BITS_ENTRY(stateBitsEntry, 34);
 				MATERIAL_DUMP_CONST_ARRAY(constantTable, mat->constantCount);
 				MATERIAL_DUMP_STATE_MAP(stateMap, mat->stateBitsCount);
 

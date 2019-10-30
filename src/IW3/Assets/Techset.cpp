@@ -96,7 +96,7 @@ namespace ZoneTool
 			// convert to IW4
 			auto asset = new IW4::VertexDecl;
 			memset(asset, 0, sizeof IW4::VertexDecl);
-
+			
 			asset->name = name;
 
 			asset->hasOptionalSource = vertex->hasOptionalSource;

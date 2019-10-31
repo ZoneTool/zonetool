@@ -136,10 +136,30 @@ namespace ZoneTool
 			return "";
 		}
 
+		void* DB_FindXAssetHeader_Unsafe(const XAssetType type, const std::string& name)
+		{
+			const static auto DB_FindXAssetHeader_Internal = 0x5BB1B0;
+			const auto name_ptr = name.data();
+			const auto type_int = static_cast<std::int32_t>(type);
+
+			const XAsset* asset_header = nullptr;
+
+			__asm
+			{
+				mov edi, type_int;
+				push name_ptr;
+				call DB_FindXAssetHeader_Internal;
+				add esp, 4;
+				mov asset_header, eax;
+			}
+
+			return (asset_header) ? asset_header->ptr.data : nullptr;
+		}
+		
 		void Linker::DB_AddXAsset(XAssetType type, XAssetHeader header)
 		{
-			static std::unordered_map<std::string, std::vector<std::pair<std::string, std::uint32_t>>> mappedShaders;
-
+			static std::vector<std::pair<XAssetType, std::string>> referencedAssets;
+			
 			// nice meme
 			if (isVerifying)
 			{
@@ -180,92 +200,78 @@ char**>(0x00799278)[type]);
 
 			if (isDumping)
 			{
-				// dont dump empty assets
-				if (GetAssetName(type, header)[0] == ',')
-				{
-					return;
-				}
-
 				// check if we're done loading the fastfile
 				if (type == rawfile && GetAssetName(type, header) == fastfile)
 				{
+					for (auto& ref : referencedAssets)
+					{
+						if (ref.second.length() <= 1)
+						{
+							continue;
+						}
+
+						const auto asset_name = &ref.second[1];
+						const auto ref_asset = DB_FindXAssetHeader_Unsafe(ref.first, asset_name);
+
+						if (ref_asset == nullptr)
+						{
+							continue;
+						}
+
+						ZONETOOL_INFO("Dumping additional asset \"%s\" because it is referenced by %s.", asset_name, currentDumpingZone.data());
+
+						XAssetHeader header;
+						header.data = ref_asset;
+						
+						DB_AddXAsset(ref.first, header);
+					}
+
+					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
+
+					// clear referenced assets array because we are done dumping
+					referencedAssets.clear();
+
 					// mark dumping as complete to exit the process if it has been started using the command line
 					if (currentDumpingZone == fastfile)
 					{
 						isDumpingComplete = true;
 					}
-
-					auto fp = fopen("mappedShaders.txt", "wb");
-					if (fp)
-					{
-						for (auto& shader : mappedShaders)
-						{
-							fprintf(fp, "shader \"%s\" uses the following amount of arguments per technique:\n",
-							        shader.first.data());
-							for (auto& techset : shader.second)
-							{
-								fprintf(fp, "\t%s - %i\n", techset.first.data(), techset.second);
-							}
-						}
-						fclose(fp);
-					}
-
-					mappedShaders.clear();
-
-					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
 				}
-				if (type == techset)
+
+				if (GetAssetName(type, header)[0] == ',')
 				{
-					for (int i = 0; i < 48; i++)
-					{
-						if (header.techset->techniques[i])
-						{
-							for (int j = 0; j < header.techset->techniques[i]->hdr.numPasses; j++)
-							{
-								if (header.techset->techniques[i]->pass[j].vertexShader)
-								{
-									mappedShaders[header.techset->techniques[i]->pass[j].vertexShader->name].push_back(
-										{
-											header.techset->name,
-											header.techset->techniques[i]->pass[j].stableArgCount + header
-											                                                        .techset->techniques
-											[i]->pass[j].perObjArgCount +
-											header.techset->techniques[i]->pass[j].perPrimArgCount
-										}
-									);
-								}
-							}
-						}
-					}
+					referencedAssets.push_back({ type, GetAssetName(type, header) });
 				}
-
-				DECLARE_ASSET(phys_collmap, IPhysCollmap);
-				DECLARE_ASSET(tracer, ITracerDef);
-				DECLARE_ASSET(xmodelsurfs, IXSurface);
-				DECLARE_ASSET(xmodel, IXModel);
-				DECLARE_ASSET(material, IMaterial);
-				DECLARE_ASSET(xanim, IXAnimParts);
-				DECLARE_ASSET(techset, ITechset);
-				DECLARE_ASSET(gfx_map, IGfxWorld);
-				DECLARE_ASSET(col_map_mp, IClipMap);
-				DECLARE_ASSET(map_ents, IMapEnts);
-				DECLARE_ASSET(fx_map, IFxWorld);
-				DECLARE_ASSET(com_map, IComWorld);
-				DECLARE_ASSET(sound, ISound);
-				DECLARE_ASSET(sndcurve, ISoundCurve);
-				DECLARE_ASSET(loaded_sound, ILoadedSound);
-				DECLARE_ASSET(rawfile, IRawFile);
-				DECLARE_ASSET(stringtable, IStringTable);
-				DECLARE_ASSET(stringtable, IStringTable);
-				DECLARE_ASSET(vertexdecl, IVertexDecl);
-				DECLARE_ASSET(pixelshader, IPixelShader);
-				DECLARE_ASSET(vertexshader, IVertexShader);
-				DECLARE_ASSET(techset, ITechset);
-				DECLARE_ASSET(game_map_mp, IGameWorldMp);
-				DECLARE_ASSET(image, IGfxImage);
-				DECLARE_ASSET(fx, IFxEffectDef);
-				DECLARE_ASSET(lightdef, ILightDef);
-				DECLARE_ASSET(weapon, IWeaponDef);
+				else
+				{
+					DECLARE_ASSET(phys_collmap, IPhysCollmap);
+					DECLARE_ASSET(tracer, ITracerDef);
+					DECLARE_ASSET(xmodelsurfs, IXSurface);
+					DECLARE_ASSET(xmodel, IXModel);
+					DECLARE_ASSET(material, IMaterial);
+					DECLARE_ASSET(xanim, IXAnimParts);
+					DECLARE_ASSET(techset, ITechset);
+					DECLARE_ASSET(gfx_map, IGfxWorld);
+					DECLARE_ASSET(col_map_mp, IClipMap);
+					DECLARE_ASSET(map_ents, IMapEnts);
+					DECLARE_ASSET(fx_map, IFxWorld);
+					DECLARE_ASSET(com_map, IComWorld);
+					DECLARE_ASSET(sound, ISound);
+					DECLARE_ASSET(sndcurve, ISoundCurve);
+					DECLARE_ASSET(loaded_sound, ILoadedSound);
+					DECLARE_ASSET(rawfile, IRawFile);
+					DECLARE_ASSET(stringtable, IStringTable);
+					DECLARE_ASSET(stringtable, IStringTable);
+					DECLARE_ASSET(vertexdecl, IVertexDecl);
+					DECLARE_ASSET(pixelshader, IPixelShader);
+					DECLARE_ASSET(vertexshader, IVertexShader);
+					DECLARE_ASSET(techset, ITechset);
+					DECLARE_ASSET(game_map_mp, IGameWorldMp);
+					DECLARE_ASSET(image, IGfxImage);
+					DECLARE_ASSET(fx, IFxEffectDef);
+					DECLARE_ASSET(lightdef, ILightDef);
+					DECLARE_ASSET(weapon, IWeaponDef);
+				}
 			}
 		}
 

@@ -3094,6 +3094,7 @@ namespace ZoneTool
 			//structureddatadefset*	structureddatadef;
 			//menudef_t*				menu;
 			GfxLightDef* lightdef;
+			void* data;
 		};
 
 		enum MaterialTechniqueType
@@ -3300,6 +3301,12 @@ namespace ZoneTool
 			CONST_SRC_CODE_INVERSE_TRANSPOSE_WORLD_VIEW_PROJECTION_MATRIX2 = 0x83,
 			CONST_SRC_TOTAL_COUNT = 0x84,
 			CONST_SRC_NONE = 0x85,
+		};
+
+		struct XAsset
+		{
+			XAssetType type;
+			XAssetHeader ptr;
 		};
 	}
 

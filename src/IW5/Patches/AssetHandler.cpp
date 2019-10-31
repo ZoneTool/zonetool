@@ -83,8 +83,30 @@ namespace ZoneTool
 
 		static std::vector<std::pair<std::int32_t, std::string>> CommonAssets;
 
+		void* DB_FindXAssetHeader_Unsafe(const XAssetType type, const std::string& name)
+		{
+			const static auto DB_FindXAssetHeader_Internal = 0x44E540;
+			const auto name_ptr = name.data();
+			const auto type_int = static_cast<std::int32_t>(type);
+
+			const XAsset* asset_header = nullptr;
+
+			__asm
+			{
+				mov edi, name_ptr;
+				push type_int;
+				call DB_FindXAssetHeader_Internal;
+				add esp, 4;
+				mov asset_header, eax;
+			}
+
+			return (asset_header) ? asset_header->header.data : nullptr;
+		}
+		
 		void AssetHandler::DB_LogLoadedAsset(void* ptr, std::int32_t type)
 		{
+			static std::vector<std::pair<XAssetType, std::string>> referencedAssets;
+
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::DB_LogLoadedAsset");
 #endif
@@ -102,7 +124,6 @@ namespace ZoneTool
 			{
 				FileSystem::SetFastFile(fastfile);
 
-				static std::vector<std::pair<XAssetType, XAssetHeader>> dumpableAssets;
 				static FILE* csvFile;
 
 				// open csv file for dumping 
@@ -123,12 +144,27 @@ namespace ZoneTool
 				{
 					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
 
-					for (auto& asset : dumpableAssets)
+					for (auto& asset : referencedAssets)
 					{
-						DB_LogLoadedAsset(asset.second.rawfile, asset.first);
+						if (asset.second.length() <= 1)
+						{
+							continue;
+						}
+
+						const auto asset_name = &asset.second[1];
+						const auto ref_asset = DB_FindXAssetHeader_Unsafe(asset.first, asset_name);
+
+						if (ref_asset == nullptr)
+						{
+							continue;
+						}
+
+						ZONETOOL_INFO("Dumping additional asset \"%s\" because it is referenced by %s.", asset_name, fastfile.data());
+
+						DB_LogLoadedAsset(ref_asset, asset.first);
 					}
 
-					dumpableAssets.clear();
+					referencedAssets.clear();
 					FileSystem::FileClose(csvFile);
 
 					isDumpingComplete = true;
@@ -136,27 +172,10 @@ namespace ZoneTool
 
 				if (GetAssetName(type, ptr)[0] == ',')
 				{
-					// auto mainThreadId = reinterpret_cast<DWORD*>(0x01C11BDC);
-
-					// store old threadId
-					// auto oldId = *mainThreadId;
-
-					// patch mainthread
-					// *mainThreadId = GetCurrentThreadId();
-
-					/*dumpableAssets.push_back(
-						{ 
-							XAssetType(type), 
-							DB_FindXAssetHeader(type, &GetAssetName(type, ptr)[1], 1)
-						}
-					);*/
-
-					// restore old thread id
-					// *mainThreadId = oldId;
-
-					return;
+					referencedAssets.push_back({ XAssetType(type), GetAssetName(type, ptr) });
 				}
-
+				else
+				{
 #define DUMPCASE(__type__,__interface__,__struct__) \
 				if (type == __type__) \
 				{ \
@@ -164,34 +183,35 @@ namespace ZoneTool
 					__interface__::dump(asset); \
 				}
 
-				DUMPCASE(attachment, IAttachmentDef, AttachmentDef);
-				DUMPCASE(leaderboarddef, ILeaderBoardDef, LeaderBoardDef);
-				DUMPCASE(material, IMaterial, Material);
+					DUMPCASE(attachment, IAttachmentDef, AttachmentDef);
+					DUMPCASE(leaderboarddef, ILeaderBoardDef, LeaderBoardDef);
+					DUMPCASE(material, IMaterial, Material);
 
-				DUMPCASE(com_map, IComWorld, ComWorld);
-				DUMPCASE(gfx_map, IGfxWorld, GfxWorld);
-				DUMPCASE(fx_map, IFxWorld, FxWorld);
-				DUMPCASE(glass_map, IGlassWorld, GlassWorld);
-				DUMPCASE(col_map_mp, IClipMap, clipMap_t);
-				DUMPCASE(map_ents, IMapEnts, MapEnts);
-				DUMPCASE(lightdef, ILightDef, GfxLightDef);
+					DUMPCASE(com_map, IComWorld, ComWorld);
+					DUMPCASE(gfx_map, IGfxWorld, GfxWorld);
+					DUMPCASE(fx_map, IFxWorld, FxWorld);
+					DUMPCASE(glass_map, IGlassWorld, GlassWorld);
+					DUMPCASE(col_map_mp, IClipMap, clipMap_t);
+					DUMPCASE(map_ents, IMapEnts, MapEnts);
+					DUMPCASE(lightdef, ILightDef, GfxLightDef);
 
-				DUMPCASE(xanim, IXAnimParts, XAnimParts);
-				DUMPCASE(xmodel, IXModel, XModel);
-				DUMPCASE(xmodelsurfs, IXSurface, ModelSurface);
-				DUMPCASE(fx, IFxEffectDef, FxEffectDef);
-				DUMPCASE(sound, ISound, snd_alias_list_t);
-				DUMPCASE(stringtable, IStringTable, StringTable);
-				DUMPCASE(rawfile, IRawFile, RawFile);
-				DUMPCASE(weapon, IWeaponDef, WeaponCompleteDef);
-				DUMPCASE(image, IGfxImage, GfxImage);
-				DUMPCASE(phys_collmap, IPhysCollmap, PhysCollmap);
-				DUMPCASE(loaded_sound, ILoadedSound, LoadedSound);
+					DUMPCASE(xanim, IXAnimParts, XAnimParts);
+					DUMPCASE(xmodel, IXModel, XModel);
+					DUMPCASE(xmodelsurfs, IXSurface, ModelSurface);
+					DUMPCASE(fx, IFxEffectDef, FxEffectDef);
+					DUMPCASE(sound, ISound, snd_alias_list_t);
+					DUMPCASE(stringtable, IStringTable, StringTable);
+					DUMPCASE(rawfile, IRawFile, RawFile);
+					DUMPCASE(weapon, IWeaponDef, WeaponCompleteDef);
+					DUMPCASE(image, IGfxImage, GfxImage);
+					DUMPCASE(phys_collmap, IPhysCollmap, PhysCollmap);
+					DUMPCASE(loaded_sound, ILoadedSound, LoadedSound);
 
-				DUMPCASE(techset, ITechset, MaterialTechniqueSet);
-				DUMPCASE(pixelshader, IPixelShader, PixelShader);
-				DUMPCASE(vertexshader, IVertexShader, VertexShader);
-				DUMPCASE(vertexdecl, IVertexDecl, VertexDecl);
+					DUMPCASE(techset, ITechset, MaterialTechniqueSet);
+					DUMPCASE(pixelshader, IPixelShader, PixelShader);
+					DUMPCASE(vertexshader, IVertexShader, VertexShader);
+					DUMPCASE(vertexdecl, IVertexDecl, VertexDecl);
+				}
 			}
 			else
 			{

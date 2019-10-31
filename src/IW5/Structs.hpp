@@ -4901,6 +4901,7 @@ namespace ZoneTool
 			StructuredDataDefSet* structureddatadef;
 			menuDef_t* menu;
 			GfxLightDef* lightdef;
+			void* data;
 		};
 	}
 }

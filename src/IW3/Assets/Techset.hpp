@@ -18,9 +18,10 @@ namespace ZoneTool
 		public:
 			static void dumpTechniquePass(MaterialTechnique* asset);
 			static void dump(MaterialTechniqueSet* asset);
-			static IW4::VertexDecl* dump_vertex_decl(const char* name, MaterialVertexDeclaration* vertex);
+			static IW4::VertexDecl* dump_vertex_decl(const std::string& name, MaterialVertexDeclaration* vertex);
 			static IW4::VertexShader* dump_vertex_shader(MaterialVertexShader* shader);
 			static IW4::PixelShader* dump_pixel_shader(MaterialPixelShader* shader);
+			static void dump_statebits(const std::string& techset, char* statebits);
 		};
 	}
 }

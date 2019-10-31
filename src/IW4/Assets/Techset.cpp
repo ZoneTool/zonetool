@@ -327,36 +327,48 @@ namespace ZoneTool
 					dest_index += 2;
 				}
 
-				iw5_techset->techniques[dest_index] = reinterpret_cast<IW5::MaterialTechnique*>(iw5_techset->techniques[i]);
-
-				if (iw5_techset->techniques[dest_index])
+				if (asset->techniques[i])
 				{
+					const auto size = sizeof IW5::MaterialTechniqueHeader + (sizeof(MaterialPass) * asset->techniques[i]->hdr.numPasses);
+					iw5_techset->techniques[dest_index] = reinterpret_cast<IW5::MaterialTechnique*>(
+						new char[size]);
+
+					memcpy(iw5_techset->techniques[dest_index], asset->techniques[i], size);
+					
 					auto& technique = iw5_techset->techniques[dest_index];
 					for (short pass = 0; pass < technique->hdr.numPasses; pass++)
 					{
-						auto passDef = &technique->pass[pass];
-						for (auto arg = 0; arg < passDef->perPrimArgCount + passDef->perObjArgCount + passDef->stableArgCount; arg++)
-						{
-							auto argDef = &passDef->argumentDef[arg];
+						const auto pass_def = &technique->pass[pass];
 
-							if (argDef->type > 1)
+						const auto arg_count = pass_def->perPrimArgCount + pass_def->perObjArgCount + pass_def->stableArgCount;
+						if (arg_count > 0)
+						{
+							pass_def->argumentDef = new IW5::ShaderArgumentDef[arg_count];
+							memcpy(pass_def->argumentDef, asset->techniques[i]->pass[pass].argumentDef, sizeof(IW5::ShaderArgumentDef) * arg_count);
+						}
+						
+						for (auto arg = 0; arg < arg_count; arg++)
+						{
+							auto arg_def = &pass_def->argumentDef[arg];
+
+							if (arg_def->type > 1)
 							{
-								argDef->type++;
+								arg_def->type++;
 							}
 
-							if (argDef->type == 4 || argDef->type == 6)
+							if (arg_def->type == 4 || arg_def->type == 6)
 							{
-								if (argDef->u.codeConst.index >= 58)
+								if (arg_def->u.codeConst.index >= 58)
 								{
-									argDef->u.codeConst.index += 8;
+									arg_def->u.codeConst.index += 8;
 								}
-								else if (argDef->u.codeConst.index >= 31)
+								else if (arg_def->u.codeConst.index >= 31)
 								{
-									argDef->u.codeConst.index += 6;
+									arg_def->u.codeConst.index += 6;
 								}
-								else if (argDef->u.codeConst.index >= 21)
+								else if (arg_def->u.codeConst.index >= 21)
 								{
-									argDef->u.codeConst.index += 5;
+									arg_def->u.codeConst.index += 5;
 								}
 							}
 						}
@@ -365,6 +377,19 @@ namespace ZoneTool
 			}
 
 			IW5::ITechset::dump(iw5_techset);
+
+			for (int i = 0; i < 54; i++)
+			{
+				if (iw5_techset->techniques[i])
+				{
+					for (short pass = 0; pass < iw5_techset->techniques[i]->hdr.numPasses; pass++)
+					{
+						delete iw5_techset->techniques[i]->pass[pass].argumentDef;
+					}
+					delete iw5_techset->techniques[i];
+				}
+			}
+			
 			delete iw5_techset;
 		}
 	}

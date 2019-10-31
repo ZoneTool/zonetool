@@ -74,14 +74,11 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void IMaterial::dumpStateBits(Material* mat)
+		void IMaterial::dump_statebits(Material* mat)
 		{
 			if (mat && mat->techniqueSet)
 			{
-				auto path = "techsets\\"s + mat->techniqueSet->name + ".statebits";
-				auto file = FileSystem::FileOpen(path, "wb");
-				fwrite(mat->stateBitsEntry, 34, 1, file);
-				FileSystem::FileClose(file);
+				ITechset::dump_statebits(mat->techniqueSet->name, mat->stateBitsEntry);
 			}
 		}
 
@@ -89,14 +86,9 @@ namespace ZoneTool
 		{
 			if (mat)
 			{
-				dumpStateBits(mat);
+				dump_statebits(mat);
 
 				auto path = "materials\\"s + mat->name;
-
-				if (FileSystem::FileExists(path))
-				{
-					return;
-				}
 
 				auto file = FileSystem::FileOpen(path, "wb");
 				if (!file)

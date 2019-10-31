@@ -134,7 +134,7 @@ namespace ZoneTool
 			{
 				linker->LoadZone(std::string(row->fields_[1]));
 			}
-				// this allows us to reference assets instead of rewriting them
+			// this allows us to reference assets instead of rewriting them
 			else if (row->fields_[0] == "reference"s)
 			{
 				if (row->numOfFields_ >= 2)
@@ -142,7 +142,12 @@ namespace ZoneTool
 					isReferencing = row->fields_[1] == "true"s;
 				}
 			}
-				// this will use a directory iterator to automatically add assets
+			// add assets that are required for maps
+			else if (row->fields_[0] == "map"s)
+			{
+				zone->AddAssetOfType("techset", "wc_l_hsm_r0c0n0s0");
+			}
+			// this will use a directory iterator to automatically add assets
 			else if (row->fields_[0] == "iterate"s)
 			{
 				try
@@ -220,11 +225,6 @@ namespace ZoneTool
 			// destroy row and alloc next one.
 			CsvParser_destroy_row(row);
 			row = CsvParser_getRow(parser);
-		}
-
-		if (linker->Version() == "IW4"s || linker->Version() == "IW5"s)
-		{
-			zone->AddAssetOfType("techset", "wc_l_hsm_r0c0n0s0");
 		}
 
 		// free csv parser

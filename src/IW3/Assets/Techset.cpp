@@ -77,7 +77,7 @@ std::uint32_t Crc32(void* buffer, const std::size_t size, const std::uint32_t in
 namespace ZoneTool
 {
 	namespace IW3
-	{
+	{		
 		std::string GenerateNameForVertexDecl(MaterialVertexDeclaration* vertexDecl)
 		{
 			// base name + crc32
@@ -91,13 +91,13 @@ namespace ZoneTool
 			return name;
 		}
 
-		IW4::VertexDecl* ITechset::dump_vertex_decl(const char* name, MaterialVertexDeclaration* vertex)
+		IW4::VertexDecl* ITechset::dump_vertex_decl(const std::string& name, MaterialVertexDeclaration* vertex)
 		{
 			// convert to IW4
 			auto asset = new IW4::VertexDecl;
 			memset(asset, 0, sizeof IW4::VertexDecl);
 			
-			asset->name = name;
+			asset->name = _strdup(name.data());
 
 			asset->hasOptionalSource = vertex->hasOptionalSource;
 			asset->streamCount = vertex->streamCount;
@@ -116,7 +116,7 @@ namespace ZoneTool
 			// shit out a warning
 			if (asset->streamCount > 13)
 			{
-				ZONETOOL_ERROR("Vertexdecl %s has more than 13 streams.", name);
+				ZONETOOL_ERROR("Vertexdecl %s has more than 13 streams.", name.data());
 			}
 
 			// lets pray it works
@@ -340,6 +340,26 @@ namespace ZoneTool
 			{IW3::CONST_SRC_TOTAL_COUNT, IW4::CONST_SRC_TOTAL_COUNT},
 			{IW3::CONST_SRC_NONE, IW4::CONST_SRC_NONE},
 		};
+
+		void ITechset::dump_statebits(const std::string& techset, char* statebits)
+		{
+			char iw4_statebits[48];
+			memset(iw4_statebits, 0, sizeof iw4_statebits);
+
+			for (int i = 0; i < 34; i++)
+			{
+				const auto itr = iw3_technique_map.find(i);
+				if (itr != iw3_technique_map.end())
+				{
+					if (itr->second >= 0)
+					{
+						iw4_statebits[itr->second] = statebits[i];
+					}
+				}
+			}
+			
+			IW4::ITechset::dump_statebits(techset, iw4_statebits);
+		}
 		
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
@@ -354,37 +374,43 @@ namespace ZoneTool
 				const auto itr = iw3_technique_map.find(i);
 				if (itr != iw3_technique_map.end())
 				{
-					if (asset->techniques[i])
+					if (asset->techniques[i] && itr->second >= 0)
 					{
-						iw4_techset->techniques[itr->second] = new IW4::MaterialTechnique; // reinterpret_cast<IW4::MaterialTechnique*>(asset->techniques[i]);
-						memcpy(iw4_techset->techniques[itr->second], asset->techniques[i], sizeof IW4::MaterialTechnique);
+						const auto size = sizeof(IW4::MaterialTechniqueHeader) + (sizeof(IW4::MaterialPass) * asset->techniques[i]->hdr.numPasses);
+						iw4_techset->techniques[itr->second] = reinterpret_cast<IW4::MaterialTechnique*>(
+							new char[size]);
+						
+						memcpy(iw4_techset->techniques[itr->second], asset->techniques[i], size);
 
 						auto& iw3_technique = asset->techniques[i];
 						auto& technique = iw4_techset->techniques[itr->second];
 						
 						for (short pass = 0; pass < technique->hdr.numPasses; pass++)
 						{
-							auto iw3_passDef = &iw3_technique->pass[pass];
-							auto passDef = &technique->pass[pass];
+							const auto iw3_pass_def = &iw3_technique->pass[pass];
+							const auto pass_def = &technique->pass[pass];
 
-							auto vertex_decl_name = GenerateNameForVertexDecl(iw3_passDef->vertexDecl);
+							auto vertex_decl_name = GenerateNameForVertexDecl(iw3_pass_def->vertexDecl);
 
-							if (iw3_passDef->pixelShader) passDef->pixelShader = dump_pixel_shader(iw3_passDef->pixelShader);
-							if (iw3_passDef->vertexDecl) passDef->vertexDecl = dump_vertex_decl(vertex_decl_name.data(), iw3_passDef->vertexDecl);
-							if (iw3_passDef->vertexShader) passDef->vertexShader = dump_vertex_shader(iw3_passDef->vertexShader);
+							if (iw3_pass_def->pixelShader) pass_def->pixelShader = dump_pixel_shader(iw3_pass_def->pixelShader);
+							if (iw3_pass_def->vertexDecl) pass_def->vertexDecl = dump_vertex_decl(vertex_decl_name, iw3_pass_def->vertexDecl);
+							if (iw3_pass_def->vertexShader) pass_def->vertexShader = dump_vertex_shader(iw3_pass_def->vertexShader);
 
-							if (passDef->pixelShader) delete passDef->pixelShader;
-							if (passDef->vertexDecl) delete passDef->vertexDecl;
-							if (passDef->vertexShader) delete passDef->vertexShader;
-							
-							for (auto arg = 0; arg < passDef->perPrimArgCount + passDef->perObjArgCount + passDef->stableArgCount; arg++)
+							const auto arg_count = pass_def->perPrimArgCount + pass_def->perObjArgCount + pass_def->stableArgCount;
+							if (arg_count > 0)
 							{
-								auto argDef = &passDef->argumentDef[arg];
-								if (argDef->type == 3 || argDef->type == 5)
+								pass_def->argumentDef = new IW4::ShaderArgumentDef[arg_count];
+								memcpy(pass_def->argumentDef, iw3_pass_def->args, sizeof(IW4::ShaderArgumentDef) * arg_count);
+							}
+							
+							for (auto arg = 0; arg < pass_def->perPrimArgCount + pass_def->perObjArgCount + pass_def->stableArgCount; arg++)
+							{
+								const auto arg_def = &pass_def->argumentDef[arg];
+								if (arg_def->type == 3 || arg_def->type == 5)
 								{
-									if (iw3_code_const_map.find(argDef->u.codeConst.index) != iw3_code_const_map.end())
+									if (iw3_code_const_map.find(arg_def->u.codeConst.index) != iw3_code_const_map.end())
 									{
-										argDef->u.codeConst.index = iw3_code_const_map[argDef->u.codeConst.index];
+										arg_def->u.codeConst.index = iw3_code_const_map[arg_def->u.codeConst.index];
 									}
 								}
 							}
@@ -399,6 +425,14 @@ namespace ZoneTool
 			{
 				if (iw4_techset->techniques[i])
 				{
+					for (short pass = 0; pass < iw4_techset->techniques[i]->hdr.numPasses; pass++)
+					{
+						delete iw4_techset->techniques[i]->pass[pass].pixelShader;
+						delete iw4_techset->techniques[i]->pass[pass].vertexDecl;
+						delete iw4_techset->techniques[i]->pass[pass].vertexShader;
+						delete iw4_techset->techniques[i]->pass[pass].argumentDef;
+					}
+
 					delete iw4_techset->techniques[i];
 				}
 			}

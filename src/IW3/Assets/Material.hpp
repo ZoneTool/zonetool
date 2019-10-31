@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		public:
 			static void dump(Material* asset);
-			static void dumpStateBits(Material* mat);
+			static void dump_statebits(Material* mat);
 		};
 	}
 }

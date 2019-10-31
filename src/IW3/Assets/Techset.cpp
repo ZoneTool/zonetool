@@ -354,6 +354,11 @@ namespace ZoneTool
 					if (itr->second >= 0)
 					{
 						iw4_statebits[itr->second] = statebits[i];
+
+						if (itr->second >= 5 && itr->second <= 36)
+						{
+							iw4_statebits[itr->second + 1] = statebits[i];
+						}
 					}
 				}
 			}
@@ -379,6 +384,11 @@ namespace ZoneTool
 						const auto size = sizeof(IW4::MaterialTechniqueHeader) + (sizeof(IW4::MaterialPass) * asset->techniques[i]->hdr.numPasses);
 						iw4_techset->techniques[itr->second] = reinterpret_cast<IW4::MaterialTechnique*>(
 							new char[size]);
+
+						if (itr->second >= 5 && itr->second <= 36)
+						{
+							iw4_techset->techniques[itr->second + 1] = iw4_techset->techniques[itr->second];
+						}
 						
 						memcpy(iw4_techset->techniques[itr->second], asset->techniques[i], size);
 
@@ -425,6 +435,11 @@ namespace ZoneTool
 			{
 				if (iw4_techset->techniques[i])
 				{
+					if (i >= 5 && i <= 36 && i % 2 == 0)
+					{
+						continue;
+					}
+					
 					for (short pass = 0; pass < iw4_techset->techniques[i]->hdr.numPasses; pass++)
 					{
 						delete iw4_techset->techniques[i]->pass[pass].pixelShader;

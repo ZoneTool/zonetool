@@ -44,6 +44,29 @@ namespace ZoneTool
 			return Dvar_RegisterBool(name, true, 0x2000, description);
 		}
 
+		void** DB_XAssetPool = (void**)0x7265E0;
+		unsigned int* g_poolSize = (unsigned int*)0x7263A0;
+
+		void* DB_FindXAssetHeader_Unsafe(const XAssetType type, const std::string& name)
+		{
+			const static auto DB_FindXAssetHeader_Internal = 0x4892A0;
+			const auto name_ptr = name.data();
+			const auto type_int = static_cast<std::int32_t>(type);
+			
+			const XAsset* asset_header = nullptr;
+			
+			__asm
+			{
+				mov edi, name_ptr;
+				push type_int;
+				call DB_FindXAssetHeader_Internal;
+				add esp, 4;
+				mov asset_header, eax;
+			}
+
+			return (asset_header) ? asset_header->ptr.data : nullptr;
+		}
+		
 		const char* Linker::GetAssetName(XAsset* asset)
 		{
 			// todo
@@ -86,8 +109,32 @@ namespace ZoneTool
 
 			if (asset->type == rawfile && GetAssetName(asset) == currentDumpingZone)
 			{
-                ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
+				for (auto& ref : referencedAssets)
+				{
+					if (ref.first != XAssetType::techset || ref.second.length() <= 1)
+					{
+						continue;
+					}
 
+					const auto asset_name = &ref.second[1];
+					const auto ref_asset = DB_FindXAssetHeader_Unsafe(ref.first, asset_name);
+
+					if (ref_asset == nullptr)
+					{
+						continue;
+					}
+					
+					XAsset asset;
+					asset.type = ref.first;
+					asset.ptr.data = ref_asset;
+
+					ZONETOOL_INFO("Dumping additional asset \"%s\" because it is referenced by %s.", asset_name, currentDumpingZone.data());
+					
+					HandleAsset(&asset);
+				}
+
+				ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
+				
 				// clear referenced assets array because we are done dumping
 				referencedAssets.clear();
 
@@ -125,9 +172,6 @@ namespace ZoneTool
 			// call original function
 			return Memory::Func<void*(XAsset* asset, int unk)>(0x489B00)(asset, unk);
 		}
-
-		void** DB_XAssetPool = (void**)0x7265E0;
-		unsigned int* g_poolSize = (unsigned int*)0x7263A0;
 
 		void* ReallocateAssetPool(uint32_t type, unsigned int newSize)
 		{

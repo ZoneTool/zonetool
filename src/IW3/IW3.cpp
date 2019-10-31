@@ -196,6 +196,11 @@ namespace ZoneTool
 			return poolEntry;
 		}
 
+		void Com_PrintfHook(int channel, const char* data, int unk)
+		{
+			printf(data);
+		}
+		
 		void Linker::Startup()
 		{
 			if (this->InUse())
@@ -255,6 +260,9 @@ namespace ZoneTool
 
 				// Disable console window
 				Memory(0x0046CE55).Nop(5);
+
+				// Obtain console output from IW3
+				Memory(0x4FCC00).Call(Com_PrintfHook);
 			}
 		}
 

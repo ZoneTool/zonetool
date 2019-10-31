@@ -111,7 +111,7 @@ namespace ZoneTool
 			{
 				for (auto& ref : referencedAssets)
 				{
-					if (ref.first != XAssetType::techset || ref.second.length() <= 1)
+					if (/*ref.first != XAssetType::techset ||*/ ref.second.length() <= 1)
 					{
 						continue;
 					}

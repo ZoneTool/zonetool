@@ -26,6 +26,7 @@ namespace ZoneTool
 			IGfxImage();
 			~IGfxImage();
 
+			static void dump_iwi(const std::string& name);
 
 			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
 			void init(void* asset, std::shared_ptr<ZoneMemory>& mem) override;

@@ -7,6 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include "IW5/Assets/GfxImage.hpp"
 
 namespace ZoneTool
 {
@@ -154,30 +155,11 @@ namespace ZoneTool
 		{
 			return image;
 		}
-
+		
 		void IGfxImage::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
 		{
-			if (FileSystem::FileExists(this->name() + ".iwi") && !std::filesystem::exists(
-				"main\\iw4_images\\" + this->name() + ".iwi"))
-			{
-				auto fp = fopen(
-					va("main\\%s\\images\\%s.iwi", FileSystem::GetFastFile().data(), this->name().data()).data(), "wb");
-				if (fp)
-				{
-					auto origfp = FileSystem::FileOpen(this->name() + ".iwi", "rb");
-
-					if (origfp)
-					{
-						auto origsize = FileSystem::FileSize(origfp);
-						auto bytes = FileSystem::ReadBytes(origfp, origsize);
-						fwrite(&bytes[0], bytes.size(), 1, fp);
-						fclose(origfp);
-					}
-
-					fclose(fp);
-				}
-			}
-
+			IW5::IGfxImage::dump_iwi(this->name());
+			
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
 

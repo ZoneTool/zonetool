@@ -2144,7 +2144,7 @@ namespace nlohmann
 		/*!
 		@brief destructor
 
-		Destroys the JSON value and frees all allocated memory.
+		Destroys the JSON value and frees all allocated memory_.
 
 		@complexity Linear.
 
@@ -2152,7 +2152,7 @@ namespace nlohmann
 		[Container](http://en.cppreference.com/w/cpp/concept/Container)
 		requirements:
 		- The complexity is linear.
-		- All stored elements are destroyed and all memory is freed.
+		- All stored elements are destroyed and all memory_ is freed.
 
 		@since version 1.0.0
 		*/

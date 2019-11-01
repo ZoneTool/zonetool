@@ -20,17 +20,17 @@ namespace ZoneTool
 			bool m_parsed;
 			
 		public:
-			static MaterialTechniqueSet* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
-			static char* parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem);
+			static MaterialTechniqueSet* parse(const std::string& name, ZoneMemory* mem);
+			static char* parse_statebits(const std::string& techset, ZoneMemory* mem);
 			
-			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
-			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
+			void init(const std::string& name, ZoneMemory* mem) override;
+			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 			void* pointer() override { return m_asset; }
 
 			std::string name() override;
 			std::int32_t type() override;
-			void write(IZone* zone, std::shared_ptr<ZoneBuffer>& buffer) override;
+			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump_statebits(const std::string& techset, char* statebits);
 			static void dump(MaterialTechniqueSet* asset);

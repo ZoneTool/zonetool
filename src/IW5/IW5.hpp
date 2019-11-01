@@ -28,20 +28,20 @@ namespace ZoneTool
 			Linker();
 			~Linker();
 
-			const char* Version() override;
-			bool InUse() override;
-			void Startup() override;
-			std::shared_ptr<IZone> AllocZone(std::string& zone) override;
-			std::shared_ptr<ZoneBuffer> AllocBuffer() override;
-			void LoadZone(std::string& name) override;
-			void UnloadZones() override;
-			bool IsValidAssetType(std::string& type) override;
-			std::int32_t TypeToInt(std::string type) override;
-			std::string TypeToString(std::int32_t type) override;
-            bool SupportsBuilding() override;
+			const char* version() override;
+			bool is_used() override;
+			void startup() override;
+			std::shared_ptr<IZone> alloc_zone(const std::string& zone) override;
+			std::shared_ptr<ZoneBuffer> alloc_buffer() override;
+			void load_zone(const std::string& name) override;
+			void unload_zones() override;
+			bool is_valid_asset_type(std::string& type) override;
+			std::int32_t type_to_int(std::string type) override;
+			std::string type_to_string(std::int32_t type) override;
+            bool supports_building() override;
 
-			void DumpZone(std::string& name) override;
-			void VerifyZone(std::string& name) override;
+			void dump_zone(const std::string& name) override;
+			void verify_zone(const std::string& name) override;
 		};
 	}
 }

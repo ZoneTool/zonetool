@@ -24,7 +24,7 @@ namespace ZoneTool
 
 		static short SL_AllocString(const std::string& string)
 		{
-			return Memory::Func<short(const char*, std::uint32_t, std::size_t)>(0x4E75A0)(
+			return Memory::func<short(const char*, std::uint32_t, std::size_t)>(0x4E75A0)(
 				string.data(), 1, string.size() + 1);
 		}
 	}

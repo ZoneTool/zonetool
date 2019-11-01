@@ -149,7 +149,7 @@ namespace ZoneTool
 		} _IWI;
 
 		// Image parsing
-		_IWI* LoadIWIHeader(std::string name, std::shared_ptr<ZoneMemory>& mem)
+		_IWI* LoadIWIHeader(std::string name, ZoneMemory* mem)
 		{
 			auto path = "images\\" + name + ".iwi";
 
@@ -170,7 +170,7 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		GfxImageLoadDef* GenerateLoadDef(GfxImage* image, short iwi_format, std::shared_ptr<ZoneMemory>& mem)
+		GfxImageLoadDef* GenerateLoadDef(GfxImage* image, short iwi_format, ZoneMemory* mem)
 		{
 			auto texture = mem->Alloc<GfxImageLoadDef>();
 
@@ -200,7 +200,7 @@ namespace ZoneTool
 		}
 
 		GfxImage* Image_Parse(const char* name, char semantic, char category, char flags,
-		                      std::shared_ptr<ZoneMemory>& mem)
+		                      ZoneMemory* mem)
 		{
 			_IWI* buf = LoadIWIHeader(name, mem);
 
@@ -227,7 +227,7 @@ namespace ZoneTool
 			return DB_FindXAssetHeader(image, name, 1).gfximage;
 		}
 
-		MaterialImage* Material_ParseMaps(nlohmann::json& matdata, std::shared_ptr<ZoneMemory>& mem)
+		MaterialImage* Material_ParseMaps(nlohmann::json& matdata, ZoneMemory* mem)
 		{
 			auto mat = mem->Alloc<MaterialImage>(matdata.size());
 
@@ -261,7 +261,7 @@ namespace ZoneTool
 
 		extern std::unordered_map<std::int32_t, std::int32_t> iw3TechniqueMap;
 
-		Material* IMaterial::parse(std::string name, std::shared_ptr<ZoneMemory>& mem)
+		Material* IMaterial::parse(std::string name, ZoneMemory* mem)
 		{
 			auto path = "materials\\" + name;
 			auto file = FileSystem::FileOpen(path, "rb"s);
@@ -366,7 +366,7 @@ namespace ZoneTool
 			return mat;
 		}
 
-		void IMaterial::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IMaterial::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -377,7 +377,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IMaterial::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IMaterial::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -387,7 +387,7 @@ namespace ZoneTool
 
 			if (data->techniqueSet)
 			{
-				zone->AddAssetOfType(techset, data->techniqueSet->name);
+				zone->add_asset_of_type(techset, data->techniqueSet->name);
 			}
 
 			for (char i = 0; i < data->numMaps; i++)
@@ -395,7 +395,7 @@ namespace ZoneTool
 				if (data->maps[i].image)
 				{
 					// use pointer rather than name here
-					zone->AddAssetOfTypePtr(image, data->maps[i].image);
+					zone->add_asset_of_type_by_pointer(image, data->maps[i].image);
 				}
 			}
 		}
@@ -410,7 +410,7 @@ namespace ZoneTool
 			return material;
 		}
 
-		void IMaterial::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IMaterial::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto dest = buf->at<Material>();
 			auto data = this->m_asset;
@@ -423,7 +423,7 @@ namespace ZoneTool
 
 			if (data->techniqueSet)
 			{
-				dest->techniqueSet = reinterpret_cast<MaterialTechniqueSet*>(zone->GetAssetPointer(
+				dest->techniqueSet = reinterpret_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(
 					techset, data->techniqueSet->name));
 			}
 
@@ -441,7 +441,7 @@ namespace ZoneTool
 					}
 					if (data->maps[i].image)
 					{
-						destmaps[i].image = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						destmaps[i].image = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->maps[i].image->name));
 					}
 				}

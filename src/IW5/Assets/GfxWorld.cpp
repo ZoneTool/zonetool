@@ -13,7 +13,7 @@ namespace ZoneTool
 	namespace IW5
 	{
 		/*legacy zonetool code, refactor me!*/
-		GfxWorld* IGfxWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		GfxWorld* IGfxWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			if (!FileSystem::FileExists(name + ".gfxmap"))
 			{
@@ -25,7 +25,7 @@ namespace ZoneTool
 			memset(asset, 0, sizeof(GfxWorld));
 
 			AssetReader read(mem);
-			if (!read.Open(name + ".gfxmap"))
+			if (!read.open(name + ".gfxmap"))
 			{
 				return nullptr;
 			}
@@ -36,103 +36,103 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW5::IGfxWorld::parse");
 #endif
 
-			asset->name = read.String();
-			asset->baseName = read.String();
+			asset->name = read.read_string();
+			asset->baseName = read.read_string();
 
-			asset->planeCount = read.Int();
-			asset->nodeCount = read.Int();
-			asset->indexCount = read.Int();
-			asset->skyCount = read.Int();
+			asset->planeCount = read.read_int();
+			asset->nodeCount = read.read_int();
+			asset->indexCount = read.read_int();
+			asset->skyCount = read.read_int();
 
-			asset->skies = read.Array<GfxSky>();
+			asset->skies = read.read_array<GfxSky>();
 			for (unsigned int i = 0; i < asset->skyCount; i++)
 			{
-				asset->skies[i].skyStartSurfs = read.Array<std::uint32_t>();
-				asset->skies[i].skyImage = read.Asset<GfxImage>();
+				asset->skies[i].skyStartSurfs = read.read_array<std::uint32_t>();
+				asset->skies[i].skyImage = read.read_asset<GfxImage>();
 			}
 
-			asset->sunPrimaryLightIndex = read.Int();
-			asset->primaryLightCount = read.Int();
-			asset->primaryLightEnvCount = read.Int();
+			asset->sunPrimaryLightIndex = read.read_int();
+			asset->primaryLightCount = read.read_int();
+			asset->primaryLightEnvCount = read.read_int();
 
-			char* unknown1 = read.Array<char>();
+			char* unknown1 = read.read_array<char>();
 			memcpy(asset->unknown1, unknown1, 12);
 
 			// dpvsplanes
-			asset->dpvsPlanes.cellCount = read.Int();
-			asset->dpvsPlanes.planes = read.Array<cplane_s>();
-			asset->dpvsPlanes.nodes = read.Array<unsigned short>();
-			asset->dpvsPlanes.sceneEntCellBits = read.Array<unsigned char>();
+			asset->dpvsPlanes.cellCount = read.read_int();
+			asset->dpvsPlanes.planes = read.read_array<cplane_s>();
+			asset->dpvsPlanes.nodes = read.read_array<unsigned short>();
+			asset->dpvsPlanes.sceneEntCellBits = read.read_array<unsigned char>();
 
 			// dpvs
-			GfxWorldDpvsStatic* dpvs = read.Array<GfxWorldDpvsStatic>();
+			GfxWorldDpvsStatic* dpvs = read.read_array<GfxWorldDpvsStatic>();
 			memcpy(&asset->dpvs, dpvs, sizeof(GfxWorldDpvsStatic));
 
-			asset->dpvs.smodelVisData[0] = read.Array<char>();
-			asset->dpvs.smodelVisData[1] = read.Array<char>();
-			asset->dpvs.smodelVisData[2] = read.Array<char>();
-			asset->dpvs.surfaceVisData[0] = read.Array<char>();
-			asset->dpvs.surfaceVisData[1] = read.Array<char>();
-			asset->dpvs.surfaceVisData[2] = read.Array<char>();
-			asset->dpvs.sortedSurfIndex = read.Array<unsigned short>();
-			asset->dpvs.smodelInsts = read.Array<GfxStaticModelInst>();
-			asset->dpvs.surfaces = read.Array<GfxSurface>();
+			asset->dpvs.smodelVisData[0] = read.read_array<char>();
+			asset->dpvs.smodelVisData[1] = read.read_array<char>();
+			asset->dpvs.smodelVisData[2] = read.read_array<char>();
+			asset->dpvs.surfaceVisData[0] = read.read_array<char>();
+			asset->dpvs.surfaceVisData[1] = read.read_array<char>();
+			asset->dpvs.surfaceVisData[2] = read.read_array<char>();
+			asset->dpvs.sortedSurfIndex = read.read_array<unsigned short>();
+			asset->dpvs.smodelInsts = read.read_array<GfxStaticModelInst>();
+			asset->dpvs.surfaces = read.read_array<GfxSurface>();
 			for (int i = 0; i < asset->indexCount; i++)
 			{
-				asset->dpvs.surfaces[i].material = read.Asset<Material>();
+				asset->dpvs.surfaces[i].material = read.read_asset<Material>();
 			}
-			asset->dpvs.cullGroups = read.Array<GfxCullGroup>();
-			asset->dpvs.smodelDrawInsts = read.Array<GfxStaticModelDrawInst>();
+			asset->dpvs.cullGroups = read.read_array<GfxCullGroup>();
+			asset->dpvs.smodelDrawInsts = read.read_array<GfxStaticModelDrawInst>();
 			for (unsigned int i = 0; i < asset->dpvs.smodelCount; i++)
 			{
-				asset->dpvs.smodelDrawInsts[i].model = read.Asset<XModel>();
+				asset->dpvs.smodelDrawInsts[i].model = read.read_asset<XModel>();
 			}
-			asset->dpvs.surfaceMaterials = read.Array<GfxDrawSurf>();
-			asset->dpvs.surfaceCastsSunShadow = read.Array<unsigned int>();
+			asset->dpvs.surfaceMaterials = read.read_array<GfxDrawSurf>();
+			asset->dpvs.surfaceCastsSunShadow = read.read_array<unsigned int>();
 
 			// dpvsDyn
-			GfxWorldDpvsDynamic* dpvsDyn = read.Array<GfxWorldDpvsDynamic>();
+			GfxWorldDpvsDynamic* dpvsDyn = read.read_array<GfxWorldDpvsDynamic>();
 			memcpy(&asset->dpvsDyn, dpvsDyn, sizeof(GfxWorldDpvsDynamic));
 
-			asset->dpvsDyn.dynEntCellBits[0] = read.Array<unsigned int>();
-			asset->dpvsDyn.dynEntCellBits[1] = read.Array<unsigned int>();
-			asset->dpvsDyn.dynEntVisData[0][0] = read.Array<char>();
-			asset->dpvsDyn.dynEntVisData[1][0] = read.Array<char>();
-			asset->dpvsDyn.dynEntVisData[0][1] = read.Array<char>();
-			asset->dpvsDyn.dynEntVisData[1][1] = read.Array<char>();
-			asset->dpvsDyn.dynEntVisData[0][2] = read.Array<char>();
-			asset->dpvsDyn.dynEntVisData[1][2] = read.Array<char>();
+			asset->dpvsDyn.dynEntCellBits[0] = read.read_array<unsigned int>();
+			asset->dpvsDyn.dynEntCellBits[1] = read.read_array<unsigned int>();
+			asset->dpvsDyn.dynEntVisData[0][0] = read.read_array<char>();
+			asset->dpvsDyn.dynEntVisData[1][0] = read.read_array<char>();
+			asset->dpvsDyn.dynEntVisData[0][1] = read.read_array<char>();
+			asset->dpvsDyn.dynEntVisData[1][1] = read.read_array<char>();
+			asset->dpvsDyn.dynEntVisData[0][2] = read.read_array<char>();
+			asset->dpvsDyn.dynEntVisData[1][2] = read.read_array<char>();
 
 			// aabbTreeCount
-			asset->aabbTreeCounts = read.Array<GfxCellTreeCount>();
+			asset->aabbTreeCounts = read.read_array<GfxCellTreeCount>();
 
 			// GfxCellTree
-			asset->aabbTree = read.Array<GfxCellTree>();
+			asset->aabbTree = read.read_array<GfxCellTree>();
 			for (int i = 0; i < asset->dpvsPlanes.cellCount; i++)
 			{
-				asset->aabbTree[i].aabbtree = read.Array<GfxAabbTree>();
+				asset->aabbTree[i].aabbtree = read.read_array<GfxAabbTree>();
 
 				for (int j = 0; j < asset->aabbTreeCounts[i].aabbTreeCount; j++)
 				{
-					asset->aabbTree[i].aabbtree[j].smodelIndexes = read.Array<unsigned short>();
+					asset->aabbTree[i].aabbtree[j].smodelIndexes = read.read_array<unsigned short>();
 				}
 			}
 
 			// read GFX cells
-			asset->cells = read.Array<GfxCell>();
+			asset->cells = read.read_array<GfxCell>();
 
 			for (int i = 0; i < asset->dpvsPlanes.cellCount; i++)
 			{
-				asset->cells[i].portals = read.Array<GfxPortal>();
+				asset->cells[i].portals = read.read_array<GfxPortal>();
 				for (int j = 0; j < asset->cells[i].portalCount; j++)
 				{
-					asset->cells[i].portals[j].vertices = read.Array<float[3]>();
+					asset->cells[i].portals[j].vertices = read.read_array<float[3]>();
 				}
-				asset->cells[i].reflectionProbes = read.Array<char>();
-				asset->cells[i].reflectionProbeReferences = read.Array<char>();
+				asset->cells[i].reflectionProbes = read.read_array<char>();
+				asset->cells[i].reflectionProbeReferences = read.read_array<char>();
 			}
 			
-			auto worldDraw = read.Array<GfxWorldDraw>();
+			auto worldDraw = read.read_array<GfxWorldDraw>();
 			memcpy(&asset->worldDraw, worldDraw, sizeof GfxWorldDraw);
 
 			asset->worldDraw.reflectionImages = mem->Alloc<GfxImage*>(asset->worldDraw.reflectionProbeCount);
@@ -141,119 +141,119 @@ namespace ZoneTool
 
 			for (unsigned int i = 0; i < asset->worldDraw.reflectionProbeCount; i++)
 			{
-				asset->worldDraw.reflectionImages[i] = read.Asset<GfxImage>();
+				asset->worldDraw.reflectionImages[i] = read.read_asset<GfxImage>();
 			}
 
-			asset->worldDraw.reflectionProbes = read.Array<GfxReflectionProbe>();
+			asset->worldDraw.reflectionProbes = read.read_array<GfxReflectionProbe>();
 
-			asset->worldDraw.reflectionProbeReferences = read.Array<char>();
-			asset->worldDraw.reflectionProbeReferenceOrigins = read.Array<GfxReflectionProbeReferenceOrigin>();
+			asset->worldDraw.reflectionProbeReferences = read.read_array<char>();
+			asset->worldDraw.reflectionProbeReferenceOrigins = read.read_array<GfxReflectionProbeReferenceOrigin>();
 
-			asset->worldDraw.reflectionProbeTextures = read.Array<GfxTexture>();
-			asset->worldDraw.lightmaps = read.Array<GfxLightmapArray>();
+			asset->worldDraw.reflectionProbeTextures = read.read_array<GfxTexture>();
+			asset->worldDraw.lightmaps = read.read_array<GfxLightmapArray>();
 			for (int i = 0; i < asset->worldDraw.lightmapCount; i++)
 			{
-				asset->worldDraw.lightmaps[i].primary = read.Asset<GfxImage>();
-				asset->worldDraw.lightmaps[i].secondary = read.Asset<GfxImage>();
+				asset->worldDraw.lightmaps[i].primary = read.read_asset<GfxImage>();
+				asset->worldDraw.lightmaps[i].secondary = read.read_asset<GfxImage>();
 			}
-			asset->worldDraw.lightmapPrimaryTextures = read.Array<GfxTexture>();
-			asset->worldDraw.lightmapSecondaryTextures = read.Array<GfxTexture>();
-			asset->worldDraw.skyImage = read.Asset<GfxImage>();
-			asset->worldDraw.outdoorImage = read.Asset<GfxImage>();
-			asset->worldDraw.vd.vertices = read.Array<GfxWorldVertex>();
-			asset->worldDraw.vld.data = read.Array<char>();
-			asset->worldDraw.indices = read.Array<unsigned short>();
+			asset->worldDraw.lightmapPrimaryTextures = read.read_array<GfxTexture>();
+			asset->worldDraw.lightmapSecondaryTextures = read.read_array<GfxTexture>();
+			asset->worldDraw.skyImage = read.read_asset<GfxImage>();
+			asset->worldDraw.outdoorImage = read.read_asset<GfxImage>();
+			asset->worldDraw.vd.vertices = read.read_array<GfxWorldVertex>();
+			asset->worldDraw.vld.data = read.read_array<char>();
+			asset->worldDraw.indices = read.read_array<unsigned short>();
 
 
 			// GfxLightGrid
-			GfxLightGrid* lightGrid = read.Array<GfxLightGrid>();
+			GfxLightGrid* lightGrid = read.read_array<GfxLightGrid>();
 			memcpy(&asset->lightGrid, lightGrid, sizeof(GfxLightGrid));
 
-			asset->lightGrid.rowDataStart = read.Array<unsigned short>();
-			asset->lightGrid.rawRowData = read.Array<char>();
-			asset->lightGrid.entries = read.Array<GfxLightGridEntry>();
-			asset->lightGrid.colors = read.Array<GfxLightGridColors>();
+			asset->lightGrid.rowDataStart = read.read_array<unsigned short>();
+			asset->lightGrid.rawRowData = read.read_array<char>();
+			asset->lightGrid.entries = read.read_array<GfxLightGridEntry>();
+			asset->lightGrid.colors = read.read_array<GfxLightGridColors>();
 
 			// models
-			asset->modelCount = read.Int();
-			asset->models = read.Array<GfxBrushModel>();
+			asset->modelCount = read.read_int();
+			asset->models = read.read_array<GfxBrushModel>();
 
 			// mins/maxs
-			float* mins = read.Array<float>();
+			float* mins = read.read_array<float>();
 			memcpy(asset->mins, mins, sizeof(float) * 3);
 
-			float* maxs = read.Array<float>();
+			float* maxs = read.read_array<float>();
 			memcpy(asset->maxs, maxs, sizeof(float) * 3);
 
-			asset->checksum = read.Int();
+			asset->checksum = read.read_int();
 
 			// materialmemory
-			asset->materialMemoryCount = read.Int();
-			asset->materialMemory = read.Array<MaterialMemory>();
+			asset->materialMemoryCount = read.read_int();
+			asset->materialMemory = read.read_array<MaterialMemory>();
 			for (int i = 0; i < asset->materialMemoryCount; i++)
 			{
-				asset->materialMemory[i].material = read.Asset<Material>();
+				asset->materialMemory[i].material = read.read_asset<Material>();
 			}
 
 			// sun data
-			sunflare_t* sun = read.Array<sunflare_t>();
+			sunflare_t* sun = read.read_array<sunflare_t>();
 			memcpy(&asset->sun, sun, sizeof(sunflare_t));
 
-			asset->sun.spriteMaterial = read.Asset<Material>();
-			asset->sun.flareMaterial = read.Asset<Material>();
+			asset->sun.spriteMaterial = read.read_asset<Material>();
+			asset->sun.flareMaterial = read.read_asset<Material>();
 
 			// outdoor shit
-			auto lookupMatrix = read.Array<VecInternal<4>>();
+			auto lookupMatrix = read.read_array<VecInternal<4>>();
 			memcpy(&asset->outdoorLookupMatrix, lookupMatrix, sizeof(VecInternal<4>) * 4);
 
-			asset->outdoorImage = read.Asset<GfxImage>();
+			asset->outdoorImage = read.read_asset<GfxImage>();
 
 			// CellcasterBits
-			asset->cellCasterBits[0] = read.Array<unsigned int>();
-			asset->cellCasterBits[1] = read.Array<unsigned int>();
+			asset->cellCasterBits[0] = read.read_array<unsigned int>();
+			asset->cellCasterBits[1] = read.read_array<unsigned int>();
 
 			// SceneDynModel
-			asset->sceneDynModel = read.Array<GfxSceneDynModel>();
+			asset->sceneDynModel = read.read_array<GfxSceneDynModel>();
 
 			// SceneDynBrush
-			asset->sceneDynBrush = read.Array<GfxSceneDynBrush>();
+			asset->sceneDynBrush = read.read_array<GfxSceneDynBrush>();
 
 			// PrimaryLightEntityShadowVis
-			asset->primaryLightEntityShadowVis = read.Array<unsigned char>();
+			asset->primaryLightEntityShadowVis = read.read_array<unsigned char>();
 
 			// PrimaryLightDynEntShadowVis
-			asset->primaryLightDynEntShadowVis[0] = read.Array<unsigned int>();
-			asset->primaryLightDynEntShadowVis[1] = read.Array<unsigned int>();
+			asset->primaryLightDynEntShadowVis[0] = read.read_array<unsigned int>();
+			asset->primaryLightDynEntShadowVis[1] = read.read_array<unsigned int>();
 
 			// PrimaryLightForModelDynEnt
-			asset->primaryLightForModelDynEnt = read.Array<char>();
+			asset->primaryLightForModelDynEnt = read.read_array<char>();
 
 			// GfxShadowGeometry
-			asset->shadowGeom = read.Array<GfxShadowGeometry>();
+			asset->shadowGeom = read.read_array<GfxShadowGeometry>();
 			for (int i = 0; i < asset->primaryLightCount; i++)
 			{
-				asset->shadowGeom[i].sortedSurfIndex = read.Array<unsigned short>();
-				asset->shadowGeom[i].smodelIndex = read.Array<unsigned short>();
+				asset->shadowGeom[i].sortedSurfIndex = read.read_array<unsigned short>();
+				asset->shadowGeom[i].smodelIndex = read.read_array<unsigned short>();
 			}
 
 			// GfxLightRegion
-			asset->lightRegion = read.Array<GfxLightRegion>();
+			asset->lightRegion = read.read_array<GfxLightRegion>();
 			for (int i = 0; i < asset->primaryLightCount; i++)
 			{
-				asset->lightRegion[i].hulls = read.Array<GfxLightRegionHull>();
+				asset->lightRegion[i].hulls = read.read_array<GfxLightRegionHull>();
 				for (unsigned int j = 0; j < asset->lightRegion[i].hullCount; j++)
 				{
-					asset->lightRegion[i].hulls[j].axis = read.Array<GfxLightRegionAxis>();
+					asset->lightRegion[i].hulls[j].axis = read.read_array<GfxLightRegionAxis>();
 				}
 			}
 
-			asset->mapVtxChecksum = read.Int();
+			asset->mapVtxChecksum = read.read_int();
 
 			// heroLights
 			asset->heroLightCount = 0;
 			asset->heroLights = nullptr;
 
-			asset->fogTypesAllowed = read.Int();
+			asset->fogTypesAllowed = read.read_int();
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
@@ -270,7 +270,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IGfxWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -281,7 +281,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGfxWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -300,7 +300,7 @@ namespace ZoneTool
 				{
 					if (data->skies[i].skyImage)
 					{
-						zone->AddAssetOfType(image, data->skies[i].skyImage->name);
+						zone->add_asset_of_type(image, data->skies[i].skyImage->name);
 					}
 				}
 			}
@@ -312,7 +312,7 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.reflectionImages[i])
 					{
-						zone->AddAssetOfType(image, data->worldDraw.reflectionImages[i]->name);
+						zone->add_asset_of_type(image, data->worldDraw.reflectionImages[i]->name);
 					}
 				}
 			}
@@ -324,12 +324,12 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.lightmaps[i].primary)
 					{
-						zone->AddAssetOfType(image, data->worldDraw.lightmaps[i].primary->name);
+						zone->add_asset_of_type(image, data->worldDraw.lightmaps[i].primary->name);
 					}
 
 					if (data->worldDraw.lightmaps[i].secondary)
 					{
-						zone->AddAssetOfType(image, data->worldDraw.lightmaps[i].secondary->name);
+						zone->add_asset_of_type(image, data->worldDraw.lightmaps[i].secondary->name);
 					}
 				}
 			}
@@ -337,13 +337,13 @@ namespace ZoneTool
 			// SkyImage (Unused?)
 			if (data->worldDraw.skyImage)
 			{
-				zone->AddAssetOfType(image, data->worldDraw.skyImage->name);
+				zone->add_asset_of_type(image, data->worldDraw.skyImage->name);
 			}
 
 			// OutdoorImage (Unused?)
 			if (data->worldDraw.outdoorImage)
 			{
-				zone->AddAssetOfType(image, data->worldDraw.outdoorImage->name);
+				zone->add_asset_of_type(image, data->worldDraw.outdoorImage->name);
 			}
 
 			// MaterialMemory
@@ -354,7 +354,7 @@ namespace ZoneTool
 				{
 					if (data->materialMemory[i].material)
 					{
-						zone->AddAssetOfType(material, data->materialMemory[i].material->name);
+						zone->add_asset_of_type(material, data->materialMemory[i].material->name);
 					}
 				}
 			}
@@ -362,18 +362,18 @@ namespace ZoneTool
 			// Sunflare_t
 			if (data->sun.spriteMaterial)
 			{
-				zone->AddAssetOfType(material, data->sun.spriteMaterial->name);
+				zone->add_asset_of_type(material, data->sun.spriteMaterial->name);
 			}
 
 			if (data->sun.flareMaterial)
 			{
-				zone->AddAssetOfType(material, data->sun.flareMaterial->name);
+				zone->add_asset_of_type(material, data->sun.flareMaterial->name);
 			}
 
 			// OutdoorImage
 			if (data->outdoorImage)
 			{
-				zone->AddAssetOfType(image, data->outdoorImage->name);
+				zone->add_asset_of_type(image, data->outdoorImage->name);
 			}
 
 			// Dpvs.Surfaces
@@ -383,7 +383,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.surfaces[i].material)
 					{
-						zone->AddAssetOfType(material, data->dpvs.surfaces[i].material->name);
+						zone->add_asset_of_type(material, data->dpvs.surfaces[i].material->name);
 					}
 				}
 			}
@@ -394,7 +394,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.smodelDrawInsts[i].model)
 					{
-						zone->AddAssetOfType(xmodel, data->dpvs.smodelDrawInsts[i].model->name);
+						zone->add_asset_of_type(xmodel, data->dpvs.smodelDrawInsts[i].model->name);
 					}
 				}
 			}
@@ -414,7 +414,7 @@ namespace ZoneTool
 			return gfx_map;
 		}
 
-		void IGfxWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IGfxWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::IGfxWorld::write");
@@ -451,7 +451,7 @@ namespace ZoneTool
 
 					if (data->skies[i].skyImage)
 					{
-						skiesArray[i].skyImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						skiesArray[i].skyImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->skies[i].skyImage->name));
 					}
 				}
@@ -570,7 +570,7 @@ namespace ZoneTool
 				{
 					if (reflectionProbes[i])
 					{
-						reflectionProbes[i] = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						reflectionProbes[i] = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.reflectionImages[i]->name));
 					}
 				}
@@ -617,13 +617,13 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.lightmaps[i].primary)
 					{
-						gfx_lightmap_array[i].primary = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						gfx_lightmap_array[i].primary = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.lightmaps[i].primary->name));
 					}
 
 					if (data->worldDraw.lightmaps[i].secondary)
 					{
-						gfx_lightmap_array[i].secondary = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						gfx_lightmap_array[i].secondary = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.lightmaps[i].secondary->name));
 					}
 				}
@@ -649,13 +649,13 @@ namespace ZoneTool
 
 			if (data->worldDraw.skyImage)
 			{
-				dest->worldDraw.skyImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+				dest->worldDraw.skyImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 					image, data->worldDraw.skyImage->name));
 			}
 
 			if (data->worldDraw.outdoorImage)
 			{
-				dest->worldDraw.outdoorImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+				dest->worldDraw.outdoorImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 					image, data->worldDraw.outdoorImage->name));
 			}
 
@@ -725,7 +725,7 @@ namespace ZoneTool
 
 				for (std::int32_t i = 0; i < data->materialMemoryCount; i++)
 				{
-					memory[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					memory[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, data->materialMemory[i].material->name));
 				}
 
@@ -734,18 +734,18 @@ namespace ZoneTool
 
 			if (data->sun.spriteMaterial)
 			{
-				dest->sun.spriteMaterial = reinterpret_cast<Material*>(zone->GetAssetPointer(
+				dest->sun.spriteMaterial = reinterpret_cast<Material*>(zone->get_asset_pointer(
 					material, data->sun.spriteMaterial->name));
 			}
 			if (data->sun.flareMaterial)
 			{
-				dest->sun.flareMaterial = reinterpret_cast<Material*>(zone->GetAssetPointer(
+				dest->sun.flareMaterial = reinterpret_cast<Material*>(zone->get_asset_pointer(
 					material, data->sun.flareMaterial->name));
 			}
 
 			if (data->outdoorImage)
 			{
-				dest->outdoorImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(image, data->outdoorImage->name)
+				dest->outdoorImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(image, data->outdoorImage->name)
 				);
 			}
 
@@ -935,7 +935,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.surfaces[i].material)
 					{
-						surface[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						surface[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->dpvs.surfaces[i].material->name));
 					}
 				}
@@ -959,7 +959,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.smodelDrawInsts[i].model)
 					{
-						static_model_draw_inst[i].model = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						static_model_draw_inst[i].model = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dpvs.smodelDrawInsts[i].model->name));
 					}
 				}
@@ -1061,229 +1061,229 @@ namespace ZoneTool
 		{
 			// dump code
 			AssetDumper write;
-			if (!write.Open(asset->name + ".gfxmap"s))
+			if (!write.open(asset->name + ".gfxmap"s))
 			{
 				return;
 			}
 
-			write.String(asset->name);
-			write.String(asset->baseName);
+			write.dump_string(asset->name);
+			write.dump_string(asset->baseName);
 
-			write.Int(asset->planeCount);
-			write.Int(asset->nodeCount);
-			write.Int(asset->indexCount);
-			write.Int(asset->skyCount);
+			write.dump_int(asset->planeCount);
+			write.dump_int(asset->nodeCount);
+			write.dump_int(asset->indexCount);
+			write.dump_int(asset->skyCount);
 
-			write.Array(asset->skies, asset->skyCount);
+			write.dump_array(asset->skies, asset->skyCount);
 			for (unsigned int i = 0; i < asset->skyCount; i++)
 			{
-				write.Array(asset->skies[i].skyStartSurfs, asset->skies[i].skySurfCount);
-				write.Asset(asset->skies[i].skyImage);
+				write.dump_array(asset->skies[i].skyStartSurfs, asset->skies[i].skySurfCount);
+				write.dump_asset(asset->skies[i].skyImage);
 			}
 
-			write.Int(asset->sunPrimaryLightIndex);
-			write.Int(asset->primaryLightCount);
-			write.Int(asset->primaryLightEnvCount);
+			write.dump_int(asset->sunPrimaryLightIndex);
+			write.dump_int(asset->primaryLightCount);
+			write.dump_int(asset->primaryLightEnvCount);
 
-			write.Array(asset->unknown1, 12);
+			write.dump_array(asset->unknown1, 12);
 
 			// dpvsplanes
-			write.Int(asset->dpvsPlanes.cellCount);
-			write.Array(asset->dpvsPlanes.planes, asset->planeCount);
-			write.Array(asset->dpvsPlanes.nodes, asset->nodeCount);
-			write.Array(asset->dpvsPlanes.sceneEntCellBits, asset->dpvsPlanes.cellCount << 11);
+			write.dump_int(asset->dpvsPlanes.cellCount);
+			write.dump_array(asset->dpvsPlanes.planes, asset->planeCount);
+			write.dump_array(asset->dpvsPlanes.nodes, asset->nodeCount);
+			write.dump_array(asset->dpvsPlanes.sceneEntCellBits, asset->dpvsPlanes.cellCount << 11);
 
 			// dpvs
-			write.Array(&asset->dpvs, 1);
-			write.Array(asset->dpvs.smodelVisData[0], asset->dpvs.smodelCount);
-			write.Array(asset->dpvs.smodelVisData[1], asset->dpvs.smodelCount);
-			write.Array(asset->dpvs.smodelVisData[2], asset->dpvs.smodelCount);
-			write.Array(asset->dpvs.surfaceVisData[0], asset->dpvs.staticSurfaceCount);
-			write.Array(asset->dpvs.surfaceVisData[1], asset->dpvs.staticSurfaceCount);
-			write.Array(asset->dpvs.surfaceVisData[2], asset->dpvs.staticSurfaceCount);
-			write.Array(asset->dpvs.sortedSurfIndex,
+			write.dump_array(&asset->dpvs, 1);
+			write.dump_array(asset->dpvs.smodelVisData[0], asset->dpvs.smodelCount);
+			write.dump_array(asset->dpvs.smodelVisData[1], asset->dpvs.smodelCount);
+			write.dump_array(asset->dpvs.smodelVisData[2], asset->dpvs.smodelCount);
+			write.dump_array(asset->dpvs.surfaceVisData[0], asset->dpvs.staticSurfaceCount);
+			write.dump_array(asset->dpvs.surfaceVisData[1], asset->dpvs.staticSurfaceCount);
+			write.dump_array(asset->dpvs.surfaceVisData[2], asset->dpvs.staticSurfaceCount);
+			write.dump_array(asset->dpvs.sortedSurfIndex,
 			            (asset->dpvs.staticSurfaceCount + asset->dpvs.staticSurfaceCountNoDecal));
-			write.Array(asset->dpvs.smodelInsts, asset->dpvs.smodelCount);
-			write.Array(asset->dpvs.surfaces, asset->indexCount);
+			write.dump_array(asset->dpvs.smodelInsts, asset->dpvs.smodelCount);
+			write.dump_array(asset->dpvs.surfaces, asset->indexCount);
 
 			for (int i = 0; i < asset->indexCount; i++)
 			{
-				write.Asset(asset->dpvs.surfaces[i].material);
+				write.dump_asset(asset->dpvs.surfaces[i].material);
 			}
 
-			write.Array(asset->dpvs.cullGroups, asset->indexCount);
-			write.Array(asset->dpvs.smodelDrawInsts, asset->dpvs.smodelCount);
+			write.dump_array(asset->dpvs.cullGroups, asset->indexCount);
+			write.dump_array(asset->dpvs.smodelDrawInsts, asset->dpvs.smodelCount);
 
 			for (unsigned int i = 0; i < asset->dpvs.smodelCount; i++)
 			{
-				write.Asset(asset->dpvs.smodelDrawInsts[i].model);
+				write.dump_asset(asset->dpvs.smodelDrawInsts[i].model);
 			}
-			write.Array(asset->dpvs.surfaceMaterials, asset->indexCount);
-			write.Array(asset->dpvs.surfaceCastsSunShadow, asset->dpvs.surfaceVisDataCount);
+			write.dump_array(asset->dpvs.surfaceMaterials, asset->indexCount);
+			write.dump_array(asset->dpvs.surfaceCastsSunShadow, asset->dpvs.surfaceVisDataCount);
 
 			// dpvsDyn
-			write.Array(&asset->dpvsDyn, 1);
-			write.Array(asset->dpvsDyn.dynEntCellBits[0],
+			write.dump_array(&asset->dpvsDyn, 1);
+			write.dump_array(asset->dpvsDyn.dynEntCellBits[0],
 			            asset->dpvsDyn.dynEntClientWordCount[0] * asset->dpvsPlanes.cellCount);
-			write.Array(asset->dpvsDyn.dynEntCellBits[1],
+			write.dump_array(asset->dpvsDyn.dynEntCellBits[1],
 			            asset->dpvsDyn.dynEntClientWordCount[1] * asset->dpvsPlanes.cellCount);
-			write.Array(asset->dpvsDyn.dynEntVisData[0][0], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
-			write.Array(asset->dpvsDyn.dynEntVisData[1][0], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
-			write.Array(asset->dpvsDyn.dynEntVisData[0][1], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
-			write.Array(asset->dpvsDyn.dynEntVisData[1][1], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
-			write.Array(asset->dpvsDyn.dynEntVisData[0][2], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
-			write.Array(asset->dpvsDyn.dynEntVisData[1][2], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[0][0], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[1][0], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[0][1], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[1][1], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[0][2], asset->dpvsDyn.dynEntClientWordCount[0] * 32);
+			write.dump_array(asset->dpvsDyn.dynEntVisData[1][2], asset->dpvsDyn.dynEntClientWordCount[1] * 32);
 
 			// aabbTreeCount
-			write.Array(asset->aabbTreeCounts, asset->dpvsPlanes.cellCount);
+			write.dump_array(asset->aabbTreeCounts, asset->dpvsPlanes.cellCount);
 
 			// GfxCellTree
-			write.Array(asset->aabbTree, asset->dpvsPlanes.cellCount);
+			write.dump_array(asset->aabbTree, asset->dpvsPlanes.cellCount);
 			for (int i = 0; i < asset->dpvsPlanes.cellCount; i++)
 			{
-				write.Array(asset->aabbTree[i].aabbtree, asset->aabbTreeCounts[i].aabbTreeCount);
+				write.dump_array(asset->aabbTree[i].aabbtree, asset->aabbTreeCounts[i].aabbTreeCount);
 
 				for (int j = 0; j < asset->aabbTreeCounts[i].aabbTreeCount; j++)
 				{
-					write.Array(asset->aabbTree[i].aabbtree[j].smodelIndexes,
+					write.dump_array(asset->aabbTree[i].aabbtree[j].smodelIndexes,
 					            asset->aabbTree[i].aabbtree[j].smodelIndexCount);
 				}
 			}
 
 			// read GFX cells
-			write.Array(asset->cells, asset->dpvsPlanes.cellCount);
+			write.dump_array(asset->cells, asset->dpvsPlanes.cellCount);
 
 			for (int i = 0; i < asset->dpvsPlanes.cellCount; i++)
 			{
-				write.Array(asset->cells[i].portals, asset->cells[i].portalCount);
+				write.dump_array(asset->cells[i].portals, asset->cells[i].portalCount);
 				for (int j = 0; j < asset->cells[i].portalCount; j++)
 				{
-					write.Array(asset->cells[i].portals[j].vertices, asset->cells[i].portals[j].vertexCount);
+					write.dump_array(asset->cells[i].portals[j].vertices, asset->cells[i].portals[j].vertexCount);
 				}
-				write.Array(asset->cells[i].reflectionProbes, asset->cells[i].reflectionProbeCount);
-				write.Array(asset->cells[i].reflectionProbeReferences, asset->cells[i].reflectionProbeReferenceCount);
+				write.dump_array(asset->cells[i].reflectionProbes, asset->cells[i].reflectionProbeCount);
+				write.dump_array(asset->cells[i].reflectionProbeReferences, asset->cells[i].reflectionProbeReferenceCount);
 			}
 
 			// worldDraw
-			write.Array(&asset->worldDraw, 1);
+			write.dump_array(&asset->worldDraw, 1);
 
 			for (unsigned int i = 0; i < asset->worldDraw.reflectionProbeCount; i++)
 			{
-				write.Asset(asset->worldDraw.reflectionImages[i]);
+				write.dump_asset(asset->worldDraw.reflectionImages[i]);
 			}
 
-			write.Array(asset->worldDraw.reflectionProbes, asset->worldDraw.reflectionProbeCount);
+			write.dump_array(asset->worldDraw.reflectionProbes, asset->worldDraw.reflectionProbeCount);
 
-			write.Array(asset->worldDraw.reflectionProbeReferences, asset->worldDraw.reflectionProbeReferenceCount);
-			write.Array(asset->worldDraw.reflectionProbeReferenceOrigins,
+			write.dump_array(asset->worldDraw.reflectionProbeReferences, asset->worldDraw.reflectionProbeReferenceCount);
+			write.dump_array(asset->worldDraw.reflectionProbeReferenceOrigins,
 			            asset->worldDraw.reflectionProbeReferenceCount);
 
-			write.Array(asset->worldDraw.reflectionProbeTextures, asset->worldDraw.reflectionProbeCount);
-			write.Array(asset->worldDraw.lightmaps, asset->worldDraw.lightmapCount);
+			write.dump_array(asset->worldDraw.reflectionProbeTextures, asset->worldDraw.reflectionProbeCount);
+			write.dump_array(asset->worldDraw.lightmaps, asset->worldDraw.lightmapCount);
 
 			for (int i = 0; i < asset->worldDraw.lightmapCount; i++)
 			{
-				write.Asset(asset->worldDraw.lightmaps[i].primary);
-				write.Asset(asset->worldDraw.lightmaps[i].secondary);
+				write.dump_asset(asset->worldDraw.lightmaps[i].primary);
+				write.dump_asset(asset->worldDraw.lightmaps[i].secondary);
 			}
 
-			write.Array(asset->worldDraw.lightmapPrimaryTextures, asset->worldDraw.lightmapCount);
-			write.Array(asset->worldDraw.lightmapSecondaryTextures, asset->worldDraw.lightmapCount);
+			write.dump_array(asset->worldDraw.lightmapPrimaryTextures, asset->worldDraw.lightmapCount);
+			write.dump_array(asset->worldDraw.lightmapSecondaryTextures, asset->worldDraw.lightmapCount);
 
-			write.Asset(asset->worldDraw.skyImage);
-			write.Asset(asset->worldDraw.outdoorImage);
+			write.dump_asset(asset->worldDraw.skyImage);
+			write.dump_asset(asset->worldDraw.outdoorImage);
 
-			write.Array(asset->worldDraw.vd.vertices, asset->worldDraw.vertexCount);
-			write.Array(asset->worldDraw.vld.data, asset->worldDraw.vertexLayerDataSize);
-			write.Array(asset->worldDraw.indices, asset->worldDraw.indexCount);
+			write.dump_array(asset->worldDraw.vd.vertices, asset->worldDraw.vertexCount);
+			write.dump_array(asset->worldDraw.vld.data, asset->worldDraw.vertexLayerDataSize);
+			write.dump_array(asset->worldDraw.indices, asset->worldDraw.indexCount);
 
 			// GfxLightGrid
-			write.Array(&asset->lightGrid, 1);
-			write.Array(asset->lightGrid.rowDataStart,
+			write.dump_array(&asset->lightGrid, 1);
+			write.dump_array(asset->lightGrid.rowDataStart,
 			            (asset->lightGrid.maxs[asset->lightGrid.rowAxis] - asset->lightGrid.mins[asset
 			                                                                                     ->lightGrid.rowAxis] +
 				            1));
-			write.Array(asset->lightGrid.rawRowData, asset->lightGrid.rawRowDataSize);
-			write.Array(asset->lightGrid.entries, asset->lightGrid.entryCount);
-			write.Array(asset->lightGrid.colors, asset->lightGrid.colorCount);
+			write.dump_array(asset->lightGrid.rawRowData, asset->lightGrid.rawRowDataSize);
+			write.dump_array(asset->lightGrid.entries, asset->lightGrid.entryCount);
+			write.dump_array(asset->lightGrid.colors, asset->lightGrid.colorCount);
 
 			// models
-			write.Int(asset->modelCount);
-			write.Array(asset->models, asset->modelCount);
+			write.dump_int(asset->modelCount);
+			write.dump_array(asset->models, asset->modelCount);
 
 			// mins/maxs
-			write.Array(asset->mins, 3);
-			write.Array(asset->maxs, 3);
+			write.dump_array(asset->mins, 3);
+			write.dump_array(asset->maxs, 3);
 
-			write.Int(asset->checksum);
+			write.dump_int(asset->checksum);
 
 			// materialmemory
-			write.Int(asset->materialMemoryCount);
-			write.Array(asset->materialMemory, asset->materialMemoryCount);
+			write.dump_int(asset->materialMemoryCount);
+			write.dump_array(asset->materialMemory, asset->materialMemoryCount);
 			for (int i = 0; i < asset->materialMemoryCount; i++)
 			{
-				write.Asset(asset->materialMemory[i].material);
+				write.dump_asset(asset->materialMemory[i].material);
 			}
 
 			// sun data
-			write.Array(&asset->sun, 1);
-			write.Asset(asset->sun.spriteMaterial);
-			write.Asset(asset->sun.flareMaterial);
+			write.dump_array(&asset->sun, 1);
+			write.dump_asset(asset->sun.spriteMaterial);
+			write.dump_asset(asset->sun.flareMaterial);
 
 			// outdoor shit
-			write.Array(asset->outdoorLookupMatrix, 4);
-			write.Asset(asset->outdoorImage);
+			write.dump_array(asset->outdoorLookupMatrix, 4);
+			write.dump_asset(asset->outdoorImage);
 
 			// CellcasterBits
-			write.Array(asset->cellCasterBits[0],
+			write.dump_array(asset->cellCasterBits[0],
 			            asset->dpvsPlanes.cellCount * ((asset->dpvsPlanes.cellCount + 31) >> 5));
-			write.Array(asset->cellCasterBits[1], (asset->dpvsPlanes.cellCount + 31) >> 5);
+			write.dump_array(asset->cellCasterBits[1], (asset->dpvsPlanes.cellCount + 31) >> 5);
 
 			// SceneDynModel
-			write.Array(asset->sceneDynModel, asset->dpvsDyn.dynEntClientCount[0]);
+			write.dump_array(asset->sceneDynModel, asset->dpvsDyn.dynEntClientCount[0]);
 
 			// SceneDynBrush
-			write.Array(asset->sceneDynBrush, asset->dpvsDyn.dynEntClientCount[1]);
+			write.dump_array(asset->sceneDynBrush, asset->dpvsDyn.dynEntClientCount[1]);
 
 			// PrimaryLightEntityShadowVis
-			write.Array(asset->primaryLightEntityShadowVis,
+			write.dump_array(asset->primaryLightEntityShadowVis,
 			            (asset->primaryLightCount - asset->sunPrimaryLightIndex - 1) << 15);
 
 			// PrimaryLightDynEntShadowVis
-			write.Array(asset->primaryLightDynEntShadowVis[0],
+			write.dump_array(asset->primaryLightDynEntShadowVis[0],
 			            asset->dpvsDyn.dynEntClientCount[0] * (asset->primaryLightCount - asset->sunPrimaryLightIndex -
 				            1));
-			write.Array(asset->primaryLightDynEntShadowVis[1],
+			write.dump_array(asset->primaryLightDynEntShadowVis[1],
 			            asset->dpvsDyn.dynEntClientCount[1] * (asset->primaryLightCount - asset->sunPrimaryLightIndex -
 				            1));
 
 			// PrimaryLightForModelDynEnt
-			write.Array(asset->primaryLightForModelDynEnt, asset->dpvsDyn.dynEntClientCount[0]);
+			write.dump_array(asset->primaryLightForModelDynEnt, asset->dpvsDyn.dynEntClientCount[0]);
 
 			// GfxShadowGeometry
-			write.Array(asset->shadowGeom, asset->primaryLightCount);
+			write.dump_array(asset->shadowGeom, asset->primaryLightCount);
 			for (int i = 0; i < asset->primaryLightCount; i++)
 			{
-				write.Array(asset->shadowGeom[i].sortedSurfIndex, asset->shadowGeom[i].surfaceCount);
-				write.Array(asset->shadowGeom[i].smodelIndex, asset->shadowGeom[i].smodelCount);
+				write.dump_array(asset->shadowGeom[i].sortedSurfIndex, asset->shadowGeom[i].surfaceCount);
+				write.dump_array(asset->shadowGeom[i].smodelIndex, asset->shadowGeom[i].smodelCount);
 			}
 
 			// GfxLightRegion
-			write.Array(asset->lightRegion, asset->primaryLightCount);
+			write.dump_array(asset->lightRegion, asset->primaryLightCount);
 			for (int i = 0; i < asset->primaryLightCount; i++)
 			{
-				write.Array(asset->lightRegion[i].hulls, asset->lightRegion[i].hullCount);
+				write.dump_array(asset->lightRegion[i].hulls, asset->lightRegion[i].hullCount);
 				for (unsigned int j = 0; j < asset->lightRegion[i].hullCount; j++)
 				{
-					write.Array(asset->lightRegion[i].hulls[j].axis, asset->lightRegion[i].hulls[j].axisCount);
+					write.dump_array(asset->lightRegion[i].hulls[j].axis, asset->lightRegion[i].hulls[j].axisCount);
 				}
 			}
 
-			write.Int(asset->mapVtxChecksum);
-			write.Int(asset->fogTypesAllowed);
+			write.dump_int(asset->mapVtxChecksum);
+			write.dump_int(asset->fogTypesAllowed);
 
 			// save file to disk!
-			write.Close();
+			write.close();
 		}
 	}
 }

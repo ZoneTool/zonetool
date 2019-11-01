@@ -21,5 +21,5 @@ extern std::string currentzone;
 
 namespace ZoneTool
 {
-	void Startup();
+	void startup();
 }

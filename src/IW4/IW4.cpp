@@ -18,17 +18,17 @@ namespace ZoneTool
 		bool isVerifying = false;
 		auto currentDumpingZone = ""s;
 
-		const char* Linker::Version()
+		const char* Linker::version()
 		{
 			return "IW4";
 		}
 
-		bool Linker::InUse()
+		bool Linker::is_used()
 		{
-			return !strncmp(reinterpret_cast<char*>(0x71B85C), this->Version(), 3);
+			return !strncmp(reinterpret_cast<char*>(0x71B85C), this->version(), 3);
 		}
 
-		void Linker::LoadDefaultZones()
+		void Linker::load_default_zones()
 		{
 			static std::vector<std::string> defaultzones =
 			{
@@ -53,7 +53,7 @@ namespace ZoneTool
 			return DB_LoadXAssets(zones, defaultzones.size(), 0);
 		}
 
-		void Linker::Run()
+		void Linker::run()
 		{
 			// function definitions
 			typedef void (__cdecl * Win_InitLocalization_t)(int);
@@ -98,7 +98,7 @@ namespace ZoneTool
 			LargeLocalInit();
 			FS_Init();
 
-			LoadDefaultZones();
+			load_default_zones();
 
 			// Cmd_RegisterCommands();
 			// ZoneTool_LoadZones(nullptr, 0, 0);
@@ -117,7 +117,7 @@ namespace ZoneTool
 			}
 		}
 
-		const char* Linker::GetAssetName(XAssetType type, XAssetHeader header)
+		const char* Linker::get_asset_name(XAssetType type, XAssetHeader header)
 		{
 			// todo
 			if (type == image)
@@ -164,7 +164,7 @@ namespace ZoneTool
 			if (isVerifying)
 			{
 				// print asset name to console
-				ZONETOOL_INFO("Loading asset \"%s\" of type %s.", Linker::GetAssetName(type, header), reinterpret_cast<
+				ZONETOOL_INFO("Loading asset \"%s\" of type %s.", Linker::get_asset_name(type, header), reinterpret_cast<
 char**>(0x00799278)[type]);
 			}
 
@@ -194,14 +194,14 @@ char**>(0x00799278)[type]);
 				if (csvFile)
 				{
 					auto xassettypes = reinterpret_cast<char**>(0x00799278);
-					fprintf(csvFile, "%s,%s\n", xassettypes[type], GetAssetName(type, header));
+					fprintf(csvFile, "%s,%s\n", xassettypes[type], get_asset_name(type, header));
 				}
 			}
 
 			if (isDumping)
 			{
 				// check if we're done loading the fastfile
-				if (type == rawfile && GetAssetName(type, header) == fastfile)
+				if (type == rawfile && get_asset_name(type, header) == fastfile)
 				{
 					for (auto& ref : referencedAssets)
 					{
@@ -238,9 +238,9 @@ char**>(0x00799278)[type]);
 					}
 				}
 
-				if (GetAssetName(type, header)[0] == ',')
+				if (get_asset_name(type, header)[0] == ',')
 				{
-					referencedAssets.push_back({ type, GetAssetName(type, header) });
+					referencedAssets.push_back({ type, get_asset_name(type, header) });
 				}
 				else
 				{
@@ -389,7 +389,7 @@ char**>(0x00799278)[type]);
 			readPosition = 0;
 
 			// read header
-			return Memory::Func<void(void*, int)>(0x00445460)(ptr, size);
+			return Memory::func<void(void*, int)>(0x00445460)(ptr, size);
 		}
 
 		void Linker::Load_XSurfaceArray(int shouldLoad, int count)
@@ -398,7 +398,7 @@ char**>(0x00799278)[type]);
 			auto surface = *reinterpret_cast<ModelSurface**>(0x0112A95C);
 
 			// call original read function with the correct count
-			return Memory::Func<void(int, int)>(0x004925B0)(shouldLoad, surface->xSurficiesCount);
+			return Memory::func<void(int, int)>(0x004925B0)(shouldLoad, surface->xSurficiesCount);
 		}
 
         const char* Linker::GetZonePath(const char* zoneName)
@@ -411,7 +411,7 @@ char**>(0x00799278)[type]);
             };
 
             const std::string zoneFileName = zoneName;
-            const char* languageName = Memory::Func<const char* ()>(0x45CBA0)();
+            const char* languageName = Memory::func<const char* ()>(0x45CBA0)();
 
             // Priority 1: localized zone folder
             const std::string localizedZonePath = va("zone\\%s\\", languageName, zoneName);
@@ -441,9 +441,9 @@ char**>(0x00799278)[type]);
 			std::exit(0);
 		}
 
-		void Linker::Startup()
+		void Linker::startup()
 		{
-			if (this->InUse())
+			if (this->is_used())
 			{
 				// Realloc asset pools
 				ReallocateAssetPoolM(localize, 2);
@@ -471,133 +471,133 @@ char**>(0x00799278)[type]);
 				ReallocateAssetPoolM(lightdef, 2);
 
 				// Kill Com_Error
-				Memory(0x004B22D0).Jump(ExitZoneTool);
+				Memory(0x004B22D0).jump(ExitZoneTool);
 
 				// Tool init func
-				Memory(0x6BABA1).Call(Run);
-				Memory(0x4AA88B).Call(printf);
+				Memory(0x6BABA1).call(run);
+				Memory(0x4AA88B).call(printf);
 
 				// r_loadForRenderer
-				Memory(0x519DDF).Set<BYTE>(0x0);
+				Memory(0x519DDF).set<BYTE>(0x0);
 
 				// dirty disk breakpoint
 				// Memory(0x4CF7F0).Set<BYTE>(0xCC);
 
 				// delay loading of images, disable it
-				Memory(0x51F450).Set<BYTE>(0xC3);
+				Memory(0x51F450).set<BYTE>(0xC3);
 
 				// don't remove the 'texture data' pointer from GfxImage	
-				Memory(0x51F4FA).Nop(6);
+				Memory(0x51F4FA).nop(6);
 
 				// needed for the above to make Image_Release not misinterpret the texture data as a D3D texture
-				Memory(0x51F03D).Set<BYTE>(0xEB);
+				Memory(0x51F03D).set<BYTE>(0xEB);
 
 				// don't zero out pixel shaders
-				Memory(0x505AFB).Nop(7);
+				Memory(0x505AFB).nop(7);
 
 				// don't zero out vertex shaders
-				Memory(0x505BDB).Nop(7);
+				Memory(0x505BDB).nop(7);
 
 				// don't memset vertex declarations (not needed?)
-				Memory(0x00431B91).Nop(5);
+				Memory(0x00431B91).nop(5);
 
 				// allow loading of IWffu (unsigned) files
-				Memory(0x4158D9).Set<BYTE>(0xEB); //main function
-				Memory(0x4A1D97).Nop(2); //DB_AuthLoad_InflateInit
+				Memory(0x4158D9).set<BYTE>(0xEB); //main function
+				Memory(0x4A1D97).nop(2); //DB_AuthLoad_InflateInit
 
 				// basic checks (hash jumps, both normal and playlist)
-				Memory(0x5B97A3).Nop(2);
-				Memory(0x5BA493).Nop(2);
+				Memory(0x5B97A3).nop(2);
+				Memory(0x5BA493).nop(2);
 
-				Memory(0x5B991C).Nop(2);
-				Memory(0x5BA60C).Nop(2);
+				Memory(0x5B991C).nop(2);
+				Memory(0x5BA60C).nop(2);
 
-				Memory(0x5B97B4).Nop(2);
-				Memory(0x5BA4A4).Nop(2);
+				Memory(0x5B97B4).nop(2);
+				Memory(0x5BA4A4).nop(2);
 
 				// some other, unknown, check
-				Memory(0x5B9912).Set<BYTE>(0xB8);
-				Memory(0x5B9913).Set<DWORD>(1);
+				Memory(0x5B9912).set<BYTE>(0xB8);
+				Memory(0x5B9913).set<DWORD>(1);
 
-				Memory(0x5BA602).Set<BYTE>(0xB8);
-				Memory(0x5BA603).Set<DWORD>(1);
+				Memory(0x5BA602).set<BYTE>(0xB8);
+				Memory(0x5BA603).set<DWORD>(1);
 
 				// something related to image loading
-				Memory(0x54ADB0).Set<BYTE>(0xC3);
+				Memory(0x54ADB0).set<BYTE>(0xC3);
 
 				// dvar setting function, unknown stuff related to server thread sync
-				Memory(0x647781).Set<BYTE>(0xEB);
+				Memory(0x647781).set<BYTE>(0xEB);
 
 				// fs_basegame
-				Memory(0x6431D1).Set("zonetool");
+				Memory(0x6431D1).set("zonetool");
 
 				// hunk size (was 300 MiB)
-				Memory(0x64A029).Set<DWORD>(0x3F000000);
-				Memory(0x64A057).Set<DWORD>(0x3F000000); // 0x1C200000
+				Memory(0x64A029).set<DWORD>(0x3F000000);
+				Memory(0x64A057).set<DWORD>(0x3F000000); // 0x1C200000
 
 				// allow loading of IWffu (unsigned) files
-				Memory(0x4158D9).Set<BYTE>(0xEB); // main function
-				Memory(0x4A1D97).Nop(2); // DB_AuthLoad_InflateInit
+				Memory(0x4158D9).set<BYTE>(0xEB); // main function
+				Memory(0x4A1D97).nop(2); // DB_AuthLoad_InflateInit
 
 				// basic checks (hash jumps, both normal and playlist)
-				Memory(0x5B97A3).Nop(2);
-				Memory(0x5BA493).Nop(2);
+				Memory(0x5B97A3).nop(2);
+				Memory(0x5BA493).nop(2);
 
-				Memory(0x5B991C).Nop(2);
-				Memory(0x5BA60C).Nop(2);
+				Memory(0x5B991C).nop(2);
+				Memory(0x5BA60C).nop(2);
 
-				Memory(0x5B97B4).Nop(2);
-				Memory(0x5BA4A4).Nop(2);
+				Memory(0x5B97B4).nop(2);
+				Memory(0x5BA4A4).nop(2);
 
 				// Disabling loadedsound touching
-				Memory(0x492EFC).Nop(5);
+				Memory(0x492EFC).nop(5);
 
 				// weaponfile patches
-				Memory(0x408228).Nop(5); // find asset header
-				Memory(0x408230).Nop(5); // is asset default
-				Memory(0x40823A).Nop(2); // jump
+				Memory(0x408228).nop(5); // find asset header
+				Memory(0x408230).nop(5); // is asset default
+				Memory(0x40823A).nop(2); // jump
 
 				// menu stuff
 				// disable the 2 new tokens in ItemParse_rect
-				Memory(0x640693).Set<BYTE>(0xEB);
+				Memory(0x640693).set<BYTE>(0xEB);
 
 				// Dont load ASSET_TYPE_MENU anymore, we dont need it.
-				Memory(0x453406).Nop(5);
+				Memory(0x453406).nop(5);
 
 				// DB_AddXAsset hook
-				Memory(0x005BB650).Jump(DB_AddXAssetStub);
+				Memory(0x005BB650).jump(DB_AddXAssetStub);
 
 				// Fix fucking XSurface assets
-				Memory(0x0048E8A5).Call(Load_XSurfaceArray);
+				Memory(0x0048E8A5).call(Load_XSurfaceArray);
 
 				// Fastfile debugging
-				Memory(0x0044546D).Jump(IncreaseReadPointer);
-				Memory(0x00470E51).Jump(IncreaseReadPointer2);
-				Memory(0x004159E2).Call(ReadHeader);
+				Memory(0x0044546D).jump(IncreaseReadPointer);
+				Memory(0x00470E51).jump(IncreaseReadPointer2);
+				Memory(0x004159E2).call(ReadHeader);
 
                 // Load fastfiles from custom zone folders
-                Memory(0x44DA90).Jump(GetZonePath);
+                Memory(0x44DA90).jump(GetZonePath);
 			}
 		}
 
-		std::shared_ptr<IZone> Linker::AllocZone(std::string& zone)
+		std::shared_ptr<IZone> Linker::alloc_zone(const std::string& zone)
 		{
 			// Patch current thread
-			Memory(0x1CDE7FC).Set(GetCurrentThreadId());
+			Memory(0x1CDE7FC).set(GetCurrentThreadId());
 
 			// allocate zone
 			auto ptr = std::make_shared<Zone>(zone, this);
 			return ptr;
 		}
 
-		std::shared_ptr<ZoneBuffer> Linker::AllocBuffer()
+		std::shared_ptr<ZoneBuffer> Linker::alloc_buffer()
 		{
 			auto ptr = std::make_shared<ZoneBuffer>();
 			ptr->init_streams(8);
 			return ptr;
 		}
 
-		void Linker::LoadZone(std::string& name)
+		void Linker::load_zone(const std::string& name)
 		{
 			ZONETOOL_INFO("Loading zone \"%s\"...", name.data());
 
@@ -607,16 +607,16 @@ char**>(0x00799278)[type]);
 			ZONETOOL_INFO("Zone \"%s\" loaded.", name.data());
 		}
 
-		void Linker::UnloadZones()
+		void Linker::unload_zones()
 		{
 		}
 
-		bool Linker::IsValidAssetType(std::string& type)
+		bool Linker::is_valid_asset_type(std::string& type)
 		{
-			return this->TypeToInt(type) >= 0;
+			return this->type_to_int(type) >= 0;
 		}
 
-		std::int32_t Linker::TypeToInt(std::string type)
+		std::int32_t Linker::type_to_int(std::string type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x00799278);
 
@@ -629,23 +629,23 @@ char**>(0x00799278)[type]);
 			return -1;
 		}
 
-		std::string Linker::TypeToString(std::int32_t type)
+		std::string Linker::type_to_string(std::int32_t type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x00799278);
 			return xassettypes[type];
 		}
 
-        bool Linker::SupportsBuilding()
+        bool Linker::supports_building()
         {
             return true;
         }
 
-        void Linker::DumpZone(std::string& name)
+        void Linker::dump_zone(const std::string& name)
 		{
 			isDumpingComplete = false;
 			isDumping = true;
 			currentDumpingZone = name;
-			LoadZone(name);
+			load_zone(name);
 
 			while (!isDumpingComplete)
 			{
@@ -653,11 +653,11 @@ char**>(0x00799278)[type]);
 			}
 		}
 
-		void Linker::VerifyZone(std::string& name)
+		void Linker::verify_zone(const std::string& name)
 		{
 			isVerifying = true;
 			currentDumpingZone = name;
-			LoadZone(name);
+			load_zone(name);
 		}
 
 		Linker::Linker()

@@ -12,8 +12,8 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		extern bool isDumpingComplete;
-		extern bool isDumping;
+		extern bool is_dumping_complete;
+		extern bool is_dumping;
 
 		XAssetEntry AssetHandler::XAssetEntries[AssetEntries];
 		std::uint32_t AssetHandler::db_hashmap[AssetEntries];
@@ -167,7 +167,7 @@ namespace ZoneTool
 					referencedAssets.clear();
 					FileSystem::FileClose(csvFile);
 
-					isDumpingComplete = true;
+					is_dumping_complete = true;
 				}
 
 				if (GetAssetName(type, ptr)[0] == ',')
@@ -441,8 +441,8 @@ namespace ZoneTool
 			// mem = std::make_shared < ZoneMemory >();
 
 			// Stream position logging
-			Memory(0x00436CA8).Jump(ShitOutTheCurrentStreamPositionsStub);
-			Memory(0x00436C07).Jump(InitStreamsStub);
+			Memory(0x00436CA8).jump(ShitOutTheCurrentStreamPositionsStub);
+			Memory(0x00436C07).jump(InitStreamsStub);
 
 #ifdef REALLOC_XASSETS
 			// Empty the arrays
@@ -489,7 +489,7 @@ namespace ZoneTool
 #endif
 
 			// Always allocate a default asset, even for map assets.
-			Memory(0x4505EE).Nop(6);
+			Memory(0x4505EE).nop(6);
 
 			// Reallocate AssetPools
 			ReallocateAssetPoolM(techset, 2);
@@ -514,11 +514,11 @@ namespace ZoneTool
 			ReallocateAssetPoolM(attachment, 2);
 
 			// DB_AddXAssetHeader hook
-			Memory(0x44EFEF).Jump(DB_AddXAsset);
+			Memory(0x44EFEF).jump(DB_AddXAsset);
 
 			// Do not modify loadedsound struct after loading
-			Memory(0x0043856E).Nop(19);
-			Memory(0x00438556).Nop(12);
+			Memory(0x0043856E).nop(19);
+			Memory(0x00438556).nop(12);
 
 			// Prevent sound data from getting lost
 			// Memory(0x00438551).Jump(hkRestoreSoundData);

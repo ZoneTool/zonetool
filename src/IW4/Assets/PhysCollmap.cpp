@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		PhysCollmap* IPhysCollmap::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		PhysCollmap* IPhysCollmap::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto version = 4;
 			auto path = "physcollmap/" + name + ".cme4";
@@ -38,57 +38,57 @@ namespace ZoneTool
 
 			AssetReader read(mem);
 
-			if (!read.Open(path))
+			if (!read.open(path))
 			{
 				return nullptr;
 			}
 
 			ZONETOOL_INFO("Parsing phys_collmap \"%s\"...", name.c_str());
 
-			auto physcollmap = read.Array<PhysCollmap>(); // mem->Alloc<PhysCollmap>();
+			auto physcollmap = read.read_array<PhysCollmap>(); // mem->Alloc<PhysCollmap>();
 			physcollmap->name = mem->StrDup(name);
 
-			if (read.Int())
+			if (read.read_int())
 			{
-				physcollmap->info = read.Array<PhysGeomInfo>();
+				physcollmap->info = read.read_array<PhysGeomInfo>();
 
 				for (int i = 0; i < physcollmap->numInfo; i++)
 				{
-					if (read.Int())
+					if (read.read_int())
 					{
-						physcollmap->info[i].brush = read.Array<BrushWrapper>();
+						physcollmap->info[i].brush = read.read_array<BrushWrapper>();
 
 						if (version == 4)
 						{
-							if (read.Int())
+							if (read.read_int())
 							{
-								physcollmap->info[i].brush->plane = read.Array<cplane_s>();
+								physcollmap->info[i].brush->plane = read.read_array<cplane_s>();
 							}
 						}
 
-						if (read.Int())
+						if (read.read_int())
 						{
-							physcollmap->info[i].brush->side = read.Array<cbrushside_t>();
+							physcollmap->info[i].brush->side = read.read_array<cbrushside_t>();
 
 							for (int j = 0; j < physcollmap->info[i].brush->numPlaneSide; j++)
 							{
-								if (read.Int())
+								if (read.read_int())
 								{
-									physcollmap->info[i].brush->side[j].plane = read.Array<cplane_s>();
+									physcollmap->info[i].brush->side[j].plane = read.read_array<cplane_s>();
 								}
 							}
 						}
 
-						if (read.Int())
+						if (read.read_int())
 						{
-							physcollmap->info[i].brush->edge = read.Array<char>();
+							physcollmap->info[i].brush->edge = read.read_array<char>();
 						}
 
 						if (version == 3)
 						{
-							if (read.Int())
+							if (read.read_int())
 							{
-								physcollmap->info[i].brush->plane = read.Array<cplane_s>();
+								physcollmap->info[i].brush->plane = read.read_array<cplane_s>();
 							}
 						}
 					}
@@ -98,7 +98,7 @@ namespace ZoneTool
 			return physcollmap;
 		}
 
-		void IPhysCollmap::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IPhysCollmap::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -109,7 +109,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IPhysCollmap::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IPhysCollmap::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -127,7 +127,7 @@ namespace ZoneTool
 			return phys_collmap;
 		}
 
-		void IPhysCollmap::write_BrushWrapper(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, BrushWrapper* data)
+		void IPhysCollmap::write_BrushWrapper(IZone* zone, ZoneBuffer* buf, BrushWrapper* data)
 		{
 			auto dest = buf->write(data);
 
@@ -157,7 +157,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IPhysCollmap::write_PhysGeomInfo(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, PhysGeomInfo* dest)
+		void IPhysCollmap::write_PhysGeomInfo(IZone* zone, ZoneBuffer* buf, PhysGeomInfo* dest)
 		{
 			auto data = dest;
 
@@ -169,7 +169,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IPhysCollmap::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IPhysCollmap::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -197,82 +197,82 @@ namespace ZoneTool
 			std::string path = "physcollmap/" + std::string(asset->name) + ".cme4";
 
 			AssetDumper dump;
-			dump.Open(path.data());
-			dump.Array(asset, 1);
+			dump.open(path.data());
+			dump.dump_array(asset, 1);
 
 			if (asset->info)
 			{
-				dump.Int(1);
-				dump.Array(asset->info, asset->numInfo);
+				dump.dump_int(1);
+				dump.dump_array(asset->info, asset->numInfo);
 
 				for (auto i = 0; i < asset->numInfo; i++)
 				{
 					if (asset->info[i].brush)
 					{
-						dump.Int(1);
-						dump.Array(asset->info[i].brush, 1);
+						dump.dump_int(1);
+						dump.dump_array(asset->info[i].brush, 1);
 
 						if (asset->info[i].brush->plane)
 						{
-							dump.Int(1);
-							dump.Array(asset->info[i].brush->plane, asset->info[i].brush->numPlaneSide);
+							dump.dump_int(1);
+							dump.dump_array(asset->info[i].brush->plane, asset->info[i].brush->numPlaneSide);
 
 							// printf("phys_collmap \"%s\"[%i] has %i collision planes.\n", asset->name, i, asset->info[i].brush->numPlaneSide);
 						}
 						else
 						{
-							dump.Int(0);
+							dump.dump_int(0);
 						}
 
 						if (asset->info[i].brush->side)
 						{
 							// printf("phys_collmap \"%s\"[%i] has %i collision sides.\n", asset->name, i, asset->info[i].brush->numPlaneSide);
 
-							dump.Int(1);
-							dump.Array(asset->info[i].brush->side, asset->info[i].brush->numPlaneSide);
+							dump.dump_int(1);
+							dump.dump_array(asset->info[i].brush->side, asset->info[i].brush->numPlaneSide);
 
 							for (int j = 0; j < asset->info[i].brush->numPlaneSide; j++)
 							{
 								if (asset->info[i].brush->side[j].plane)
 								{
-									dump.Int(1);
-									dump.Array(asset->info[i].brush->side[j].plane, 1);
+									dump.dump_int(1);
+									dump.dump_array(asset->info[i].brush->side[j].plane, 1);
 								}
 								else
 								{
-									dump.Int(0);
+									dump.dump_int(0);
 								}
 							}
 						}
 						else
 						{
-							dump.Int(0);
+							dump.dump_int(0);
 						}
 
 						if (asset->info[i].brush->edge)
 						{
 							// printf("phys_collmap \"%s\"[%i] has %i collision edges.\n", asset->name, i, asset->info[i].brush->numEdge);
 
-							dump.Int(1);
-							dump.Array(asset->info[i].brush->edge, asset->info[i].brush->numEdge);
+							dump.dump_int(1);
+							dump.dump_array(asset->info[i].brush->edge, asset->info[i].brush->numEdge);
 						}
 						else
 						{
-							dump.Int(0);
+							dump.dump_int(0);
 						}
 					}
 					else
 					{
-						dump.Int(0);
+						dump.dump_int(0);
 					}
 				}
 			}
 			else
 			{
-				dump.Int(0);
+				dump.dump_int(0);
 			}
 
-			dump.Close();
+			dump.close();
 		}
 	}
 }

@@ -59,7 +59,7 @@ namespace ZoneTool
 				// dump asset
 				IW4::IXAnimParts::dump(asset, SL_ConvertToString);
 
-				// free memory
+				// free memory_
 				delete[] asset;
 			}
 		}

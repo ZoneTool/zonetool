@@ -20,7 +20,7 @@ namespace ZoneTool
 			bool isMapImage;
 
 			std::string clean_name(const std::string& name);
-			GfxImage* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
+			GfxImage* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
 			IGfxImage();
@@ -28,16 +28,16 @@ namespace ZoneTool
 
 			static void dump_iwi(const std::string& name);
 
-			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
-			void init(void* asset, std::shared_ptr<ZoneMemory>& mem) override;
+			void init(const std::string& name, ZoneMemory* mem) override;
+			void init(void* asset, ZoneMemory* mem) override;
 
-			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
+			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 
 			void* pointer() override { return m_asset; }
 			std::string name() override;
 			std::int32_t type() override;
-			void write(IZone* zone, std::shared_ptr<ZoneBuffer>& buffer) override;
+			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump(GfxImage* asset);
 		};

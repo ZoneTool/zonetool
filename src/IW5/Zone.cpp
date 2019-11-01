@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		void* Zone::GetAssetPointer(std::int32_t type, std::string name)
+		void* Zone::get_asset_pointer(std::int32_t type, const std::string& name)
 		{
 			for (std::size_t idx = 0; idx < m_assets.size(); idx++)
 			{
@@ -26,7 +26,7 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		void Zone::AddAssetOfTypePtr(std::int32_t type, void* pointer)
+		void Zone::add_asset_of_type_by_pointer(std::int32_t type, void* pointer)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::Zone::AddAssetOfTypePtr");
@@ -45,7 +45,7 @@ namespace ZoneTool
 			if (type == __type__) \
 			{ \
 				auto asset = std::make_shared < __interface__ >(); \
-				asset->init(pointer, this->m_zonemem); \
+				asset->init(pointer, this->m_zonemem.get()); \
 				asset->load_depending(this); \
 				m_assets.push_back(asset); \
 			}
@@ -60,14 +60,14 @@ namespace ZoneTool
 #endif
 		}
 
-		void Zone::AddAssetOfType(std::int32_t type, const std::string& name)
+		void Zone::add_asset_of_type(std::int32_t type, const std::string& name)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::Zone::AddAssetOfType");
 #endif
 
 			// don't add asset if it already exists
-			if (GetAssetPointer(type, name))
+			if (get_asset_pointer(type, name))
 			{
 				return;
 			}
@@ -76,7 +76,7 @@ namespace ZoneTool
 			if (type == __type__) \
 			{ \
 				auto asset = std::make_shared < __interface__ >(); \
-				asset->init(name, this->m_zonemem); \
+				asset->init(name, this->m_zonemem.get()); \
 				asset->load_depending(this); \
 				m_assets.push_back(asset); \
 			}
@@ -120,18 +120,18 @@ namespace ZoneTool
 #endif
 		}
 
-		std::int32_t Zone::GetTypeByName(const std::string& type)
+		std::int32_t Zone::get_type_by_name(const std::string& type)
 		{
-			return m_linker->TypeToInt(type);
+			return m_linker->type_to_int(type);
 		}
 
-		void Zone::AddAssetOfType(const std::string& type, const std::string& name)
+		void Zone::add_asset_of_type(const std::string& type, const std::string& name)
 		{
-			std::int32_t itype = m_linker->TypeToInt(type);
-			this->AddAssetOfType(itype, name);
+			std::int32_t itype = m_linker->type_to_int(type);
+			this->add_asset_of_type(itype, name);
 		}
 
-		void Zone::Build(std::shared_ptr<ZoneBuffer>& buf)
+		void Zone::build(ZoneBuffer* buf)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::Zone::Build");
@@ -161,7 +161,7 @@ namespace ZoneTool
 			// write asset types to header
 			for (auto i = 0u; i < m_assets.size(); i++)
 			{
-				m_assets[i]->prepare(buf, this->m_zonemem);
+				m_assets[i]->prepare(buf, this->m_zonemem.get());
 			}
 
 			// write scriptstring count

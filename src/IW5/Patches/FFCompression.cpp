@@ -395,24 +395,24 @@ namespace ZoneTool
 #endif
 
 			// Allow loading of unsigned fastfiles
-			Memory(0x436B3D).Nop(2);
+			Memory(0x436B3D).nop(2);
 
 			// Compression hooks
-			Memory(0x5DAF20).Jump(db_inflateInit);
-			Memory(0x5DAED0).Jump(db_inflateEnd);
-			Memory(0x5DAFE0).Jump(db_inflate);
+			Memory(0x5DAF20).jump(db_inflateInit);
+			Memory(0x5DAED0).jump(db_inflateEnd);
+			Memory(0x5DAFE0).jump(db_inflate);
 
 			// Fastfile version hook
-			Memory(0x436AD2).Jump(DB_ReadXFileVersion);
+			Memory(0x436AD2).jump(DB_ReadXFileVersion);
 
 			// encrypted load stream hooks
-			Memory(0x00440CF4).Call(EncryptedLoadStream); // col_map_mp
-			Memory(0x00441AEB).Call(EncryptedLoadStream); // com_map
-			Memory(0x0044075B).Call(EncryptedLoadStream); // map_ents
-			Memory(0x0043F38B).Call(EncryptedLoadStream); // fx_map
-			Memory(0x0044C244).Call(EncryptedLoadStream); // gfx_map
-			Memory(0x00446E6E).Call(EncryptedLoadStream); // weapon
-			Memory(0x0043A92E).Call(EncryptedLoadStream); // techset
+			Memory(0x00440CF4).call(EncryptedLoadStream); // col_map_mp
+			Memory(0x00441AEB).call(EncryptedLoadStream); // com_map
+			Memory(0x0044075B).call(EncryptedLoadStream); // map_ents
+			Memory(0x0043F38B).call(EncryptedLoadStream); // fx_map
+			Memory(0x0044C244).call(EncryptedLoadStream); // gfx_map
+			Memory(0x00446E6E).call(EncryptedLoadStream); // weapon
+			Memory(0x0043A92E).call(EncryptedLoadStream); // techset
 
 			// Encryption hooks
 			// Memory(0x00436B1F).Jump(FFCompression::ReadEncryptedKey);

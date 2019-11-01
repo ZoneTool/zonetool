@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		AttachmentDef* IAttachmentDef::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		AttachmentDef* IAttachmentDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			if (name == "cheytacscope")
 			{
@@ -47,7 +47,7 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		void IAttachmentDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IAttachmentDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -58,7 +58,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IAttachmentDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IAttachmentDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -77,12 +77,12 @@ namespace ZoneTool
 			{
 				if (data->worldModels && data->worldModels[i])
 				{
-					zone->AddAssetOfType(xmodel, data->worldModels[i]->name);
+					zone->add_asset_of_type(xmodel, data->worldModels[i]->name);
 				}
 
 				if (data->viewModels && data->viewModels[i])
 				{
-					zone->AddAssetOfType(xmodel, data->viewModels[i]->name);
+					zone->add_asset_of_type(xmodel, data->viewModels[i]->name);
 				}
 			}
 
@@ -90,7 +90,7 @@ namespace ZoneTool
 			{
 				if (data->reticleViewModels && data->reticleViewModels[i])
 				{
-					zone->AddAssetOfType(xmodel, data->reticleViewModels[i]->name);
+					zone->add_asset_of_type(xmodel, data->reticleViewModels[i]->name);
 				}
 			}
 
@@ -98,7 +98,7 @@ namespace ZoneTool
 			{
 				if (data->ammogeneral->tracerType)
 				{
-					zone->AddAssetOfType(tracer, data->ammogeneral->tracerType->name);
+					zone->add_asset_of_type(tracer, data->ammogeneral->tracerType->name);
 				}
 			}
 
@@ -106,12 +106,12 @@ namespace ZoneTool
 			{
 				if (data->general->reticleCenter)
 				{
-					zone->AddAssetOfType(material, data->general->reticleCenter->name);
+					zone->add_asset_of_type(material, data->general->reticleCenter->name);
 				}
 
 				if (data->general->reticleSide)
 				{
-					zone->AddAssetOfType(material, data->general->reticleSide->name);
+					zone->add_asset_of_type(material, data->general->reticleSide->name);
 				}
 			}
 
@@ -119,12 +119,12 @@ namespace ZoneTool
 			{
 				if (data->ui->ammoCounterIcon)
 				{
-					zone->AddAssetOfType(material, data->ui->ammoCounterIcon->name);
+					zone->add_asset_of_type(material, data->ui->ammoCounterIcon->name);
 				}
 
 				if (data->ui->dpadIcon)
 				{
-					zone->AddAssetOfType(material, data->ui->dpadIcon->name);
+					zone->add_asset_of_type(material, data->ui->dpadIcon->name);
 				}
 			}
 
@@ -132,22 +132,22 @@ namespace ZoneTool
 			{
 				if (data->adsOverlay->overlay.shader)
 				{
-					zone->AddAssetOfType(material, data->adsOverlay->overlay.shader->name);
+					zone->add_asset_of_type(material, data->adsOverlay->overlay.shader->name);
 				}
 
 				if (data->adsOverlay->overlay.shaderLowRes)
 				{
-					zone->AddAssetOfType(material, data->adsOverlay->overlay.shaderLowRes->name);
+					zone->add_asset_of_type(material, data->adsOverlay->overlay.shaderLowRes->name);
 				}
 
 				if (data->adsOverlay->overlay.shaderEMP)
 				{
-					zone->AddAssetOfType(material, data->adsOverlay->overlay.shaderEMP->name);
+					zone->add_asset_of_type(material, data->adsOverlay->overlay.shaderEMP->name);
 				}
 
 				if (data->adsOverlay->overlay.shaderEMPLowRes)
 				{
-					zone->AddAssetOfType(material, data->adsOverlay->overlay.shaderEMPLowRes->name);
+					zone->add_asset_of_type(material, data->adsOverlay->overlay.shaderEMPLowRes->name);
 				}
 			}
 
@@ -205,7 +205,7 @@ namespace ZoneTool
 			return attachment;
 		}
 
-		void IAttachmentDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IAttachmentDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -229,7 +229,7 @@ namespace ZoneTool
 				{
 					if (models[i])
 					{
-						models[i] = reinterpret_cast<XModel*>(zone->GetAssetPointer(xmodel, models[i]->name));
+						models[i] = reinterpret_cast<XModel*>(zone->get_asset_pointer(xmodel, models[i]->name));
 					}
 				}
 
@@ -245,7 +245,7 @@ namespace ZoneTool
 				{
 					if (models[i])
 					{
-						models[i] = reinterpret_cast<XModel*>(zone->GetAssetPointer(xmodel, models[i]->name));
+						models[i] = reinterpret_cast<XModel*>(zone->get_asset_pointer(xmodel, models[i]->name));
 					}
 				}
 
@@ -261,7 +261,7 @@ namespace ZoneTool
 				{
 					if (models[i])
 					{
-						models[i] = reinterpret_cast<XModel*>(zone->GetAssetPointer(xmodel, models[i]->name));
+						models[i] = reinterpret_cast<XModel*>(zone->get_asset_pointer(xmodel, models[i]->name));
 					}
 				}
 
@@ -275,7 +275,7 @@ namespace ZoneTool
 
 				if (ammo->tracerType)
 				{
-					ammo->tracerType = reinterpret_cast<TracerDef*>(zone->GetAssetPointer(
+					ammo->tracerType = reinterpret_cast<TracerDef*>(zone->get_asset_pointer(
 						tracer, ammo->tracerType->name));
 				}
 
@@ -310,13 +310,13 @@ namespace ZoneTool
 
 				if (general->reticleCenter)
 				{
-					general->reticleCenter = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					general->reticleCenter = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, general->reticleCenter->name));
 				}
 
 				if (general->reticleSide)
 				{
-					general->reticleSide = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					general->reticleSide = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, general->reticleSide->name));
 				}
 
@@ -400,25 +400,25 @@ namespace ZoneTool
 
 				if (overlay->overlay.shader)
 				{
-					overlay->overlay.shader = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					overlay->overlay.shader = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, overlay->overlay.shader->name));
 				}
 
 				if (overlay->overlay.shaderEMP)
 				{
-					overlay->overlay.shaderEMP = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					overlay->overlay.shaderEMP = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, overlay->overlay.shaderEMP->name));
 				}
 
 				if (overlay->overlay.shaderEMPLowRes)
 				{
-					overlay->overlay.shaderEMPLowRes = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					overlay->overlay.shaderEMPLowRes = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, overlay->overlay.shaderEMPLowRes->name));
 				}
 
 				if (overlay->overlay.shaderLowRes)
 				{
-					overlay->overlay.shaderLowRes = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					overlay->overlay.shaderLowRes = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, overlay->overlay.shaderLowRes->name));
 				}
 
@@ -432,13 +432,13 @@ namespace ZoneTool
 
 				if (ui->ammoCounterIcon)
 				{
-					ui->ammoCounterIcon = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					ui->ammoCounterIcon = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, ui->ammoCounterIcon->name));
 				}
 
 				if (ui->dpadIcon)
 				{
-					ui->dpadIcon = reinterpret_cast<Material*>(zone->GetAssetPointer(material, ui->dpadIcon->name));
+					ui->dpadIcon = reinterpret_cast<Material*>(zone->get_asset_pointer(material, ui->dpadIcon->name));
 				}
 
 				ZoneBuffer::ClearPointer(&dest->ui);

@@ -37,7 +37,7 @@ namespace ZoneTool
 			return newName;
 		}
 
-		GfxImage* IGfxImage::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		GfxImage* IGfxImage::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = "images\\" + this->clean_name(name) + ".ffimg";
 
@@ -102,7 +102,7 @@ namespace ZoneTool
 			return img;
 		}
 
-		void IGfxImage::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxImage::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -119,7 +119,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGfxImage::init(void* asset, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxImage::init(void* asset, ZoneMemory* mem)
 		{
 			this->m_asset = reinterpret_cast<GfxImage*>(asset);
 			this->m_name = this->m_asset->name;
@@ -137,7 +137,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGfxImage::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxImage::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -290,7 +290,7 @@ namespace ZoneTool
 			}
 		}
 		
-		void IGfxImage::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IGfxImage::write(IZone* zone, ZoneBuffer* buf)
 		{
 			dump_iwi(this->name());
 

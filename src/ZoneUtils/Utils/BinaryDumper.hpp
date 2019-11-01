@@ -37,7 +37,7 @@ namespace ZoneTool
 		FILE* fp = nullptr;
 
 		template <typename T>
-		void WriteInternal(const T& value)
+		void write_internal(const T& value)
 		{
 			if (fp)
 			{
@@ -46,7 +46,7 @@ namespace ZoneTool
 		}
 
 		template <typename T>
-		void WriteInternal(const T& value, DUMP_TYPE type)
+		void write_internal(const T& value, DUMP_TYPE type)
 		{
 			if (fp)
 			{
@@ -55,7 +55,7 @@ namespace ZoneTool
 			}
 		}
 
-		void WriteString(const char* str)
+		void write_string_internal(const char* str)
 		{
 			if (fp)
 			{
@@ -72,38 +72,38 @@ namespace ZoneTool
 		~AssetDumper()
 		{
 			// close file pointer
-			Close();
+			close();
 		}
 
-		bool Open(const std::string& filename)
+		bool open(const std::string& filename)
 		{
-			Close();
+			close();
 			fp = FileSystem::FileOpen(filename, "wb");
 			return fp != nullptr;
 		}
 
-		void Close()
+		void close()
 		{
 			list.clear();
 			FileSystem::FileClose(fp);
 		}
 
-		void Float(float f)
+		void dump_float(float f)
 		{
-			WriteInternal(f, DUMP_TYPE_FLOAT);
+			write_internal(f, DUMP_TYPE_FLOAT);
 		}
 
-		void Int(std::int32_t i)
+		void dump_int(std::int32_t i)
 		{
-			WriteInternal(i, DUMP_TYPE_INT);
+			write_internal(i, DUMP_TYPE_INT);
 		}
 
-		void Uint(std::uint32_t i)
+		void dump_uint(std::uint32_t i)
 		{
-			WriteInternal(i, DUMP_TYPE_INT);
+			write_internal(i, DUMP_TYPE_INT);
 		}
 
-		void String(char* s)
+		void dump_string(char* s)
 		{
 			if (fp)
 			{
@@ -114,8 +114,8 @@ namespace ZoneTool
 					{
 						if (oldEntry.start == s && oldEntry.entrySize == 1 && oldEntry.entryCount == 1)
 						{
-							this->WriteInternal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
-							this->WriteInternal<std::int32_t>(0);
+							this->write_internal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
+							this->write_internal<std::int32_t>(0);
 							return;
 						}
 						listIndex++;
@@ -127,23 +127,23 @@ namespace ZoneTool
 					entry.start = reinterpret_cast<void*>(s);
 					list.push_back(entry);
 
-					this->WriteInternal<char>(DUMP_EXISTING, DUMP_TYPE_STRING);
-					this->WriteString(s);
+					this->write_internal<char>(DUMP_EXISTING, DUMP_TYPE_STRING);
+					this->write_string_internal(s);
 				}
 				else
 				{
-					this->WriteInternal<char>(DUMP_NONEXISTING, DUMP_TYPE_STRING);
+					this->write_internal<char>(DUMP_NONEXISTING, DUMP_TYPE_STRING);
 				}
 			}
 		}
 
-		void String(const char* s)
+		void dump_string(const char* s)
 		{
-			this->String(const_cast<char*>(s));
+			this->dump_string(const_cast<char*>(s));
 		}
 
 		template <typename T>
-		void Asset(T* asset)
+		void dump_asset(T* asset)
 		{
 			if (fp)
 			{
@@ -157,8 +157,8 @@ namespace ZoneTool
 							entrySize >= int(asset) &&
 							(int(asset) - reinterpret_cast<int>(oldEntry.start)) % oldEntry.entrySize == 0)
 						{
-							this->WriteInternal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
-							this->WriteInternal<std::int32_t>((int(asset) - reinterpret_cast<int>(oldEntry.start)) / oldEntry.entrySize);
+							this->write_internal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
+							this->write_internal<std::int32_t>((int(asset) - reinterpret_cast<int>(oldEntry.start)) / oldEntry.entrySize);
 							return;
 						}
 						listIndex++;
@@ -170,17 +170,17 @@ namespace ZoneTool
 					entry.start = static_cast<void*>(asset);
 					list.push_back(entry);
 
-					this->WriteInternal<char>(DUMP_EXISTING, DUMP_TYPE_ASSET);
-					this->WriteString(asset->name);
+					this->write_internal<char>(DUMP_EXISTING, DUMP_TYPE_ASSET);
+					this->write_string_internal(asset->name);
 				}
 				else
 				{
-					this->WriteInternal<char>(DUMP_NONEXISTING, DUMP_TYPE_ASSET);
+					this->write_internal<char>(DUMP_NONEXISTING, DUMP_TYPE_ASSET);
 				}
 			}
 		}
 
-		template <typename T> void Array(T* data, int arraySize)
+		template <typename T> void dump_array(T* data, int arraySize)
 		{
 			if (fp)
 			{
@@ -197,8 +197,8 @@ namespace ZoneTool
 							(int(data) - reinterpret_cast<int>(oldEntry.start)) % oldEntry.entrySize == 0)
 							// Check if the data is actually at the start of an array entry
 						{
-							this->WriteInternal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
-							this->WriteInternal<std::int32_t>((int(data) - reinterpret_cast<int>(oldEntry.start)) / oldEntry.entrySize);
+							this->write_internal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
+							this->write_internal<std::int32_t>((int(data) - reinterpret_cast<int>(oldEntry.start)) / oldEntry.entrySize);
 							return;
 						}
 						listIndex++;
@@ -210,19 +210,19 @@ namespace ZoneTool
 					entry.start = static_cast<void*>(data);
 					list.push_back(entry);
 
-					this->WriteInternal<std::uint32_t>(arraySize, DUMP_TYPE_ARRAY);
+					this->write_internal<std::uint32_t>(arraySize, DUMP_TYPE_ARRAY);
 					fwrite(data, sizeof(T), arraySize, fp);
 				}
 				else
 				{
-					this->WriteInternal<std::uint32_t>(0, DUMP_TYPE_ARRAY);
+					this->write_internal<std::uint32_t>(0, DUMP_TYPE_ARRAY);
 				}
 			}
 		}
 
-		template <typename T> void Single(T* asset)
+		template <typename T> void dump_single(T* asset)
 		{
-			return this->Array(asset, 1);
+			return this->dump_array(asset, 1);
 		}
 	};
 
@@ -230,33 +230,33 @@ namespace ZoneTool
 	{
 	protected:
 		std::vector<dumpListEntry> list;
-		FILE* fp = nullptr;
-		std::shared_ptr<ZoneMemory> memory;
+		FILE* fp_ = nullptr;
+		ZoneMemory* memory_;
 
 		template <typename T>
-		T ReadInternal()
+		T read_internal()
 		{
 			T value;
 
-			if (fp)
+			if (fp_)
 			{
-				fread(&value, sizeof T, 1, fp);
+				fread(&value, sizeof T, 1, fp_);
 			}
 
 			return value;
 		}
 
-		char* ReadStr()
+		char* read_string_internal()
 		{
 			char tempBuf[1024];
 			char ch = 0;
 			int i = 0;
 
-			if (fp)
+			if (fp_)
 			{
 				do
 				{
-					fread(&ch, 1, 1, fp);
+					fread(&ch, 1, 1, fp_);
 
 					tempBuf[i++] = ch;
 
@@ -268,16 +268,16 @@ namespace ZoneTool
 				while (ch);
 			}
 
-			char* retval = memory->Alloc<char>(i); // new char[i];
+			char* retval = memory_->Alloc<char>(i); // new char[i];
 			strcpy(retval, tempBuf);
 
 			return retval;
 		}
 
 	public:
-		AssetReader(std::shared_ptr<ZoneMemory>& mem)
+		AssetReader(ZoneMemory* mem)
 		{
-			memory = mem;
+			memory_ = mem;
 
 			list.clear();
 		}
@@ -285,88 +285,88 @@ namespace ZoneTool
 		~AssetReader()
 		{
 			// close file
-			Close();
+			close();
 		}
 
-		bool Open(const std::string& filename, bool preferLocal = false)
+		bool open(const std::string& filename, bool preferLocal = false)
 		{
-			Close();
+			close();
 
 			FileSystem::PreferLocalOverExternal(preferLocal);
-			fp = FileSystem::FileOpen(filename, "rb");
+			fp_ = FileSystem::FileOpen(filename, "rb");
 			FileSystem::PreferLocalOverExternal(false);
 
-			return fp != nullptr;
+			return fp_ != nullptr;
 		}
 
-		void Close()
+		void close()
 		{
 			list.clear();
-			FileSystem::FileClose(fp);
+			FileSystem::FileClose(fp_);
 		}
 
-		float Float()
+		float read_float()
 		{
-			if (fp)
+			if (fp_)
 			{
-				char type = this->ReadInternal<char>();
+				char type = this->read_internal<char>();
 				if (type != DUMP_TYPE_FLOAT)
 				{
 					printf("Reader error: Type not DUMP_TYPE_FLOAT but %i", type);
 					throw;
 					return 0;
 				}
-				return this->ReadInternal<float>();
+				return this->read_internal<float>();
 			}
 			return 0;
 		}
 
-		int Int()
+		int read_int()
 		{
-			if (fp)
+			if (fp_)
 			{
-				const auto type = this->ReadInternal<char>();
+				const auto type = this->read_internal<char>();
 				if (type != DUMP_TYPE_INT)
 				{
 					printf("Reader error: Type not DUMP_TYPE_INT but %i", type);
 					throw;
 					return 0;
 				}
-				return this->ReadInternal<std::int32_t>();
+				return this->read_internal<std::int32_t>();
 			}
 			return 0;
 		}
 
-		unsigned int Uint()
+		unsigned int read_uint()
 		{
-			if (fp)
+			if (fp_)
 			{
-				const auto type = this->ReadInternal<char>();
+				const auto type = this->read_internal<char>();
 				if (type != DUMP_TYPE_INT)
 				{
 					printf("Reader error: Type not DUMP_TYPE_INT but %i", type);
 					throw;
 					return 0;
 				}
-				return this->ReadInternal<std::uint32_t>();
+				return this->read_internal<std::uint32_t>();
 			}
 			return 0;
 		}
 
-		char* String()
+		char* read_string()
 		{
-			if (fp)
+			if (fp_)
 			{
-				const auto type = this->ReadInternal<char>();
+				const auto type = this->read_internal<char>();
 
 				if (type == DUMP_TYPE_STRING)
 				{
-					const auto existing = this->ReadInternal<char>();
+					const auto existing = this->read_internal<char>();
 					if (existing == DUMP_NONEXISTING)
 					{
 						return nullptr;
 					}
-					const auto output = this->ReadStr(); // freadstr(fp);
+					const auto output = this->read_string_internal(); // freadstr(fp_);
 
 					dumpListEntry entry;
 					entry.entryCount = 1;
@@ -378,8 +378,8 @@ namespace ZoneTool
 				}
 				if (type == DUMP_TYPE_OFFSET)
 				{
-					const auto listIndex = this->ReadInternal<int>(); // freadint(fp);
-					const auto arrayIndex = this->ReadInternal<int>();
+					const auto listIndex = this->read_internal<int>(); // freadint(fp_);
+					const auto arrayIndex = this->read_internal<int>();
 
 					return reinterpret_cast<char*>(reinterpret_cast<int>(list[listIndex].start) + list[listIndex].entrySize * arrayIndex);
 				}
@@ -391,23 +391,23 @@ namespace ZoneTool
 		}
 
 		template <typename T>
-		T* Asset()
+		T* read_asset()
 		{
-			if (fp)
+			if (fp_)
 			{
-				const auto type = this->ReadInternal<char>();
+				const auto type = this->read_internal<char>();
 
 				if (type == DUMP_TYPE_ASSET)
 				{
-					const auto existing = this->ReadInternal<char>();
+					const auto existing = this->read_internal<char>();
 					if (existing == DUMP_NONEXISTING)
 					{
 						return nullptr;
 					}
-					const char* name = this->ReadStr();
+					const char* name = this->read_string_internal();
 					// T* asset = new T;
 
-					auto asset = memory->Alloc<T>();
+					auto asset = memory_->Alloc<T>();
 
 					memset(asset, 0, sizeof(T));
 					asset->name = const_cast<char*>(name);
@@ -422,8 +422,8 @@ namespace ZoneTool
 				}
 				if (type == DUMP_TYPE_OFFSET)
 				{
-					const auto listIndex = this->ReadInternal<int>();
-					const auto arrayIndex = this->ReadInternal<int>();
+					const auto listIndex = this->read_internal<int>();
+					const auto arrayIndex = this->read_internal<int>();
 
 					return reinterpret_cast<T*>(reinterpret_cast<int>(list[listIndex].start) + list[listIndex].entrySize * arrayIndex);
 				}
@@ -436,23 +436,23 @@ namespace ZoneTool
 		}
 
 		template <typename T>
-		T* Array()
+		T* read_array()
 		{
-			if (fp)
+			if (fp_)
 			{
-				const auto type = this->ReadInternal<char>();
+				const auto type = this->read_internal<char>();
 
 				if (type == DUMP_TYPE_ARRAY)
 				{
-					const auto arraySize = this->ReadInternal<std::uint32_t>();
+					const auto arraySize = this->read_internal<std::uint32_t>();
 
 					if (arraySize <= 0)
 					{
 						return nullptr;
 					}
 
-					auto nArray = memory->Alloc<T>(arraySize);
-					fread(static_cast<void*>(nArray), sizeof(T), arraySize, fp);
+					auto nArray = memory_->Alloc<T>(arraySize);
+					fread(static_cast<void*>(nArray), sizeof(T), arraySize, fp_);
 
 					dumpListEntry entry;
 					entry.entryCount = arraySize;
@@ -464,8 +464,8 @@ namespace ZoneTool
 				}
 				if (type == DUMP_TYPE_OFFSET)
 				{
-					const auto listIndex = this->ReadInternal<int>();
-					const auto arrayIndex = this->ReadInternal<int>();
+					const auto listIndex = this->read_internal<int>();
+					const auto arrayIndex = this->read_internal<int>();
 
 					return reinterpret_cast<T*>(reinterpret_cast<int>(list[listIndex].start) + list[listIndex].entrySize * arrayIndex);
 				}
@@ -477,9 +477,9 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		template <typename T> T* Single()
+		template <typename T> T* read_single()
 		{
-			return this->Array<T>();
+			return this->read_array<T>();
 		}
 	};
 }

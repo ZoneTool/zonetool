@@ -20,17 +20,17 @@ namespace ZoneTool
 		{
 		}
 
-		void IFxEffectDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IFxEffectDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).fx;
 		}
 
-		void IFxEffectDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IFxEffectDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
-		FxEffectDef* IFxEffectDef::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		FxEffectDef* IFxEffectDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = "fx\\" + name;
 			if (!FileSystem::FileExists(path))
@@ -45,7 +45,7 @@ namespace ZoneTool
 				}
 
 				AssetReader read(mem);
-				if (!read.Open(path))
+				if (!read.open(path))
 				{
 					FileSystem::PreferLocalOverExternal(false);
 					return nullptr;
@@ -53,16 +53,16 @@ namespace ZoneTool
 
 				ZONETOOL_INFO("Parsing \"%s\"", name.data());
 
-				auto fx = read.Array<FxEffectDef>();
-				fx->elemDefCountEmission = read.Int();
-				fx->elemDefCountLooping = read.Int();
-				fx->elemDefCountOneShot = read.Int();
-				fx->elemDefs = read.Array<FxElemDef>();
-				fx->flags = read.Int();
-				fx->msecLoopingLife = read.Int();
-				fx->name = read.String();
-				fx->totalSize = read.Int();
-				read.Close();
+				auto fx = read.read_array<FxEffectDef>();
+				fx->elemDefCountEmission = read.read_int();
+				fx->elemDefCountLooping = read.read_int();
+				fx->elemDefCountOneShot = read.read_int();
+				fx->elemDefs = read.read_array<FxElemDef>();
+				fx->flags = read.read_int();
+				fx->msecLoopingLife = read.read_int();
+				fx->name = read.read_string();
+				fx->totalSize = read.read_int();
+				read.close();
 
 				FileSystem::PreferLocalOverExternal(false);
 
@@ -83,9 +83,9 @@ namespace ZoneTool
 						if (vis->markArray[i])
 						{
 							if (vis->markArray[i][0])
-								zone->AddAssetOfType(material, vis->markArray[i][0]->name);
+								zone->add_asset_of_type(material, vis->markArray[i][0]->name);
 							if (vis->markArray[i][1])
-								zone->AddAssetOfType(material, vis->markArray[i][1]->name);
+								zone->add_asset_of_type(material, vis->markArray[i][1]->name);
 						}
 					}
 				}
@@ -94,30 +94,30 @@ namespace ZoneTool
 					for (int i = 0; i < def->visualCount; i++)
 					{
 						if (def->elemType == 12)
-							zone->AddAssetOfType(fx, vis->array[i].effectDef->name);
+							zone->add_asset_of_type(fx, vis->array[i].effectDef->name);
 						else if (def->elemType == 10)
-							zone->AddAssetOfType(sound, vis->array[i].soundName);
+							zone->add_asset_of_type(sound, vis->array[i].soundName);
 						else if (def->elemType == 7)
-							zone->AddAssetOfType(xmodel, vis->array[i].xmodel->name);
+							zone->add_asset_of_type(xmodel, vis->array[i].xmodel->name);
 						else
 						{
 							if (def->elemType != 8)
-								zone->AddAssetOfType(material, vis->array[i].material->name);
+								zone->add_asset_of_type(material, vis->array[i].material->name);
 						}
 					}
 				}
 				else
 				{
 					if (def->elemType == 12)
-						zone->AddAssetOfType(fx, vis->instance.effectDef->name);
+						zone->add_asset_of_type(fx, vis->instance.effectDef->name);
 					else if (def->elemType == 10)
-						zone->AddAssetOfType(sound, vis->instance.soundName);
+						zone->add_asset_of_type(sound, vis->instance.soundName);
 					else if (def->elemType == 7)
-						zone->AddAssetOfType(xmodel, vis->instance.xmodel->name);
+						zone->add_asset_of_type(xmodel, vis->instance.xmodel->name);
 					else
 					{
 						if (def->elemType != 8)
-							zone->AddAssetOfType(material, vis->instance.material->name);
+							zone->add_asset_of_type(material, vis->instance.material->name);
 					}
 				}
 			};
@@ -129,11 +129,11 @@ namespace ZoneTool
 
 				// Sub-FX effects
 				if (def.effectEmitted)
-					zone->AddAssetOfType(fx, def.effectEmitted->name);
+					zone->add_asset_of_type(fx, def.effectEmitted->name);
 				if (def.effectOnDeath)
-					zone->AddAssetOfType(fx, def.effectOnDeath->name);
+					zone->add_asset_of_type(fx, def.effectOnDeath->name);
 				if (def.effectOnImpact)
-					zone->AddAssetOfType(fx, def.effectOnImpact->name);
+					zone->add_asset_of_type(fx, def.effectOnImpact->name);
 
 				// Visuals
 				load_FxElemVisuals(&def, &def.visuals);
@@ -150,7 +150,7 @@ namespace ZoneTool
 			return fx;
 		}
 
-		void IFxEffectDef::write_FxElemVisuals(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, FxElemDef* def,
+		void IFxEffectDef::write_FxElemVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                       FxElemVisuals* dest)
 		{
 			auto data = dest;
@@ -175,14 +175,14 @@ namespace ZoneTool
 			case FX_ELEM_TYPE_SPOT_LIGHT:
 				{
 					dest->anonymous = (data->anonymous)
-						                  ? zone->GetAssetPointer(lightdef, ((GfxLightDef*)data->anonymous)->name)
+						                  ? zone->get_asset_pointer(lightdef, ((GfxLightDef*)data->anonymous)->name)
 						                  : nullptr;
 					break;
 				}
 			case FX_ELEM_TYPE_MODEL:
 				{
 					dest->xmodel = (data->xmodel)
-						               ? reinterpret_cast<XModel*>(zone->GetAssetPointer(xmodel, data->xmodel->name))
+						               ? reinterpret_cast<XModel*>(zone->get_asset_pointer(xmodel, data->xmodel->name))
 						               : nullptr;
 					break;
 				}
@@ -191,7 +191,7 @@ namespace ZoneTool
 					if (def->elemType != FX_ELEM_TYPE_OMNI_LIGHT)
 					{
 						dest->material = (data->material)
-							                 ? reinterpret_cast<Material*>(zone->GetAssetPointer(
+							                 ? reinterpret_cast<Material*>(zone->get_asset_pointer(
 								                 material, data->material->name))
 							                 : nullptr;
 					}
@@ -199,7 +199,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDefVisuals(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, FxElemDef* def,
+		void IFxEffectDef::write_FxElemDefVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                          FxElemDefVisuals* dest)
 		{
 			auto data = dest;
@@ -213,11 +213,11 @@ namespace ZoneTool
 					for (int i = 0; i < def->visualCount; i++)
 					{
 						destvisuals[i][0] = (data->markArray[i][0])
-							                    ? reinterpret_cast<Material*>(zone->GetAssetPointer(
+							                    ? reinterpret_cast<Material*>(zone->get_asset_pointer(
 								                    material, data->markArray[i][0]->name))
 							                    : nullptr;
 						destvisuals[i][1] = (data->markArray[i][1])
-							                    ? reinterpret_cast<Material*>(zone->GetAssetPointer(
+							                    ? reinterpret_cast<Material*>(zone->get_asset_pointer(
 								                    material, data->markArray[i][1]->name))
 							                    : nullptr;
 					}
@@ -238,7 +238,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDef(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, FxElemDef* dest)
+		void IFxEffectDef::write_FxElemDef(IZone* zone, ZoneBuffer* buf, FxElemDef* dest)
 		{
 			auto data = dest;
 
@@ -330,7 +330,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxEffectDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IFxEffectDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -364,14 +364,14 @@ namespace ZoneTool
 		{
 			AssetDumper dump;
 
-			if (!dump.Open("fx\\"s + asset->name + ".fxe"))
+			if (!dump.open("fx\\"s + asset->name + ".fxe"))
 			{
 				return;
 			}
 
-			dump.Array(asset, 1);
-			dump.String(asset->name);
-			dump.Array(asset->elemDefs,
+			dump.dump_array(asset, 1);
+			dump.dump_string(asset->name);
+			dump.dump_array(asset->elemDefs,
 			           asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot);
 
 			// dump elemDefs
@@ -381,49 +381,49 @@ namespace ZoneTool
 				auto def = &asset->elemDefs[i];
 
 				// dump elem samples
-				dump.Array(def->velSamples, def->velIntervalCount + 1);
-				dump.Array(def->visSamples, def->visStateIntervalCount + 1);
+				dump.dump_array(def->velSamples, def->velIntervalCount + 1);
+				dump.dump_array(def->visSamples, def->visStateIntervalCount + 1);
 
 				// todo: dump visuals!
 
 				// dump reference FX defs
-				dump.Asset(def->effectOnImpact);
-				dump.Asset(def->effectOnDeath);
-				dump.Asset(def->effectEmitted);
+				dump.dump_asset(def->effectOnImpact);
+				dump.dump_asset(def->effectOnDeath);
+				dump.dump_asset(def->effectEmitted);
 
 				// dump extended FX data
 				if (def->extended.trailDef)
 				{
 					if (def->elemType == FX_ELEM_TYPE_TRAIL)
 					{
-						dump.Array(def->extended.trailDef, 1);
+						dump.dump_array(def->extended.trailDef, 1);
 
 						if (def->extended.trailDef->verts)
 						{
-							dump.Array(def->extended.trailDef->verts, def->extended.trailDef->vertCount);
+							dump.dump_array(def->extended.trailDef->verts, def->extended.trailDef->vertCount);
 						}
 
 						if (def->extended.trailDef->inds)
 						{
-							dump.Array(def->extended.trailDef->inds, def->extended.trailDef->indCount);
+							dump.dump_array(def->extended.trailDef->inds, def->extended.trailDef->indCount);
 						}
 					}
 					else if (def->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
 					{
-						dump.Array(def->extended.sparkFountain, 1);
+						dump.dump_array(def->extended.sparkFountain, 1);
 					}
 					else if (def->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
 					{
-						dump.Array(def->extended.unknownDef, 24);
+						dump.dump_array(def->extended.unknownDef, 24);
 					}
 					else
 					{
-						dump.Array(def->extended.unknownDef, 1);
+						dump.dump_array(def->extended.unknownDef, 1);
 					}
 				}
 			}
 
-			dump.Close();
+			dump.close();
 		}
 	}
 }

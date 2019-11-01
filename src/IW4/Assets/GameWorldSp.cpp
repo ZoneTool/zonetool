@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		void IGameWorldSp::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IGameWorldSp::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			const auto mp_asset = IGameWorldMp::parse(name, mem);
@@ -30,7 +30,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGameWorldSp::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IGameWorldSp::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -43,7 +43,7 @@ namespace ZoneTool
 			return this->m_name;
 		}
 
-		void IGameWorldSp::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IGameWorldSp::write(IZone* zone, ZoneBuffer* buf)
 		{
 			const auto data = this->m_asset;
 			const auto dest = buf->write(data);

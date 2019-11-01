@@ -22,18 +22,18 @@ namespace ZoneTool
 			IPhysCollmap();
 			~IPhysCollmap();
 
-			PhysCollmap* parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem);
+			PhysCollmap* parse(const std::string& name, ZoneMemory* mem);
 
-			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
-			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
+			void init(const std::string& name, ZoneMemory* mem) override;
+			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 
 			std::string name() override;
 			std::int32_t type() override;
-			void write_CBrushWrapper(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, cbrush_t* data);
-			void write_BrushWrapper(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, BrushWrapper* data);
-			void write_PhysGeomInfo(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, PhysGeomInfo* dest);
-			void write(IZone* zone, std::shared_ptr<ZoneBuffer>& buffer) override;
+			void write_CBrushWrapper(IZone* zone, ZoneBuffer* buf, cbrush_t* data);
+			void write_BrushWrapper(IZone* zone, ZoneBuffer* buf, BrushWrapper* data);
+			void write_PhysGeomInfo(IZone* zone, ZoneBuffer* buf, PhysGeomInfo* dest);
+			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump(PhysCollmap* asset);
 		};

@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		GlassWorld* IGlassWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		GlassWorld* IGlassWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = name + ".glassmap";
 			if (!FileSystem::FileExists(path))
@@ -34,39 +34,39 @@ namespace ZoneTool
 			ZONETOOL_INFO("Parsing GlassMap \"%s\" ...", name.data());
 
 			AssetReader read(mem);
-			if (!read.Open(path))
+			if (!read.open(path))
 			{
 				return nullptr;
 			}
 
-			asset = read.Array<GlassWorld>();
-			asset->name = read.String();
-			asset->g_glassData = read.Array<G_GlassData>();
+			asset = read.read_array<GlassWorld>();
+			asset->name = read.read_string();
+			asset->g_glassData = read.read_array<G_GlassData>();
 
 			if (asset->g_glassData)
 			{
-				asset->g_glassData->glassPieces = read.Array<G_GlassPiece>();
-				asset->g_glassData->glassNames = read.Array<G_GlassName>();
+				asset->g_glassData->glassPieces = read.read_array<G_GlassPiece>();
+				asset->g_glassData->glassNames = read.read_array<G_GlassName>();
 
 				for (int i = 0; i < asset->g_glassData->glassNameCount; i++)
 				{
-					asset->g_glassData->glassNames[i].nameStr = read.String();
-					asset->g_glassData->glassNames[i].pieceIndices = read.Array<unsigned short>();
+					asset->g_glassData->glassNames[i].nameStr = read.read_string();
+					asset->g_glassData->glassNames[i].pieceIndices = read.read_array<unsigned short>();
 				}
 			}
 
-			read.Close();
+			read.close();
 
 			return asset;
 		}
 
-		void IGlassWorld::init(void* asset, std::shared_ptr<ZoneMemory>& mem)
+		void IGlassWorld::init(void* asset, ZoneMemory* mem)
 		{
 			this->m_asset = reinterpret_cast<GlassWorld*>(asset);
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 		}
 
-		void IGlassWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IGlassWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -77,7 +77,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGlassWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IGlassWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -95,7 +95,7 @@ namespace ZoneTool
 			return glass_map;
 		}
 
-		void IGlassWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IGlassWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -155,30 +155,30 @@ namespace ZoneTool
 			auto path = asset->name + ".glassmap"s;
 			AssetDumper write;
 
-			if (!write.Open(path))
+			if (!write.open(path))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
-			write.String(asset->name);
+			write.dump_array(asset, 1);
+			write.dump_string(asset->name);
 
-			write.Array(asset->g_glassData, 1);
+			write.dump_array(asset->g_glassData, 1);
 
 			if (asset->g_glassData)
 			{
-				write.Array(asset->g_glassData->glassPieces, asset->g_glassData->pieceCount);
-				write.Array(asset->g_glassData->glassNames, asset->g_glassData->glassNameCount);
+				write.dump_array(asset->g_glassData->glassPieces, asset->g_glassData->pieceCount);
+				write.dump_array(asset->g_glassData->glassNames, asset->g_glassData->glassNameCount);
 
 				for (int i = 0; i < asset->g_glassData->glassNameCount; i++)
 				{
-					write.String(asset->g_glassData->glassNames[i].nameStr);
-					write.Array(asset->g_glassData->glassNames[i].pieceIndices,
+					write.dump_string(asset->g_glassData->glassNames[i].nameStr);
+					write.dump_array(asset->g_glassData->glassNames[i].pieceIndices,
 					            asset->g_glassData->glassNames[i].pieceCount);
 				}
 			}
 
-			write.Close();
+			write.close();
 		}
 	}
 }

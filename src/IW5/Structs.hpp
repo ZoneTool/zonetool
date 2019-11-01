@@ -3759,7 +3759,7 @@ namespace ZoneTool
 			bool armorPiercing;
 			char pad[2];
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3791,7 +3791,7 @@ namespace ZoneTool
 			// bool useScopeDrift;
 			// bool useDualFOV;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3816,7 +3816,7 @@ namespace ZoneTool
 			bool noPartialReload;
 			bool segmentedReload;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3836,7 +3836,7 @@ namespace ZoneTool
 			bool motionTracker;
 			bool silenced;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3865,7 +3865,7 @@ namespace ZoneTool
 			float moveSpeedScale;
 			float adsMoveSpeedScale;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3894,7 +3894,7 @@ namespace ZoneTool
 			int startAmmo;
 			int clipSize;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3920,7 +3920,7 @@ namespace ZoneTool
 			int playerDamage;
 			int minPlayerDamage;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -3962,7 +3962,7 @@ namespace ZoneTool
 			float locLeftFoot;
 			float locGun;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4003,7 +4003,7 @@ namespace ZoneTool
 			float adsIdleLerpStartTime;
 			float adsIdleLerpTime;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4041,7 +4041,7 @@ namespace ZoneTool
 			float adsDamageRangeScale;
 			float adsFireAnimFrac;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4077,7 +4077,7 @@ namespace ZoneTool
 			float fScopeDriftSteadyFactor;
 			float fScopeDriftUnsteadyFactor;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4111,7 +4111,7 @@ namespace ZoneTool
 			float hipSpreadDuckedDecay;
 			float hipSpreadProneDecay;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4161,7 +4161,7 @@ namespace ZoneTool
 			float adsGunKickSpeedDecay;
 			float adsGunKickStaticDecay;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4209,7 +4209,7 @@ namespace ZoneTool
 			// float adsViewKickMagMin;
 			float adsViewKickCenterSpeed;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4240,7 +4240,7 @@ namespace ZoneTool
 			bool thermalToggle;
 			bool outlineEnemies;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4270,7 +4270,7 @@ namespace ZoneTool
 			weaponIconRatioType_t ammoCounterIconRatio;
 			ammoCounterClipType_t ammoCounterClip;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4294,7 +4294,7 @@ namespace ZoneTool
 			const char* fireRumble;
 			const char* meleeImpactRumble;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4337,7 +4337,7 @@ namespace ZoneTool
 			FxEffectDef* projIgnitionEffect;
 			snd_alias_list_t* projIgnitionSound;
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 			}
 
@@ -4421,7 +4421,7 @@ namespace ZoneTool
 			bool shareAmmoWithAlt;
 			char pad[2];
 
-			void Parse(Json& data, std::shared_ptr<ZoneMemory>& mem)
+			void Parse(Json& data, ZoneMemory* mem)
 			{
 				JSON_PARSE_STRING(szInternalName);
 				JSON_PARSE_STRING(szDisplayName);

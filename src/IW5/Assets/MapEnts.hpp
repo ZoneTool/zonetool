@@ -19,23 +19,23 @@ namespace ZoneTool
 			MapEnts* m_asset;
 
 		public:
-			MapEnts* parse(std::string name, std::shared_ptr<ZoneMemory>& mem);
+			MapEnts* parse(std::string name, ZoneMemory* mem);
 			IMapEnts();
 			~IMapEnts();
 
-			void init(const std::string& name, std::shared_ptr<ZoneMemory>& mem) override;
-			void prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem) override;
+			void init(const std::string& name, ZoneMemory* mem) override;
+			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 			static void load_depending_internal(IZone* zone, const char* entityString);
 
 			std::string name() override;
 			std::int32_t type() override;
-			void write(IZone* zone, std::shared_ptr<ZoneBuffer>& buffer) override;
+			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump(MapEnts* asset);
 
 			// sadly, this cannot be moved to a CPP file.
-			static void write_triggers(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, MapTriggers* dest);
+			static void write_triggers(IZone* zone, ZoneBuffer* buf, MapTriggers* dest);
 		};
 	}
 }

@@ -20,13 +20,13 @@ namespace ZoneTool
 		{
 		}
 
-		void ILeaderBoardDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ILeaderBoardDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).leaderboard;
 		}
 
-		void ILeaderBoardDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ILeaderBoardDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -44,7 +44,7 @@ namespace ZoneTool
 			return leaderboarddef;
 		}
 
-		void ILeaderBoardDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ILeaderBoardDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto varLeaderboardDef = this->m_asset;
 			auto dest = buf->write(varLeaderboardDef);

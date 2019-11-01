@@ -14,74 +14,74 @@ namespace ZoneTool
 	{
 #define INFO info->
 
-		void parse_info(ClipInfo* info, AssetReader& read, std::shared_ptr<ZoneMemory>& mem)
+		void parse_info(ClipInfo* info, AssetReader& read, ZoneMemory* mem)
 		{
-			INFO numCPlanes = read.Int();
-			INFO cPlanes = read.Array<cplane_s>();
+			INFO numCPlanes = read.read_int();
+			INFO cPlanes = read.read_array<cplane_s>();
 
-			INFO numMaterials = read.Int();
-			INFO materials = read.Array<dmaterial_t>();
+			INFO numMaterials = read.read_int();
+			INFO materials = read.read_array<dmaterial_t>();
 			for (auto i = 0; i < INFO numMaterials; i++)
 			{
 				if (INFO materials[i].material)
 				{
-					INFO materials[i].material = read.String();
+					INFO materials[i].material = read.read_string();
 				}
 			}
 
-			INFO numCBrushSides = read.Int();
-			INFO cBrushSides = read.Array<cbrushside_t>();
+			INFO numCBrushSides = read.read_int();
+			INFO cBrushSides = read.read_array<cbrushside_t>();
 			for (auto i = 0; i < INFO numCBrushSides; i++)
 			{
 				if (INFO cBrushSides[i].plane)
 				{
-					INFO cBrushSides[i].plane = read.Array<cplane_s>();
+					INFO cBrushSides[i].plane = read.read_array<cplane_s>();
 				}
 			}
 
-			INFO numCBrushEdges = read.Int();
-			INFO cBrushEdges = read.Array<cbrushedge_t>();
+			INFO numCBrushEdges = read.read_int();
+			INFO cBrushEdges = read.read_array<cbrushedge_t>();
 
-			INFO numLeafBrushes = read.Int();
-			INFO leafBrushes = read.Array<short>();
+			INFO numLeafBrushes = read.read_int();
+			INFO leafBrushes = read.read_array<short>();
 
-			INFO numCLeafBrushNodes = read.Int();
-			INFO cLeafBrushNodes = read.Array<cLeafBrushNode_s>();
+			INFO numCLeafBrushNodes = read.read_int();
+			INFO cLeafBrushNodes = read.read_array<cLeafBrushNode_s>();
 			for (auto i = 0; i < INFO numCLeafBrushNodes; i++)
 			{
 				if (INFO cLeafBrushNodes[i].leafBrushCount > 0)
 				{
-					INFO cLeafBrushNodes[i].data.leaf.brushes = read.Array<unsigned short>();
+					INFO cLeafBrushNodes[i].data.leaf.brushes = read.read_array<unsigned short>();
 				}
 			}
 
-			INFO numBrushes = read.Int();
-			INFO brushes = read.Array<cbrush_t>();
+			INFO numBrushes = read.read_int();
+			INFO brushes = read.read_array<cbrush_t>();
 			for (auto i = 0; i < INFO numBrushes; i++)
 			{
 				if (INFO brushes[i].sides)
 				{
-					INFO brushes[i].sides = read.Array<cbrushside_t>();
+					INFO brushes[i].sides = read.read_array<cbrushside_t>();
 
 					if (INFO brushes[i].sides->plane)
 					{
-						INFO brushes[i].sides->plane = read.Array<cplane_s>();
+						INFO brushes[i].sides->plane = read.read_array<cplane_s>();
 					}
 				}
 				if (INFO brushes[i].edge)
 				{
-					INFO brushes[i].edge = read.Array<cbrushedge_t>();
+					INFO brushes[i].edge = read.read_array<cbrushedge_t>();
 				}
 			}
 
-			INFO brushBounds = read.Array<Bounds>();
-			INFO brushContents = read.Array<int>();
+			INFO brushBounds = read.read_array<Bounds>();
+			INFO brushContents = read.read_array<int>();
 		}
 
 #undef INFO
 #define INFO info.
 
-		clipMap_t* IClipMap::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		clipMap_t* IClipMap::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = name + ".colmap";
 
@@ -92,7 +92,7 @@ namespace ZoneTool
 
 			AssetReader read(mem);
 
-			if (!read.Open(path))
+			if (!read.open(path))
 			{
 				return nullptr;
 			}
@@ -105,59 +105,59 @@ namespace ZoneTool
 
 			auto colmap = mem->Alloc<clipMap_t>();
 
-			colmap->name = read.String();
-			colmap->isInUse = read.Int();
+			colmap->name = read.read_string();
+			colmap->isInUse = read.read_int();
 
 			parse_info(&colmap->info, read, mem);
 
-			colmap->numStaticModels = read.Int();
-			colmap->staticModelList = read.Array<cStaticModel_s>();
+			colmap->numStaticModels = read.read_int();
+			colmap->staticModelList = read.read_array<cStaticModel_s>();
 			for (auto i = 0; i < colmap->numStaticModels; i++)
 			{
 				if (colmap->staticModelList[i].xmodel)
 				{
-					colmap->staticModelList[i].xmodel = read.Asset<XModel>();
+					colmap->staticModelList[i].xmodel = read.read_asset<XModel>();
 				}
 			}
 
-			colmap->numCNodes = read.Int();
-			colmap->cNodes = read.Array<cNode_t>();
+			colmap->numCNodes = read.read_int();
+			colmap->cNodes = read.read_array<cNode_t>();
 			for (auto i = 0; i < colmap->numCNodes; i++)
 			{
 				if (colmap->cNodes[i].plane)
 				{
-					colmap->cNodes[i].plane = read.Array<cplane_s>();
+					colmap->cNodes[i].plane = read.read_array<cplane_s>();
 				}
 			}
 
-			colmap->numCLeaf = read.Int();
-			colmap->cLeaf = read.Array<cLeaf_t>();
+			colmap->numCLeaf = read.read_int();
+			colmap->cLeaf = read.read_array<cLeaf_t>();
 
-			colmap->numVerts = read.Int();
-			colmap->verts = read.Array<VecInternal<3>>();
+			colmap->numVerts = read.read_int();
+			colmap->verts = read.read_array<VecInternal<3>>();
 
-			colmap->numTriIndices = read.Int();
-			colmap->triIndices = read.Array<short>();
-			colmap->triEdgeIsWalkable = read.Array<char>();
+			colmap->numTriIndices = read.read_int();
+			colmap->triIndices = read.read_array<short>();
+			colmap->triEdgeIsWalkable = read.read_array<char>();
 
-			colmap->numCollisionBorders = read.Int();
-			colmap->collisionBorders = read.Array<CollisionBorder>();
+			colmap->numCollisionBorders = read.read_int();
+			colmap->collisionBorders = read.read_array<CollisionBorder>();
 
-			colmap->numCollisionPartitions = read.Int();
-			colmap->collisionPartitions = read.Array<CollisionPartition>();
+			colmap->numCollisionPartitions = read.read_int();
+			colmap->collisionPartitions = read.read_array<CollisionPartition>();
 			for (auto i = 0; i < colmap->numCollisionPartitions; i++)
 			{
 				if (colmap->collisionPartitions[i].borders)
 				{
-					colmap->collisionPartitions[i].borders = read.Array<CollisionBorder>();
+					colmap->collisionPartitions[i].borders = read.read_array<CollisionBorder>();
 				}
 			}
 
-			colmap->numCollisionAABBTrees = read.Int();
-			colmap->collisionAABBTrees = read.Array<CollisionAabbTree>();
+			colmap->numCollisionAABBTrees = read.read_int();
+			colmap->collisionAABBTrees = read.read_array<CollisionAabbTree>();
 
-			colmap->numCModels = read.Int();
-			colmap->cModels = read.Array<cmodel_t>();
+			colmap->numCModels = read.read_int();
+			colmap->cModels = read.read_array<cmodel_t>();
 
 			for (auto i = 0; i < colmap->numCModels; i++)
 			{
@@ -168,10 +168,10 @@ namespace ZoneTool
 				}
 			}
 
-			colmap->mapEnts = read.Asset<MapEnts>();
+			colmap->mapEnts = read.read_asset<MapEnts>();
 			colmap->mapEnts->name = colmap->name;
-			colmap->smodelNodeCount = read.Int();
-			colmap->smodelNodes = read.Array<SModelAabbNode>();
+			colmap->smodelNodeCount = read.read_int();
+			colmap->smodelNodes = read.read_array<SModelAabbNode>();
 
 #ifdef IW4
 			colmap->dynEntCount[0] = read.Int();
@@ -259,22 +259,22 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 			// parse stages
 			AssetReader stageReader(mem);
-			if (stageReader.Open(name + ".ents.stages"))
+			if (stageReader.open(name + ".ents.stages"))
 			{
 				ZONETOOL_INFO("Parsing entity stages...");
 
-				colmap->stageCount = stageReader.Int();
+				colmap->stageCount = stageReader.read_int();
 				if (colmap->stageCount)
 				{
-					colmap->stages = stageReader.Array<Stage>();
+					colmap->stages = stageReader.read_array<Stage>();
 
 					for (int i = 0; i < colmap->stageCount; i++)
 					{
-						colmap->stages[i].name = stageReader.String();
+						colmap->stages[i].name = stageReader.read_string();
 					}
 				}
 			}
-			stageReader.Close();
+			stageReader.close();
 
 			// copy info into pInfo
 			colmap->pInfo = &colmap->info;
@@ -296,7 +296,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 		{
 		}
 
-		void IClipMap::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -308,7 +308,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			}
 		}
 
-		void IClipMap::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IClipMap::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -326,7 +326,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->staticModelList[i].xmodel)
 					{
-						zone->AddAssetOfType(xmodel, data->staticModelList[i].xmodel->name);
+						zone->add_asset_of_type(xmodel, data->staticModelList[i].xmodel->name);
 					}
 				}
 			}
@@ -337,15 +337,15 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->dynEntDefList[0][i].xModel)
 					{
-						zone->AddAssetOfType(xmodel, data->dynEntDefList[0][i].xModel->name);
+						zone->add_asset_of_type(xmodel, data->dynEntDefList[0][i].xModel->name);
 					}
 					if (data->dynEntDefList[0][i].destroyFx)
 					{
-						zone->AddAssetOfType(fx, data->dynEntDefList[0][i].destroyFx->name);
+						zone->add_asset_of_type(fx, data->dynEntDefList[0][i].destroyFx->name);
 					}
 					if (data->dynEntDefList[0][i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->dynEntDefList[0][i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->dynEntDefList[0][i].physPreset->name);
 					}
 				}
 			}
@@ -356,22 +356,22 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->dynEntDefList[1][i].xModel)
 					{
-						zone->AddAssetOfType(xmodel, data->dynEntDefList[1][i].xModel->name);
+						zone->add_asset_of_type(xmodel, data->dynEntDefList[1][i].xModel->name);
 					}
 					if (data->dynEntDefList[1][i].destroyFx)
 					{
-						zone->AddAssetOfType(fx, data->dynEntDefList[1][i].destroyFx->name);
+						zone->add_asset_of_type(fx, data->dynEntDefList[1][i].destroyFx->name);
 					}
 					if (data->dynEntDefList[1][i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->dynEntDefList[1][i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->dynEntDefList[1][i].physPreset->name);
 					}
 				}
 			}
 
 			if (data->mapEnts)
 			{
-				zone->AddAssetOfType(map_ents, this->m_asset->mapEnts->name);
+				zone->add_asset_of_type(map_ents, this->m_asset->mapEnts->name);
 			}
 
 #ifdef USE_VMPROTECT
@@ -389,7 +389,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			return col_map_mp;
 		}
 
-		void IClipMap::write_info(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, ClipInfo* data, ClipInfo* dest)
+		void IClipMap::write_info(IZone* zone, ZoneBuffer* buf, ClipInfo* data, ClipInfo* dest)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::IClipMap::write_info");
@@ -533,7 +533,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 #endif
 		}
 
-		void IClipMap::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IClipMap::write(IZone* zone, ZoneBuffer* buf)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::IClipMap::write");
@@ -571,7 +571,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->staticModelList[i].xmodel)
 					{
-						static_model[i].xmodel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						static_model[i].xmodel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->staticModelList[i].xmodel->name));
 					}
 				}
@@ -688,7 +688,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 			if (data->mapEnts)
 			{
-				dest->mapEnts = reinterpret_cast<MapEnts*>(zone->GetAssetPointer(map_ents, this->name()));
+				dest->mapEnts = reinterpret_cast<MapEnts*>(zone->get_asset_pointer(map_ents, this->name()));
 			}
 
 			if (data->stages)
@@ -723,17 +723,17 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->dynEntDefList[0][i].xModel)
 					{
-						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dynEntDefList[0][i].xModel->name));
 					}
 					if (data->dynEntDefList[0][i].destroyFx)
 					{
-						dyn_entity_def[i].destroyFx = reinterpret_cast<FxEffectDef*>(zone->GetAssetPointer(
+						dyn_entity_def[i].destroyFx = reinterpret_cast<FxEffectDef*>(zone->get_asset_pointer(
 							fx, data->dynEntDefList[0][i].destroyFx->name));
 					}
 					if (data->dynEntDefList[0][i].physPreset)
 					{
-						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->dynEntDefList[0][i].physPreset->name));
 					}
 
@@ -755,17 +755,17 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				{
 					if (data->dynEntDefList[1][i].xModel)
 					{
-						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dynEntDefList[1][i].xModel->name));
 					}
 					if (data->dynEntDefList[1][i].destroyFx)
 					{
-						dyn_entity_def[i].destroyFx = reinterpret_cast<FxEffectDef*>(zone->GetAssetPointer(
+						dyn_entity_def[i].destroyFx = reinterpret_cast<FxEffectDef*>(zone->get_asset_pointer(
 							fx, data->dynEntDefList[1][i].destroyFx->name));
 					}
 					if (data->dynEntDefList[1][i].physPreset)
 					{
-						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->dynEntDefList[1][i].physPreset->name));
 					}
 
@@ -839,136 +839,136 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 		void dump_info(ClipInfo* info, AssetDumper& write)
 		{
-			write.Int(INFO numCPlanes);
-			write.Array(INFO cPlanes, INFO numCPlanes);
+			write.dump_int(INFO numCPlanes);
+			write.dump_array(INFO cPlanes, INFO numCPlanes);
 
-			write.Int(INFO numMaterials);
-			write.Array(INFO materials, INFO numMaterials);
+			write.dump_int(INFO numMaterials);
+			write.dump_array(INFO materials, INFO numMaterials);
 
 			for (auto i = 0; i < INFO numMaterials; i++)
 			{
 				if (INFO materials[i].material)
 				{
-					write.String(INFO materials[i].material);
+					write.dump_string(INFO materials[i].material);
 				}
 			}
 
-			write.Int(INFO numCBrushSides);
-			write.Array(INFO cBrushSides, INFO numCBrushSides);
+			write.dump_int(INFO numCBrushSides);
+			write.dump_array(INFO cBrushSides, INFO numCBrushSides);
 
 			for (auto i = 0; i < INFO numCBrushSides; i++)
 			{
 				if (INFO cBrushSides[i].plane)
 				{
-					write.Array(INFO cBrushSides[i].plane, 1);
+					write.dump_array(INFO cBrushSides[i].plane, 1);
 				}
 			}
 
-			write.Int(INFO numCBrushEdges);
-			write.Array(INFO cBrushEdges, INFO numCBrushEdges);
+			write.dump_int(INFO numCBrushEdges);
+			write.dump_array(INFO cBrushEdges, INFO numCBrushEdges);
 
-			write.Int(INFO numLeafBrushes);
-			write.Array(INFO leafBrushes, INFO numLeafBrushes);
+			write.dump_int(INFO numLeafBrushes);
+			write.dump_array(INFO leafBrushes, INFO numLeafBrushes);
 
-			write.Int(INFO numCLeafBrushNodes);
-			write.Array(INFO cLeafBrushNodes, INFO numCLeafBrushNodes);
+			write.dump_int(INFO numCLeafBrushNodes);
+			write.dump_array(INFO cLeafBrushNodes, INFO numCLeafBrushNodes);
 
 			for (auto i = 0; i < INFO numCLeafBrushNodes; i++)
 			{
 				if (INFO cLeafBrushNodes[i].leafBrushCount > 0)
 				{
-					write.Array(INFO cLeafBrushNodes[i].data.leaf.brushes, INFO cLeafBrushNodes[i].leafBrushCount);
+					write.dump_array(INFO cLeafBrushNodes[i].data.leaf.brushes, INFO cLeafBrushNodes[i].leafBrushCount);
 				}
 			}
 
-			write.Int(INFO numBrushes);
-			write.Array(INFO brushes, INFO numBrushes);
+			write.dump_int(INFO numBrushes);
+			write.dump_array(INFO brushes, INFO numBrushes);
 
 			for (auto i = 0; i < INFO numBrushes; i++)
 			{
 				if (INFO brushes[i].sides)
 				{
-					write.Array(INFO brushes[i].sides, 1);
+					write.dump_array(INFO brushes[i].sides, 1);
 
 					if (INFO brushes[i].sides->plane)
 					{
-						write.Array(INFO brushes[i].sides->plane, 1);
+						write.dump_array(INFO brushes[i].sides->plane, 1);
 					}
 				}
 				if (INFO brushes[i].edge)
 				{
-					write.Array(INFO brushes[i].edge, 1);
+					write.dump_array(INFO brushes[i].edge, 1);
 				}
 			}
 
-			write.Array(INFO brushBounds, INFO numBrushes);
-			write.Array(INFO brushContents, INFO numBrushes);
+			write.dump_array(INFO brushBounds, INFO numBrushes);
+			write.dump_array(INFO brushContents, INFO numBrushes);
 		}
 
 		void IClipMap::dump(clipMap_t* asset)
 		{
 			AssetDumper write;
-			if (!write.Open(asset->name + ".colmap"s))
+			if (!write.open(asset->name + ".colmap"s))
 			{
 				return;
 			}
 
-			write.String(asset->name);
-			write.Int(asset->isInUse);
+			write.dump_string(asset->name);
+			write.dump_int(asset->isInUse);
 
 			dump_info(&asset->info, write);
 
-			write.Int(asset->numStaticModels);
-			write.Array(asset->staticModelList, asset->numStaticModels);
+			write.dump_int(asset->numStaticModels);
+			write.dump_array(asset->staticModelList, asset->numStaticModels);
 
 			for (auto i = 0; i < asset->numStaticModels; i++)
 			{
 				if (asset->staticModelList[i].xmodel)
 				{
-					write.Asset(asset->staticModelList[i].xmodel);
+					write.dump_asset(asset->staticModelList[i].xmodel);
 				}
 			}
 
-			write.Int(asset->numCNodes);
-			write.Array(asset->cNodes, asset->numCNodes);
+			write.dump_int(asset->numCNodes);
+			write.dump_array(asset->cNodes, asset->numCNodes);
 
 			for (auto i = 0; i < asset->numCNodes; i++)
 			{
 				if (asset->cNodes[i].plane)
 				{
-					write.Array(asset->cNodes[i].plane, 1);
+					write.dump_array(asset->cNodes[i].plane, 1);
 				}
 			}
 
-			write.Int(asset->numCLeaf);
-			write.Array(asset->cLeaf, asset->numCLeaf);
+			write.dump_int(asset->numCLeaf);
+			write.dump_array(asset->cLeaf, asset->numCLeaf);
 
-			write.Int(asset->numVerts);
-			write.Array(asset->verts, asset->numVerts);
+			write.dump_int(asset->numVerts);
+			write.dump_array(asset->verts, asset->numVerts);
 
-			write.Int(asset->numTriIndices);
-			write.Array(asset->triIndices, asset->numTriIndices * 3);
-			write.Array(asset->triEdgeIsWalkable, 4 * ((3 * asset->numTriIndices + 31) >> 5));
+			write.dump_int(asset->numTriIndices);
+			write.dump_array(asset->triIndices, asset->numTriIndices * 3);
+			write.dump_array(asset->triEdgeIsWalkable, 4 * ((3 * asset->numTriIndices + 31) >> 5));
 
-			write.Int(asset->numCollisionBorders);
-			write.Array(asset->collisionBorders, asset->numCollisionBorders);
+			write.dump_int(asset->numCollisionBorders);
+			write.dump_array(asset->collisionBorders, asset->numCollisionBorders);
 
-			write.Int(asset->numCollisionPartitions);
-			write.Array(asset->collisionPartitions, asset->numCollisionPartitions);
+			write.dump_int(asset->numCollisionPartitions);
+			write.dump_array(asset->collisionPartitions, asset->numCollisionPartitions);
 
 			for (auto i = 0; i < asset->numCollisionPartitions; i++)
 			{
 				if (asset->collisionPartitions[i].borders)
 				{
-					write.Array(asset->collisionPartitions[i].borders, asset->collisionPartitions[i].borderCount);
+					write.dump_array(asset->collisionPartitions[i].borders, asset->collisionPartitions[i].borderCount);
 				}
 			}
 
-			write.Int(asset->numCollisionAABBTrees);
-			write.Array(asset->collisionAABBTrees, asset->numCollisionAABBTrees);
+			write.dump_int(asset->numCollisionAABBTrees);
+			write.dump_array(asset->collisionAABBTrees, asset->numCollisionAABBTrees);
 
-			write.Int(asset->numCModels);
-			write.Array(asset->cModels, asset->numCModels);
+			write.dump_int(asset->numCModels);
+			write.dump_array(asset->cModels, asset->numCModels);
 
 			for (int i = 0; i < asset->numCModels; i++)
 			{
@@ -978,34 +978,34 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				}
 			}
 
-			write.Asset(asset->mapEnts);
+			write.dump_asset(asset->mapEnts);
 
-			write.Int(asset->smodelNodeCount);
-			write.Array(asset->smodelNodes, asset->smodelNodeCount);
+			write.dump_int(asset->smodelNodeCount);
+			write.dump_array(asset->smodelNodes, asset->smodelNodeCount);
 
 			// save file to disk
-			write.Close();
+			write.close();
 
 			// dump stages
 			if (asset->stages)
 			{
 				AssetDumper stageDumper;
 
-				if (stageDumper.Open(asset->name + ".ents.stages"s))
+				if (stageDumper.open(asset->name + ".ents.stages"s))
 				{
-					stageDumper.Int(asset->stageCount);
+					stageDumper.dump_int(asset->stageCount);
 					if (asset->stageCount)
 					{
-						stageDumper.Array(asset->stages, asset->stageCount);
+						stageDumper.dump_array(asset->stages, asset->stageCount);
 
 						for (int i = 0; i < asset->stageCount; i++)
 						{
-							stageDumper.String(asset->stages[i].name);
+							stageDumper.dump_string(asset->stages[i].name);
 						}
 					}
 				}
 
-				stageDumper.Close();
+				stageDumper.close();
 			}
 		}
 	}

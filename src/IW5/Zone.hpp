@@ -63,15 +63,15 @@ namespace ZoneTool
 			Zone(std::string name, ILinker* linker);
 			~Zone();
 
-			void* GetAssetPointer(std::int32_t type, std::string name) override;
+			void* get_asset_pointer(std::int32_t type, const std::string& name) override;
 
-			void AddAssetOfTypePtr(std::int32_t type, void* pointer) override;
+			void add_asset_of_type_by_pointer(std::int32_t type, void* pointer) override;
 
-			void AddAssetOfType(std::int32_t type, const std::string& name) override;
-			void AddAssetOfType(const std::string& type, const std::string& name) override;
-			std::int32_t GetTypeByName(const std::string& type) override;
+			void add_asset_of_type(std::int32_t type, const std::string& name) override;
+			void add_asset_of_type(const std::string& type, const std::string& name) override;
+			std::int32_t get_type_by_name(const std::string& type) override;
 
-			void Build(std::shared_ptr<ZoneBuffer>& buf) override;
+			void build(ZoneBuffer* buf) override;
 		};
 	}
 }

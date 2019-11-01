@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		LoadedSound* ILoadedSound::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		LoadedSound* ILoadedSound::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = "loaded_sound/" + name;
 
@@ -131,7 +131,7 @@ namespace ZoneTool
 			return result;
 		}
 
-		void ILoadedSound::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ILoadedSound::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -143,7 +143,7 @@ namespace ZoneTool
 			}
 		}
 
-		void ILoadedSound::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ILoadedSound::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -161,7 +161,7 @@ namespace ZoneTool
 			return loaded_sound;
 		}
 
-		void ILoadedSound::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ILoadedSound::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);

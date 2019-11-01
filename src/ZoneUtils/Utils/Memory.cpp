@@ -11,73 +11,73 @@
 namespace ZoneTool
 {
 	// Instruction opcodes
-	std::uint8_t Memory::Instructions::Nop = 0x90;
-	std::uint8_t Memory::Instructions::Call = 0xE8;
-	std::uint8_t Memory::Instructions::Jump = 0xE9;
+	std::uint8_t Memory::Instructions::nop_ = 0x90;
+	std::uint8_t Memory::Instructions::call_ = 0xE8;
+	std::uint8_t Memory::Instructions::jump_ = 0xE9;
 
-	void Memory::Restore()
+	void Memory::restore()
 	{
-		this->Unprotect(this->m_originaldata.size());
+		this->unprotect(this->original_data_.size());
 
-		for (std::size_t i = 0; i < m_originaldata.size(); i++)
+		for (std::size_t i = 0; i < original_data_.size(); i++)
 		{
-			*reinterpret_cast<std::uint8_t*>(this->m_address + i) = m_originaldata[i];
+			*reinterpret_cast<std::uint8_t*>(this->address_ + i) = original_data_[i];
 		}
 
-		this->Protect(this->m_originaldata.size());
+		this->protect(this->original_data_.size());
 	}
 
-	void Memory::Nop(std::size_t size)
+	void Memory::nop(std::size_t size)
 	{
-		this->SetOriginalData(size);
-		this->Unprotect(size);
+		this->set_original_data(size);
+		this->unprotect(size);
 
 		for (std::size_t i = 0; i < size; i++)
 		{
-			*reinterpret_cast<std::uint8_t*>(this->m_address + i) = Instructions::Nop;
+			*reinterpret_cast<std::uint8_t*>(this->address_ + i) = Instructions::nop_;
 		}
 
-		this->Protect(size);
+		this->protect(size);
 	}
 
-	void Memory::WriteString(std::string str)
+	void Memory::write_string(const std::string& str)
 	{
-		this->SetOriginalData(str.size() + 1);
+		this->set_original_data(str.size() + 1);
 
-		this->Unprotect(str.size() + 1);
-		strncpy(reinterpret_cast<char*>(this->m_address), str.data(), str.size() + 1);
-		this->Protect(str.size() + 1);
+		this->unprotect(str.size() + 1);
+		strncpy(reinterpret_cast<char*>(this->address_), str.data(), str.size() + 1);
+		this->protect(str.size() + 1);
 	}
 
-	void Memory::SetOriginalData(std::size_t size)
+	void Memory::set_original_data(std::size_t size)
 	{
-		this->m_originaldata.clear();
+		this->original_data_.clear();
 
 		for (std::size_t i = 0; i < size; i++)
 		{
-			m_originaldata.push_back(*reinterpret_cast<std::uint8_t*>(this->m_address + i));
+			original_data_.push_back(*reinterpret_cast<std::uint8_t*>(this->address_ + i));
 		}
 	}
 
-	void Memory::Unprotect(std::size_t size)
+	void Memory::unprotect(std::size_t size)
 	{
-		VirtualProtect(reinterpret_cast<void*>(this->m_address), size, PAGE_EXECUTE_READWRITE,
-		               reinterpret_cast<DWORD*>(&this->m_protect));
+		VirtualProtect(reinterpret_cast<void*>(this->address_), size, PAGE_EXECUTE_READWRITE,
+		               reinterpret_cast<DWORD*>(&this->protect_));
 	}
 
-	void Memory::Protect(std::size_t size)
+	void Memory::protect(std::size_t size)
 	{
-		VirtualProtect(reinterpret_cast<void*>(this->m_address), size, this->m_protect,
-		               reinterpret_cast<DWORD*>(&this->m_protect));
+		VirtualProtect(reinterpret_cast<void*>(this->address_), size, this->protect_,
+		               reinterpret_cast<DWORD*>(&this->protect_));
 	}
 
-	Memory* Memory::Initialize()
+	Memory* Memory::initialize()
 	{
 		return new Memory(this);
 	}
 
-	Memory* Memory::Install()
+	Memory* Memory::install()
 	{
-		return Initialize();
+		return initialize();
 	}
 }

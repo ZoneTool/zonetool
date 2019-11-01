@@ -14,7 +14,7 @@ namespace ZoneTool
 	namespace IW4
 	{
 		/*legacy zonetool code, refactor me!*/
-		GfxWorld* IGfxWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		GfxWorld* IGfxWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto iw5_gfxmap = IW5::IGfxWorld::parse(name, mem);
 
@@ -59,7 +59,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IGfxWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -70,7 +70,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IGfxWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IGfxWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -89,7 +89,7 @@ namespace ZoneTool
 				{
 					if (data->skies[i].skyImage)
 					{
-						zone->AddAssetOfType(image, data->skies[i].skyImage->name);
+						zone->add_asset_of_type(image, data->skies[i].skyImage->name);
 					}
 				}
 			}
@@ -101,7 +101,7 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.reflectionImages[i])
 					{
-						zone->AddAssetOfType(image, data->worldDraw.reflectionImages[i]->name);
+						zone->add_asset_of_type(image, data->worldDraw.reflectionImages[i]->name);
 					}
 				}
 			}
@@ -113,12 +113,12 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.lightmaps[i].primary)
 					{
-						zone->AddAssetOfType(image, data->worldDraw.lightmaps[i].primary->name);
+						zone->add_asset_of_type(image, data->worldDraw.lightmaps[i].primary->name);
 					}
 
 					if (data->worldDraw.lightmaps[i].secondary)
 					{
-						zone->AddAssetOfType(image, data->worldDraw.lightmaps[i].secondary->name);
+						zone->add_asset_of_type(image, data->worldDraw.lightmaps[i].secondary->name);
 					}
 				}
 			}
@@ -126,13 +126,13 @@ namespace ZoneTool
 			// SkyImage (Unused?)
 			if (data->worldDraw.skyImage)
 			{
-				zone->AddAssetOfType(image, data->worldDraw.skyImage->name);
+				zone->add_asset_of_type(image, data->worldDraw.skyImage->name);
 			}
 
 			// OutdoorImage (Unused?)
 			if (data->worldDraw.outdoorImage)
 			{
-				zone->AddAssetOfType(image, data->worldDraw.outdoorImage->name);
+				zone->add_asset_of_type(image, data->worldDraw.outdoorImage->name);
 			}
 
 			// MaterialMemory
@@ -143,7 +143,7 @@ namespace ZoneTool
 				{
 					if (data->materialMemory[i].material)
 					{
-						zone->AddAssetOfType(material, data->materialMemory[i].material->name);
+						zone->add_asset_of_type(material, data->materialMemory[i].material->name);
 					}
 				}
 			}
@@ -151,18 +151,18 @@ namespace ZoneTool
 			// Sunflare_t
 			if (data->sun.spriteMaterial)
 			{
-				zone->AddAssetOfType(material, data->sun.spriteMaterial->name);
+				zone->add_asset_of_type(material, data->sun.spriteMaterial->name);
 			}
 
 			if (data->sun.flareMaterial)
 			{
-				zone->AddAssetOfType(material, data->sun.flareMaterial->name);
+				zone->add_asset_of_type(material, data->sun.flareMaterial->name);
 			}
 
 			// OutdoorImage
 			if (data->outdoorImage)
 			{
-				zone->AddAssetOfType(image, data->outdoorImage->name);
+				zone->add_asset_of_type(image, data->outdoorImage->name);
 			}
 
 			// Dpvs.Surfaces
@@ -172,7 +172,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.surfaces[i].material)
 					{
-						zone->AddAssetOfType(material, data->dpvs.surfaces[i].material->name);
+						zone->add_asset_of_type(material, data->dpvs.surfaces[i].material->name);
 					}
 				}
 			}
@@ -183,7 +183,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.smodelDrawInsts[i].model)
 					{
-						zone->AddAssetOfType(xmodel, data->dpvs.smodelDrawInsts[i].model->name);
+						zone->add_asset_of_type(xmodel, data->dpvs.smodelDrawInsts[i].model->name);
 					}
 				}
 			}
@@ -203,7 +203,7 @@ namespace ZoneTool
 			return gfx_map;
 		}
 
-		void IGfxWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IGfxWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW4::IGfxWorld::write");
@@ -240,7 +240,7 @@ namespace ZoneTool
 
 					if (data->skies[i].skyImage)
 					{
-						skiesArray[i].skyImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						skiesArray[i].skyImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->skies[i].skyImage->name));
 					}
 				}
@@ -352,7 +352,7 @@ namespace ZoneTool
 				{
 					if (reflectionProbes[i])
 					{
-						reflectionProbes[i] = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						reflectionProbes[i] = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.reflectionImages[i]->name));
 					}
 				}
@@ -385,13 +385,13 @@ namespace ZoneTool
 				{
 					if (data->worldDraw.lightmaps[i].primary)
 					{
-						gfx_lightmap_array[i].primary = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						gfx_lightmap_array[i].primary = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.lightmaps[i].primary->name));
 					}
 
 					if (data->worldDraw.lightmaps[i].secondary)
 					{
-						gfx_lightmap_array[i].secondary = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+						gfx_lightmap_array[i].secondary = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 							image, data->worldDraw.lightmaps[i].secondary->name));
 					}
 				}
@@ -417,13 +417,13 @@ namespace ZoneTool
 
 			if (data->worldDraw.skyImage)
 			{
-				dest->worldDraw.skyImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+				dest->worldDraw.skyImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 					image, data->worldDraw.skyImage->name));
 			}
 
 			if (data->worldDraw.outdoorImage)
 			{
-				dest->worldDraw.outdoorImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+				dest->worldDraw.outdoorImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 					image, data->worldDraw.outdoorImage->name));
 			}
 
@@ -493,7 +493,7 @@ namespace ZoneTool
 
 				for (std::int32_t i = 0; i < data->materialMemoryCount; i++)
 				{
-					memory[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+					memory[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, data->materialMemory[i].material->name));
 				}
 
@@ -502,18 +502,18 @@ namespace ZoneTool
 
 			if (data->sun.spriteMaterial)
 			{
-				dest->sun.spriteMaterial = reinterpret_cast<Material*>(zone->GetAssetPointer(
+				dest->sun.spriteMaterial = reinterpret_cast<Material*>(zone->get_asset_pointer(
 					material, data->sun.spriteMaterial->name));
 			}
 			if (data->sun.flareMaterial)
 			{
-				dest->sun.flareMaterial = reinterpret_cast<Material*>(zone->GetAssetPointer(
+				dest->sun.flareMaterial = reinterpret_cast<Material*>(zone->get_asset_pointer(
 					material, data->sun.flareMaterial->name));
 			}
 
 			if (data->outdoorImage)
 			{
-				dest->outdoorImage = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(image, data->outdoorImage->name)
+				dest->outdoorImage = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(image, data->outdoorImage->name)
 				);
 			}
 
@@ -703,7 +703,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.surfaces[i].material)
 					{
-						surface[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						surface[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->dpvs.surfaces[i].material->name));
 					}
 				}
@@ -727,7 +727,7 @@ namespace ZoneTool
 				{
 					if (data->dpvs.smodelDrawInsts[i].model)
 					{
-						static_model_draw_inst[i].model = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						static_model_draw_inst[i].model = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dpvs.smodelDrawInsts[i].model->name));
 					}
 				}
@@ -854,7 +854,7 @@ namespace ZoneTool
 			// dump asset
 			IW5::IGfxWorld::dump(iw5_asset);
 
-			// free memory
+			// free memory_
 			delete[] iw5_asset->cells;
 			delete[] iw5_asset;
 		}

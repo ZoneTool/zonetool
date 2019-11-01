@@ -14,7 +14,7 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		MaterialTechniqueSet* ITechset::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		MaterialTechniqueSet* ITechset::parse(const std::string& name, ZoneMemory* mem)
 		{
 			const auto iw5_techset = IW5::ITechset::parse(name, mem);
 
@@ -87,7 +87,7 @@ namespace ZoneTool
 			return asset;
 		}
 
-		void ITechset::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ITechset::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(this->m_name, mem);
@@ -105,7 +105,7 @@ namespace ZoneTool
 			}
 		}
 
-		void ITechset::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ITechset::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -123,15 +123,15 @@ namespace ZoneTool
 
 						if (techniquePass.vertexDecl)
 						{
-							zone->AddAssetOfType(vertexdecl, techniquePass.vertexDecl->name);
+							zone->add_asset_of_type(vertexdecl, techniquePass.vertexDecl->name);
 						}
 						if (techniquePass.vertexShader)
 						{
-							zone->AddAssetOfType(vertexshader, techniquePass.vertexShader->name);
+							zone->add_asset_of_type(vertexshader, techniquePass.vertexShader->name);
 						}
 						if (techniquePass.pixelShader)
 						{
-							zone->AddAssetOfType(pixelshader, techniquePass.pixelShader->name);
+							zone->add_asset_of_type(pixelshader, techniquePass.pixelShader->name);
 						}
 					}
 				}
@@ -148,7 +148,7 @@ namespace ZoneTool
 			return techset;
 		}
 
-		void ITechset::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ITechset::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -177,21 +177,21 @@ namespace ZoneTool
 					if (techniquePasses[pass].vertexDecl)
 					{
 						techniquePasses[pass].vertexDecl =
-							reinterpret_cast<VertexDecl*>(zone->GetAssetPointer(
+							reinterpret_cast<VertexDecl*>(zone->get_asset_pointer(
 								vertexdecl, techniquePasses[pass].vertexDecl->name));
 					}
 
 					if (techniquePasses[pass].vertexShader)
 					{
 						techniquePasses[pass].vertexShader =
-							reinterpret_cast<VertexShader*>(zone->GetAssetPointer(
+							reinterpret_cast<VertexShader*>(zone->get_asset_pointer(
 								vertexshader, techniquePasses[pass].vertexShader->name));
 					}
 
 					if (techniquePasses[pass].pixelShader)
 					{
 						techniquePasses[pass].pixelShader =
-							reinterpret_cast<PixelShader*>(zone->GetAssetPointer(
+							reinterpret_cast<PixelShader*>(zone->get_asset_pointer(
 								pixelshader, techniquePasses[pass].pixelShader->name));
 					}
 
@@ -233,7 +233,7 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-		char* ITechset::parse_statebits(const std::string& techset, std::shared_ptr<ZoneMemory>& mem)
+		char* ITechset::parse_statebits(const std::string& techset, ZoneMemory* mem)
 		{
 			auto iw5_statebits = IW5::ITechset::parse_statebits(techset, mem);
 			auto statebits = mem->Alloc<char>(48);

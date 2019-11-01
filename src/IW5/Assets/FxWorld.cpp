@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		FxWorld* IFxWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		FxWorld* IFxWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = name + ".fxmap";
 			if (!FileSystem::FileExists(path))
@@ -26,35 +26,35 @@ namespace ZoneTool
 			ZONETOOL_INFO("Parsing FxMap \"%s\" ...", name.data());
 
 			AssetReader read(mem);
-			if (!read.Open(path))
+			if (!read.open(path))
 			{
 				return nullptr;
 			}
 
-			asset = read.Array<FxWorld>();
-			asset->name = read.String();
+			asset = read.read_array<FxWorld>();
+			asset->name = read.read_string();
 
-			asset->glassSys.defs = read.Array<FxGlassDef>();
+			asset->glassSys.defs = read.read_array<FxGlassDef>();
 			for (int i = 0; i < asset->glassSys.defCount; i++)
 			{
-				asset->glassSys.defs[i].material = read.Asset<Material>();
-				asset->glassSys.defs[i].materialShattered = read.Asset<Material>();
-				asset->glassSys.defs[i].physPreset = read.Asset<PhysPreset>();
+				asset->glassSys.defs[i].material = read.read_asset<Material>();
+				asset->glassSys.defs[i].materialShattered = read.read_asset<Material>();
+				asset->glassSys.defs[i].physPreset = read.read_asset<PhysPreset>();
 			}
 
-			asset->glassSys.piecePlaces = read.Array<FxGlassPiecePlace>();
-			asset->glassSys.pieceStates = read.Array<FxGlassPieceState>();
-			asset->glassSys.pieceDynamics = read.Array<FxGlassPieceDynamics>();
-			asset->glassSys.geoData = read.Array<FxGlassGeometryData>();
-			asset->glassSys.isInUse = read.Array<unsigned int>();
-			asset->glassSys.cellBits = read.Array<unsigned int>();
-			asset->glassSys.visData = read.Array<char>();
-			asset->glassSys.linkOrg = read.Array<VecInternal<3>>();
-			asset->glassSys.halfThickness = read.Array<float>();
-			asset->glassSys.lightingHandles = read.Array<unsigned __int16>();
-			asset->glassSys.initPieceStates = read.Array<FxGlassInitPieceState>();
-			asset->glassSys.initGeoData = read.Array<FxGlassGeometryData>();
-			read.Close();
+			asset->glassSys.piecePlaces = read.read_array<FxGlassPiecePlace>();
+			asset->glassSys.pieceStates = read.read_array<FxGlassPieceState>();
+			asset->glassSys.pieceDynamics = read.read_array<FxGlassPieceDynamics>();
+			asset->glassSys.geoData = read.read_array<FxGlassGeometryData>();
+			asset->glassSys.isInUse = read.read_array<unsigned int>();
+			asset->glassSys.cellBits = read.read_array<unsigned int>();
+			asset->glassSys.visData = read.read_array<char>();
+			asset->glassSys.linkOrg = read.read_array<VecInternal<3>>();
+			asset->glassSys.halfThickness = read.read_array<float>();
+			asset->glassSys.lightingHandles = read.read_array<unsigned __int16>();
+			asset->glassSys.initPieceStates = read.read_array<FxGlassInitPieceState>();
+			asset->glassSys.initGeoData = read.read_array<FxGlassGeometryData>();
+			read.close();
 
 			return asset;
 		}
@@ -67,7 +67,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IFxWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IFxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -78,7 +78,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IFxWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -91,15 +91,15 @@ namespace ZoneTool
 				{
 					if (data->glassSys.defs[i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->glassSys.defs[i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->glassSys.defs[i].physPreset->name);
 					}
 					if (data->glassSys.defs[i].material)
 					{
-						zone->AddAssetOfType(material, data->glassSys.defs[i].material->name);
+						zone->add_asset_of_type(material, data->glassSys.defs[i].material->name);
 					}
 					if (data->glassSys.defs[i].materialShattered)
 					{
-						zone->AddAssetOfType(material, data->glassSys.defs[i].materialShattered->name);
+						zone->add_asset_of_type(material, data->glassSys.defs[i].materialShattered->name);
 					}
 				}
 			}
@@ -115,7 +115,7 @@ namespace ZoneTool
 			return fx_map;
 		}
 
-		void IFxWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IFxWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -134,17 +134,17 @@ namespace ZoneTool
 				{
 					if (data->glassSys.defs[i].physPreset)
 					{
-						glass_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						glass_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->glassSys.defs[i].physPreset->name));
 					}
 					if (data->glassSys.defs[i].material)
 					{
-						glass_def[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						glass_def[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->glassSys.defs[i].material->name));
 					}
 					if (data->glassSys.defs[i].materialShattered)
 					{
-						glass_def[i].materialShattered = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						glass_def[i].materialShattered = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->glassSys.defs[i].materialShattered->name));
 					}
 				}
@@ -248,48 +248,48 @@ namespace ZoneTool
 		{
 			AssetDumper write;
 
-			if (!write.Open(asset->name + ".fxmap"s))
+			if (!write.open(asset->name + ".fxmap"s))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
+			write.dump_array(asset, 1);
 
-			write.String(asset->name);
+			write.dump_string(asset->name);
 
-			write.Array(asset->glassSys.defs, asset->glassSys.defCount);
+			write.dump_array(asset->glassSys.defs, asset->glassSys.defCount);
 			for (unsigned int i = 0; i < asset->glassSys.defCount; i++)
 			{
-				write.Asset(asset->glassSys.defs[i].material);
-				write.Asset(asset->glassSys.defs[i].materialShattered);
-				write.Asset(asset->glassSys.defs[i].physPreset);
+				write.dump_asset(asset->glassSys.defs[i].material);
+				write.dump_asset(asset->glassSys.defs[i].materialShattered);
+				write.dump_asset(asset->glassSys.defs[i].physPreset);
 			}
 
-			write.Array(asset->glassSys.piecePlaces, asset->glassSys.pieceLimit);
+			write.dump_array(asset->glassSys.piecePlaces, asset->glassSys.pieceLimit);
 
-			write.Array(asset->glassSys.pieceStates, asset->glassSys.pieceLimit);
+			write.dump_array(asset->glassSys.pieceStates, asset->glassSys.pieceLimit);
 
-			write.Array(asset->glassSys.pieceDynamics, asset->glassSys.pieceLimit);
+			write.dump_array(asset->glassSys.pieceDynamics, asset->glassSys.pieceLimit);
 
-			write.Array(asset->glassSys.geoData, asset->glassSys.geoDataLimit);
+			write.dump_array(asset->glassSys.geoData, asset->glassSys.geoDataLimit);
 
-			write.Array(asset->glassSys.isInUse, asset->glassSys.pieceWordCount);
+			write.dump_array(asset->glassSys.isInUse, asset->glassSys.pieceWordCount);
 
-			write.Array(asset->glassSys.cellBits, asset->glassSys.pieceWordCount * asset->glassSys.cellCount);
+			write.dump_array(asset->glassSys.cellBits, asset->glassSys.pieceWordCount * asset->glassSys.cellCount);
 
-			write.Array(asset->glassSys.visData, (asset->glassSys.pieceLimit + 15) & 0xFFFFFFF0);
+			write.dump_array(asset->glassSys.visData, (asset->glassSys.pieceLimit + 15) & 0xFFFFFFF0);
 
-			write.Array(asset->glassSys.linkOrg, asset->glassSys.pieceLimit);
+			write.dump_array(asset->glassSys.linkOrg, asset->glassSys.pieceLimit);
 
-			write.Array(asset->glassSys.halfThickness, (asset->glassSys.pieceLimit + 3) & 0xFFFFFFFC);
+			write.dump_array(asset->glassSys.halfThickness, (asset->glassSys.pieceLimit + 3) & 0xFFFFFFFC);
 
-			write.Array(asset->glassSys.lightingHandles, asset->glassSys.initPieceCount);
+			write.dump_array(asset->glassSys.lightingHandles, asset->glassSys.initPieceCount);
 
-			write.Array(asset->glassSys.initPieceStates, asset->glassSys.initPieceCount);
+			write.dump_array(asset->glassSys.initPieceStates, asset->glassSys.initPieceCount);
 
-			write.Array(asset->glassSys.initGeoData, asset->glassSys.initGeoDataCount);
+			write.dump_array(asset->glassSys.initGeoData, asset->glassSys.initGeoDataCount);
 
-			write.Close();
+			write.close();
 		}
 	}
 }

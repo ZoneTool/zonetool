@@ -20,13 +20,13 @@ namespace ZoneTool
 		{
 		}
 
-		void IPhysPreset::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IPhysPreset::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).physpreset;
 		}
 
-		void IPhysPreset::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IPhysPreset::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -44,7 +44,7 @@ namespace ZoneTool
 			return physpreset;
 		}
 
-		void IPhysPreset::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IPhysPreset::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);

@@ -41,7 +41,7 @@ namespace ZoneTool
 	}
 
 		WeaponDef* IWeaponDef::parse_weapondef(Json& data, WeaponCompleteDef* baseAsset,
-		                                       std::shared_ptr<ZoneMemory>& mem)
+		                                       ZoneMemory* mem)
 		{
 			auto weapon = mem->Alloc<WeaponDef>();
 
@@ -478,7 +478,7 @@ namespace ZoneTool
 			return weapon;
 		}
 
-		WeaponCompleteDef* IWeaponDef::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		WeaponCompleteDef* IWeaponDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			sizeof WeaponCompleteDef;
 
@@ -691,7 +691,7 @@ namespace ZoneTool
 			return weapon;
 		}
 
-		void IWeaponDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IWeaponDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -702,7 +702,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IWeaponDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IWeaponDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 			auto weapon = mem->Alloc<WeaponCompleteDef>();
 			memcpy(weapon, this->m_asset, sizeof WeaponCompleteDef);
@@ -794,18 +794,18 @@ namespace ZoneTool
 #define WEAPON_SUBASSET(__field__,__type__,__struct__) \
 			if (data->__field__) \
 			{ \
-				zone->AddAssetOfType(__type__, data->__field__->name); \
+				zone->add_asset_of_type(__type__, data->__field__->name); \
 			}
 
 			for (auto i = 0u; i < 16; i++)
 			{
 				if (data->worldModel && data->worldModel[i])
 				{
-					zone->AddAssetOfType(xmodel, data->worldModel[i]->name);
+					zone->add_asset_of_type(xmodel, data->worldModel[i]->name);
 				}
 				if (data->gunXModel && data->gunXModel[i])
 				{
-					zone->AddAssetOfType(xmodel, data->gunXModel[i]->name);
+					zone->add_asset_of_type(xmodel, data->gunXModel[i]->name);
 				}
 			}
 
@@ -823,7 +823,7 @@ namespace ZoneTool
 				{
 					if (data->sndArray1[i])
 					{
-						zone->AddAssetOfType(sound, data->sndArray1[i]->name);
+						zone->add_asset_of_type(sound, data->sndArray1[i]->name);
 					}
 				}
 			}
@@ -834,7 +834,7 @@ namespace ZoneTool
 				{
 					if (data->sndArray2[i])
 					{
-						zone->AddAssetOfType(sound, data->sndArray2[i]->name);
+						zone->add_asset_of_type(sound, data->sndArray2[i]->name);
 					}
 				}
 			}
@@ -903,13 +903,13 @@ namespace ZoneTool
 			{
 				if (data->attachment1 && data->attachment1[i])
 				{
-					zone->AddAssetOfType(attachment, this->m_asset->attachment1[i]->szInternalName);
+					zone->add_asset_of_type(attachment, this->m_asset->attachment1[i]->szInternalName);
 				}
 
 				if (i >= 3) continue;
 				if (data->attachment3 && data->attachment3[i])
 				{
-					zone->AddAssetOfType(attachment, this->m_asset->attachment3[i]->szInternalName);
+					zone->add_asset_of_type(attachment, this->m_asset->attachment3[i]->szInternalName);
 				}
 
 				// Projectile attachments require fixing.
@@ -926,12 +926,12 @@ namespace ZoneTool
 				{
 					if (data->soundOverrides[i].overrideSound)
 					{
-						zone->AddAssetOfType(sound, data->soundOverrides[i].overrideSound->name);
+						zone->add_asset_of_type(sound, data->soundOverrides[i].overrideSound->name);
 					}
 
 					if (data->soundOverrides[i].altmodeSound)
 					{
-						zone->AddAssetOfType(sound, data->soundOverrides[i].altmodeSound->name);
+						zone->add_asset_of_type(sound, data->soundOverrides[i].altmodeSound->name);
 					}
 				}
 			}
@@ -954,12 +954,12 @@ namespace ZoneTool
 
 			if (data->dpadIcon)
 			{
-				zone->AddAssetOfType(material, data->dpadIcon->name);
+				zone->add_asset_of_type(material, data->dpadIcon->name);
 			}
 
 			if (data->killIcon)
 			{
-				zone->AddAssetOfType(material, data->killIcon->name);
+				zone->add_asset_of_type(material, data->killIcon->name);
 			}
 
 			if (data->szXAnims)
@@ -968,7 +968,7 @@ namespace ZoneTool
 				{
 					if (data->szXAnims[i])
 					{
-						zone->AddAssetOfType(xanim, data->szXAnims[i]);
+						zone->add_asset_of_type(xanim, data->szXAnims[i]);
 					}
 				}
 			}
@@ -986,7 +986,7 @@ namespace ZoneTool
 			return weapon;
 		}
 
-		void IWeaponDef::write_WeaponDef(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, WeaponCompleteDef* complete,
+		void IWeaponDef::write_WeaponDef(IZone* zone, ZoneBuffer* buf, WeaponCompleteDef* complete,
 		                                 WeaponDef* data)
 		{
 			auto dest = buf->write(data);
@@ -1006,7 +1006,7 @@ namespace ZoneTool
 					if (destModels[i])
 					{
 						destModels[i] = reinterpret_cast<XModel*>(
-							zone->GetAssetPointer(xmodel, destModels[i]->name)
+							zone->get_asset_pointer(xmodel, destModels[i]->name)
 						);
 					}
 				}
@@ -1017,7 +1017,7 @@ namespace ZoneTool
 			if (data->handXModel)
 			{
 				dest->handXModel = reinterpret_cast<XModel*>(
-					zone->GetAssetPointer(xmodel, data->handXModel->name)
+					zone->get_asset_pointer(xmodel, data->handXModel->name)
 				);
 			}
 
@@ -1074,7 +1074,7 @@ namespace ZoneTool
 #define WEAPON_SUBASSET(__field__,__type__,__struct__) \
 			if (data->__field__) \
 			{ \
-				dest->__field__ = reinterpret_cast<__struct__*>(zone->GetAssetPointer(__type__, data->__field__->name)); \
+				dest->__field__ = reinterpret_cast<__struct__*>(zone->get_asset_pointer(__type__, data->__field__->name)); \
 			}
 
 			WEAPON_SUBASSET(viewFlashEffect, fx, FxEffectDef);
@@ -1102,7 +1102,7 @@ namespace ZoneTool
 					if (destSounds[i])
 					{
 						destSounds[i] = reinterpret_cast<snd_alias_list_t*>(
-							zone->GetAssetPointer(sound, destSounds[i]->name)
+							zone->get_asset_pointer(sound, destSounds[i]->name)
 						);
 					}
 				}
@@ -1120,7 +1120,7 @@ namespace ZoneTool
 					if (destSounds[i])
 					{
 						destSounds[i] = reinterpret_cast<snd_alias_list_t*>(
-							zone->GetAssetPointer(sound, destSounds[i]->name)
+							zone->get_asset_pointer(sound, destSounds[i]->name)
 						);
 					}
 				}
@@ -1145,7 +1145,7 @@ namespace ZoneTool
 					if (destModels[i])
 					{
 						destModels[i] = reinterpret_cast<XModel*>(
-							zone->GetAssetPointer(xmodel, destModels[i]->name)
+							zone->get_asset_pointer(xmodel, destModels[i]->name)
 						);
 					}
 				}
@@ -1296,7 +1296,7 @@ namespace ZoneTool
 			sizeof WeaponDef;
 		}
 
-		void IWeaponDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IWeaponDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			sizeof(WeaponCompleteDef);
 
@@ -1338,7 +1338,7 @@ namespace ZoneTool
 					if (destAttachments && destAttachments[i]) \
 					{ \
 						destAttachments[i] = reinterpret_cast<AttachmentDef*>( \
-							zone->GetAssetPointer(attachment, destAttachments[i]->szInternalName) \
+							zone->get_asset_pointer(attachment, destAttachments[i]->szInternalName) \
 						); \
 					} \
 				} \
@@ -1425,14 +1425,14 @@ namespace ZoneTool
 				{
 					if (destFxOverrides[i].overrideFX)
 					{
-						destFxOverrides[i].overrideFX = reinterpret_cast<FxEffectDef*>(zone->GetAssetPointer(
+						destFxOverrides[i].overrideFX = reinterpret_cast<FxEffectDef*>(zone->get_asset_pointer(
 							fx, destFxOverrides[i].overrideFX->name
 						));
 					}
 
 					if (destFxOverrides[i].altmodeFX)
 					{
-						destFxOverrides[i].altmodeFX = reinterpret_cast<FxEffectDef*>(zone->GetAssetPointer(
+						destFxOverrides[i].altmodeFX = reinterpret_cast<FxEffectDef*>(zone->get_asset_pointer(
 							fx, destFxOverrides[i].altmodeFX->name
 						));
 					}
@@ -1481,14 +1481,14 @@ namespace ZoneTool
 			if (data->killIcon)
 			{
 				dest->killIcon = reinterpret_cast<Material*>(
-					zone->GetAssetPointer(material, dest->killIcon->name)
+					zone->get_asset_pointer(material, dest->killIcon->name)
 				);
 			}
 
 			if (data->dpadIcon)
 			{
 				dest->dpadIcon = reinterpret_cast<Material*>(
-					zone->GetAssetPointer(material, dest->dpadIcon->name)
+					zone->get_asset_pointer(material, dest->dpadIcon->name)
 				);
 			}
 

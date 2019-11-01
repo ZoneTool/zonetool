@@ -13,7 +13,7 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		clipMap_t* IClipMap::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		clipMap_t* IClipMap::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto iw5_colmap = IW5::IClipMap::parse(name, mem);
 
@@ -107,7 +107,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IClipMap::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -119,7 +119,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IClipMap::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IClipMap::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -137,7 +137,7 @@ namespace ZoneTool
 				{
 					if (data->staticModelList[i].xmodel)
 					{
-						zone->AddAssetOfType(xmodel, data->staticModelList[i].xmodel->name);
+						zone->add_asset_of_type(xmodel, data->staticModelList[i].xmodel->name);
 					}
 				}
 			}
@@ -148,7 +148,7 @@ namespace ZoneTool
 				{
 					if (data->dynEntDefList[0][i].xModel)
 					{
-						zone->AddAssetOfType(xmodel, data->dynEntDefList[0][i].xModel->name);
+						zone->add_asset_of_type(xmodel, data->dynEntDefList[0][i].xModel->name);
 					}
 					if (data->dynEntDefList[0][i].destroyFx)
 					{
@@ -156,7 +156,7 @@ namespace ZoneTool
 					}
 					if (data->dynEntDefList[0][i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->dynEntDefList[0][i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->dynEntDefList[0][i].physPreset->name);
 					}
 				}
 			}
@@ -167,7 +167,7 @@ namespace ZoneTool
 				{
 					if (data->dynEntDefList[1][i].xModel)
 					{
-						zone->AddAssetOfType(xmodel, data->dynEntDefList[1][i].xModel->name);
+						zone->add_asset_of_type(xmodel, data->dynEntDefList[1][i].xModel->name);
 					}
 					if (data->dynEntDefList[1][i].destroyFx)
 					{
@@ -175,14 +175,14 @@ namespace ZoneTool
 					}
 					if (data->dynEntDefList[1][i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->dynEntDefList[1][i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->dynEntDefList[1][i].physPreset->name);
 					}
 				}
 			}
 
 			if (data->mapEnts)
 			{
-				zone->AddAssetOfType(map_ents, this->m_asset->mapEnts->name);
+				zone->add_asset_of_type(map_ents, this->m_asset->mapEnts->name);
 			}
 
 #ifdef USE_VMPROTECT
@@ -200,7 +200,7 @@ namespace ZoneTool
 			return col_map_mp;
 		}
 
-		void IClipMap::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IClipMap::write(IZone* zone, ZoneBuffer* buf)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW4::IClipMap::write");
@@ -229,7 +229,7 @@ namespace ZoneTool
 				{
 					if (data->staticModelList[i].xmodel)
 					{
-						static_model[i].xmodel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						static_model[i].xmodel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->staticModelList[i].xmodel->name));
 					}
 				}
@@ -435,7 +435,7 @@ namespace ZoneTool
 
 			if (data->mapEnts)
 			{
-				dest->mapEnts = reinterpret_cast<MapEnts*>(zone->GetAssetPointer(map_ents, this->name()));
+				dest->mapEnts = reinterpret_cast<MapEnts*>(zone->get_asset_pointer(map_ents, this->name()));
 			}
 
 			if (data->dynEntDefList[0])
@@ -447,7 +447,7 @@ namespace ZoneTool
 				{
 					if (data->dynEntDefList[0][i].xModel)
 					{
-						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dynEntDefList[0][i].xModel->name));
 					}
 					if (data->dynEntDefList[0][i].destroyFx)
@@ -456,7 +456,7 @@ namespace ZoneTool
 					}
 					if (data->dynEntDefList[0][i].physPreset)
 					{
-						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->dynEntDefList[0][i].physPreset->name));
 					}
 
@@ -478,7 +478,7 @@ namespace ZoneTool
 				{
 					if (data->dynEntDefList[1][i].xModel)
 					{
-						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->GetAssetPointer(
+						dyn_entity_def[i].xModel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->dynEntDefList[1][i].xModel->name));
 					}
 					if (data->dynEntDefList[1][i].destroyFx)
@@ -487,7 +487,7 @@ namespace ZoneTool
 					}
 					if (data->dynEntDefList[1][i].physPreset)
 					{
-						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						dyn_entity_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->dynEntDefList[1][i].physPreset->name));
 					}
 
@@ -634,7 +634,7 @@ namespace ZoneTool
 			// dump clipmap
 			IW5::IClipMap::dump(iw5_clipmap);
 
-			// free memory
+			// free memory_
 			delete[] iw5_clipmap->cModels;
 			delete[] iw5_clipmap;
 		}

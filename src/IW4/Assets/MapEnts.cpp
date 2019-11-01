@@ -73,7 +73,7 @@ namespace ZoneTool
 		};
 		std::unordered_map<std::string, std::string> keyConversionReversed;
 
-		void IMapEnts::ConvertEnts(MapEnts* ents, std::shared_ptr<ZoneMemory>& mem)
+		void IMapEnts::ConvertEnts(MapEnts* ents, ZoneMemory* mem)
 		{
 			ZONETOOL_INFO("Converting mapents!");
 
@@ -196,13 +196,13 @@ namespace ZoneTool
 				memcpy((void*)ents->entityString, &newEntsString[0], ents->numEntityChars);
 			}
 
-			//auto fp = fopen("output.d3dbsp.ents", "wb");
-			//fwrite(ents->entityString, ents->numEntityChars, 1, fp);
-			//fclose(fp);
+			//auto fp_ = fopen("output.d3dbsp.ents", "wb");
+			//fwrite(ents->entityString, ents->numEntityChars, 1, fp_);
+			//fclose(fp_);
 		}
 
 		/*legacy zonetool code, refactor me!*/
-		MapEnts* IMapEnts::parse(std::string name, std::shared_ptr<ZoneMemory>& mem)
+		MapEnts* IMapEnts::parse(std::string name, ZoneMemory* mem)
 		{
 			// check if we can open a filepointer
 			if (!FileSystem::FileExists(name + ".ents"))
@@ -236,36 +236,36 @@ namespace ZoneTool
 			AssetReader triggerReader(mem);
 			AssetReader stageReader(mem);
 
-			if (triggerReader.Open(name + ".ents.triggers"))
+			if (triggerReader.open(name + ".ents.triggers"))
 			{
-				ents->trigger.modelCount = triggerReader.Int();
-				ents->trigger.models = triggerReader.Array<TriggerModel>();
+				ents->trigger.modelCount = triggerReader.read_int();
+				ents->trigger.models = triggerReader.read_array<TriggerModel>();
 
-				ents->trigger.hullCount = triggerReader.Int();
-				ents->trigger.hulls = triggerReader.Array<TriggerHull>();
+				ents->trigger.hullCount = triggerReader.read_int();
+				ents->trigger.hulls = triggerReader.read_array<TriggerHull>();
 
-				ents->trigger.slabCount = triggerReader.Int();
-				ents->trigger.slabs = triggerReader.Array<TriggerSlab>();
+				ents->trigger.slabCount = triggerReader.read_int();
+				ents->trigger.slabs = triggerReader.read_array<TriggerSlab>();
 			}
 
-			if (stageReader.Open(name + ".ents.stages"))
+			if (stageReader.open(name + ".ents.stages"))
 			{
 				ZONETOOL_INFO("Parsing entity stages...");
 
-				ents->stageCount = stageReader.Int();
+				ents->stageCount = stageReader.read_int();
 				if (ents->stageCount)
 				{
-					ents->stageNames = stageReader.Array<Stage>();
+					ents->stageNames = stageReader.read_array<Stage>();
 
 					for (int i = 0; i < ents->stageCount; i++)
 					{
-						ents->stageNames[i].stageName = stageReader.String();
+						ents->stageNames[i].stageName = stageReader.read_string();
 					}
 				}
 			}
 
-			stageReader.Close();
-			triggerReader.Close();
+			stageReader.close();
+			triggerReader.close();
 
 			// return mapents
 			return ents;
@@ -279,7 +279,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IMapEnts::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IMapEnts::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -290,7 +290,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IMapEnts::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IMapEnts::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -309,7 +309,7 @@ namespace ZoneTool
 			return map_ents;
 		}
 
-		void IMapEnts::write_triggers(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, MapTriggers* dest)
+		void IMapEnts::write_triggers(IZone* zone, ZoneBuffer* buf, MapTriggers* dest)
 		{
 			if (dest->models)
 			{
@@ -325,7 +325,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IMapEnts::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IMapEnts::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -376,35 +376,35 @@ namespace ZoneTool
 			}
 
 			AssetDumper triggerDumper;
-			if (triggerDumper.Open(asset->name + ".ents.triggers"s))
+			if (triggerDumper.open(asset->name + ".ents.triggers"s))
 			{
-				triggerDumper.Int(asset->trigger.modelCount);
-				triggerDumper.Array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
+				triggerDumper.dump_int(asset->trigger.modelCount);
+				triggerDumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
 
-				triggerDumper.Int(asset->trigger.hullCount);
-				triggerDumper.Array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
+				triggerDumper.dump_int(asset->trigger.hullCount);
+				triggerDumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
 
-				triggerDumper.Int(asset->trigger.slabCount);
-				triggerDumper.Array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
+				triggerDumper.dump_int(asset->trigger.slabCount);
+				triggerDumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
 
-				triggerDumper.Close();
+				triggerDumper.close();
 			}
 
 			AssetDumper stageDumper;
-			if (stageDumper.Open(asset->name + ".ents.stages"s))
+			if (stageDumper.open(asset->name + ".ents.stages"s))
 			{
-				stageDumper.Int(asset->stageCount);
+				stageDumper.dump_int(asset->stageCount);
 				if (asset->stageCount)
 				{
-					stageDumper.Array(asset->stageNames, asset->stageCount);
+					stageDumper.dump_array(asset->stageNames, asset->stageCount);
 
 					for (int i = 0; i < asset->stageCount; i++)
 					{
-						stageDumper.String(asset->stageNames[i].stageName);
+						stageDumper.dump_string(asset->stageNames[i].stageName);
 					}
 				}
 			}
-			stageDumper.Close();
+			stageDumper.close();
 		}
 	}
 }

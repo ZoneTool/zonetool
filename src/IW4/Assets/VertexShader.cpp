@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		VertexShader* IVertexShader::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem, bool preferLocal)
+		VertexShader* IVertexShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "vertexshader\\" + name;
 
@@ -36,7 +36,7 @@ namespace ZoneTool
 				}
 
 				AssetReader read(mem);
-				if (!read.Open(path))
+				if (!read.open(path))
 				{
 					FileSystem::PreferLocalOverExternal(false);
 					return nullptr;
@@ -44,10 +44,10 @@ namespace ZoneTool
 
 				ZONETOOL_INFO("Parsing vertexshader \"%s\"...", name.data());
 
-				auto asset = read.Array<VertexShader>();
-				asset->name = read.String();
-				asset->bytecode = read.Array<DWORD>();
-				read.Close();
+				auto asset = read.read_array<VertexShader>();
+				asset->name = read.read_string();
+				asset->bytecode = read.read_array<DWORD>();
+				read.close();
 
 				FileSystem::PreferLocalOverExternal(false);
 
@@ -69,13 +69,13 @@ namespace ZoneTool
 			return asset;
 		}
 
-		void IVertexShader::init(void* asset, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexShader::init(void* asset, ZoneMemory* mem)
 		{
 			this->m_asset = reinterpret_cast<VertexShader*>(asset);
 			this->m_name = this->m_asset->name + "_IW5"s;
 		}
 
-		void IVertexShader::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexShader::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -87,7 +87,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IVertexShader::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexShader::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -105,7 +105,7 @@ namespace ZoneTool
 			return vertexshader;
 		}
 
-		void IVertexShader::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IVertexShader::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -129,15 +129,15 @@ namespace ZoneTool
 		void IVertexShader::dump(VertexShader* asset)
 		{
 			AssetDumper write;
-			if (!write.Open("techsets\\"s + asset->name + ".vertexshader"s))
+			if (!write.open("techsets\\"s + asset->name + ".vertexshader"s))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
-			write.String(asset->name);
-			write.Array(asset->bytecode, asset->codeLen);
-			write.Close();
+			write.dump_array(asset, 1);
+			write.dump_string(asset->name);
+			write.dump_array(asset->bytecode, asset->codeLen);
+			write.close();
 		}
 	}
 }

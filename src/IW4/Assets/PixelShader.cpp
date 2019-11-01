@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		PixelShader* IPixelShader::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem, bool preferLocal)
+		PixelShader* IPixelShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "pixelshader\\" + name;
 
@@ -29,17 +29,17 @@ namespace ZoneTool
 				path = "techsets\\" + name + ".pixelshader";
 
 				AssetReader read(mem);
-				if (!read.Open(path, preferLocal))
+				if (!read.open(path, preferLocal))
 				{
 					return nullptr;
 				}
 
 				ZONETOOL_INFO("Parsing pixelshader \"%s\"...", name.data());
 
-				auto asset = read.Array<PixelShader>();
-				asset->name = read.String();
-				asset->bytecode = read.Array<DWORD>();
-				read.Close();
+				auto asset = read.read_array<PixelShader>();
+				asset->name = read.read_string();
+				asset->bytecode = read.read_array<DWORD>();
+				read.close();
 
 				return asset;
 			}
@@ -60,13 +60,13 @@ namespace ZoneTool
 			return asset;
 		}
 
-		void IPixelShader::init(void* asset, std::shared_ptr<ZoneMemory>& mem)
+		void IPixelShader::init(void* asset, ZoneMemory* mem)
 		{
 			this->m_asset = reinterpret_cast<PixelShader*>(asset);
 			this->m_name = this->m_asset->name + "_IW5"s;
 		}
 
-		void IPixelShader::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IPixelShader::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -78,7 +78,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IPixelShader::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IPixelShader::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -96,7 +96,7 @@ namespace ZoneTool
 			return pixelshader;
 		}
 
-		void IPixelShader::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IPixelShader::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -118,15 +118,15 @@ namespace ZoneTool
 		void IPixelShader::dump(PixelShader* asset)
 		{
 			AssetDumper write;
-			if (!write.Open("techsets\\"s + asset->name + ".pixelshader"s))
+			if (!write.open("techsets\\"s + asset->name + ".pixelshader"s))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
-			write.String(asset->name);
-			write.Array(asset->bytecode, asset->codeLen);
-			write.Close();
+			write.dump_array(asset, 1);
+			write.dump_string(asset->name);
+			write.dump_array(asset->bytecode, asset->codeLen);
+			write.close();
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		ComWorld* IComWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		ComWorld* IComWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto iw5_comworld = IW5::IComWorld::parse(name, mem);
 
@@ -47,7 +47,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IComWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IComWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -58,7 +58,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IComWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IComWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -70,7 +70,7 @@ namespace ZoneTool
 			{
 				if (asset->primaryLights[i].defName)
 				{
-					zone->AddAssetOfType(lightdef, asset->primaryLights[i].defName);
+					zone->add_asset_of_type(lightdef, asset->primaryLights[i].defName);
 				}
 			}
 		}
@@ -85,7 +85,7 @@ namespace ZoneTool
 			return com_map;
 		}
 
-		void IComWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IComWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -131,7 +131,7 @@ namespace ZoneTool
 			// dump comworld
 			IW5::IComWorld::dump(iw5_comworld);
 
-			// free memory
+			// free memory_
 			delete[] iw5_comworld->primaryLights;
 			delete[] iw5_comworld;
 		}

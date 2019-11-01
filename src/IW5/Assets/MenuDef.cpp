@@ -20,13 +20,13 @@ namespace ZoneTool
 		{
 		}
 
-		void IMenuDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IMenuDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).menu;
 		}
 
-		void IMenuDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IMenuDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -44,13 +44,13 @@ namespace ZoneTool
 			return menu;
 		}
 
-		void IMenuDef::write_MenuData(IZone* zone, std::shared_ptr<ZoneBuffer>& buf, menuData_t* data)
+		void IMenuDef::write_MenuData(IZone* zone, ZoneBuffer* buf, menuData_t* data)
 		{
 			auto dest = buf->write(data);
 			memset(dest, 0, sizeof menuData_t);
 		}
 
-		void IMenuDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IMenuDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			// the only purpose for this is to decrease load time of the game...
 			auto data = this->m_asset;

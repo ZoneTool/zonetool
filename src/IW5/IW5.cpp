@@ -12,17 +12,17 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		bool isDumpingComplete = false;
-		bool isDumping = false;
+		bool is_dumping_complete = false;
+		bool is_dumping = false;
 
-		const char* Linker::Version()
+		const char* Linker::version()
 		{
 			return "IW5";
 		}
 
-		bool Linker::InUse()
+		bool Linker::is_used()
 		{
-			return !strncmp(reinterpret_cast<char*>(0x770C6C), this->Version(), 3);
+			return !strncmp(reinterpret_cast<char*>(0x770C6C), this->version(), 3);
 		}
 
 		__declspec(naked) void Linker::MessageLoop()
@@ -32,45 +32,45 @@ namespace ZoneTool
 			}
 		}
 
-		void Linker::Startup()
+		void Linker::startup()
 		{
 			// AssetHandler::SetDump(true);
 
-			if (this->InUse())
+			if (this->is_used())
 			{
 				// Kill original console window
-				Memory(0x53CB60).Set<std::uint8_t>(0xC3);
-				Memory(0x53C850).Set<std::uint8_t>(0xC3);
+				Memory(0x53CB60).set<std::uint8_t>(0xC3);
+				Memory(0x53C850).set<std::uint8_t>(0xC3);
 
 				// Message loop
-				Memory(0x53A2E0).Jump(MessageLoop);
+				Memory(0x53A2E0).jump(MessageLoop);
 
 				// Load patches
 				RegisterPatch<FFCompression>();
 				RegisterPatch<AssetHandler>();
 
 				// Disable DW
-				Memory(0x53821C).Nop(5);
+				Memory(0x53821C).nop(5);
 
 				// Do not read server config, we don't need it anyways.
-				Memory(0x4DAEFE).Nop(5);
+				Memory(0x4DAEFE).nop(5);
 
 				// Do not interact with the steamapi functions.
-				Memory(0x599EAE).Nop(5);
+				Memory(0x599EAE).nop(5);
 
 				// Sys_Error -> printf
-				Memory(0x539A50).Jump(printf);
+				Memory(0x539A50).jump(printf);
 
 				// Patch hunk size (Allows us to load more assets)
-				Memory(0x5340D9).Set<DWORD>(0x3F000000);
-				Memory(0x534110).Set<DWORD>(0x3F000000);
+				Memory(0x5340D9).set<DWORD>(0x3F000000);
+				Memory(0x534110).set<DWORD>(0x3F000000);
 
 				// Replace the default attachment name (the specified default does not exist)
-				Memory(0x74B0BC).WriteString("reflex");
+				Memory(0x74B0BC).write_string("reflex");
 			}
 		}
 
-		std::shared_ptr<IZone> Linker::AllocZone(std::string& zone)
+		std::shared_ptr<IZone> Linker::alloc_zone(const std::string& zone)
 		{
 			// Patch main thread ID
 			// Memory(0x01C11BDC).Set(GetCurrentThreadId());
@@ -79,7 +79,7 @@ namespace ZoneTool
 			return ptr;
 		}
 
-		std::shared_ptr<ZoneBuffer> Linker::AllocBuffer()
+		std::shared_ptr<ZoneBuffer> Linker::alloc_buffer()
 		{
 			auto ptr = std::make_shared<ZoneBuffer>();
 			ptr->init_streams(9);
@@ -87,7 +87,7 @@ namespace ZoneTool
 			return ptr;
 		}
 
-		void Linker::LoadZone(std::string& name)
+		void Linker::load_zone(const std::string& name)
 		{
 			ZONETOOL_INFO("Loading zone \"%s\"...", name.data());
 
@@ -99,7 +99,7 @@ namespace ZoneTool
 			Sleep(timeout);
 		}
 
-		void Linker::UnloadZones()
+		void Linker::unload_zones()
 		{
 			ZONETOOL_INFO("Unloading zones...");
 
@@ -107,12 +107,12 @@ namespace ZoneTool
 			DB_LoadXAssets(&zone, 1, 1);
 		}
 
-		bool Linker::IsValidAssetType(std::string& type)
+		bool Linker::is_valid_asset_type(std::string& type)
 		{
-			return this->TypeToInt(type) >= 0;
+			return this->type_to_int(type) >= 0;
 		}
 
-		std::int32_t Linker::TypeToInt(std::string type)
+		std::int32_t Linker::type_to_int(std::string type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x7C6208);
 
@@ -125,36 +125,36 @@ namespace ZoneTool
 			return -1;
 		}
 
-		std::string Linker::TypeToString(std::int32_t type)
+		std::string Linker::type_to_string(std::int32_t type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x7C6208);
 			return xassettypes[type];
 		}
 
-        bool Linker::SupportsBuilding()
+        bool Linker::supports_building()
         {
             return true;
         }
 
-        void Linker::DumpZone(std::string& name)
+        void Linker::dump_zone(const std::string& name)
 		{
-			isDumpingComplete = false;
-			isDumping = true;
+			is_dumping_complete = false;
+			is_dumping = true;
 
 			FileSystem::SetFastFile(name);
 			AssetHandler::SetDump(true);
-			LoadZone(name);
+			load_zone(name);
 
-			while (!isDumpingComplete)
+			while (!is_dumping_complete)
 			{
 				Sleep(1);
 			}
 		}
 
-		void Linker::VerifyZone(std::string& name)
+		void Linker::verify_zone(const std::string& name)
 		{
 			AssetHandler::SetVerify(true);
-			LoadZone(name);
+			load_zone(name);
 			AssetHandler::SetVerify(false);
 		}
 

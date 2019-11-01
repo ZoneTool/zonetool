@@ -15,7 +15,7 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		RawFile* IRawFile::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		RawFile* IRawFile::parse(const std::string& name, ZoneMemory* mem)
 		{
 			if (FileSystem::FileExists(name))
 			{
@@ -54,7 +54,7 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		void IRawFile::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IRawFile::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = parse(name, mem);
@@ -65,7 +65,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IRawFile::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IRawFile::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -83,7 +83,7 @@ namespace ZoneTool
 			return rawfile;
 		}
 
-		void IRawFile::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IRawFile::write(IZone* zone, ZoneBuffer* buf)
 		{
 			const auto data = this->m_asset;
 			auto dest = buf->write<RawFile>(data);

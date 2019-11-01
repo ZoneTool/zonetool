@@ -15,12 +15,12 @@ namespace ZoneTool
 	std::vector<std::shared_ptr<ILinker>> linkers;
 	std::map<std::string, std::function<void(std::vector<std::string>)>> commands;
 
-	void RegisterCommand(std::string& name, std::function<void(std::vector<std::string>)> cb)
+	void register_command(const std::string& name, std::function<void(std::vector<std::string>)> cb)
 	{
 		commands[name] = cb;
 	}
 
-	void ExecuteCommand(std::vector<std::string> args)
+	void execute_command(std::vector<std::string> args)
 	{
 		const auto itr = commands.find(args[0]);
 		if (itr != commands.end())
@@ -33,7 +33,7 @@ namespace ZoneTool
 		}
 	}
 
-	void CommandThread()
+	void command_thread()
 	{
 		while (true)
 		{
@@ -54,11 +54,11 @@ namespace ZoneTool
 			}
 
 			// Execute command
-			ExecuteCommand(args);
+			execute_command(args);
 		}
 	}
 
-	void AddAssetsUsingIterator(const std::string& fastfile, const std::string& type, const std::string& folder,
+	void add_assets_using_iterator(const std::string& fastfile, const std::string& type, const std::string& folder,
 	                            const std::string& extension, bool skip_reference, IZone* zone)
 	{
 		if (std::filesystem::is_directory("zonetool\\" + fastfile + "\\" + folder))
@@ -84,21 +84,21 @@ namespace ZoneTool
 						filename = filename.substr(0, filename.length() - extension.length());
 
 						// add asset to disk
-						zone->AddAssetOfType(type, filename);
+						zone->add_asset_of_type(type, filename);
 					}
 				}
 			}
 		}
 	}
 
-	void BuildZone(ILinker* linker, std::string& fastfile)
+	void build_zone(ILinker* linker, std::string& fastfile)
 	{
 		// make sure FS is correct.
 		FileSystem::SetFastFile(fastfile);
 
-		ZONETOOL_INFO("Building fastfile \"%s\" for game \"%s\"", fastfile.data(), linker->Version());
+		ZONETOOL_INFO("Building fastfile \"%s\" for game \"%s\"", fastfile.data(), linker->version());
 
-		auto& zone = linker->AllocZone(fastfile);
+		auto zone = linker->alloc_zone(fastfile);
 		if (zone == nullptr)
 		{
 			ZONETOOL_ERROR("An error occured while building fastfile \"%s\": Are you out of memory?", fastfile.data());
@@ -132,7 +132,7 @@ namespace ZoneTool
 			}
 			if (row->fields_[0] == "require"s)
 			{
-				linker->LoadZone(std::string(row->fields_[1]));
+				linker->load_zone(std::string(row->fields_[1]));
 			}
 			// this allows us to reference assets instead of rewriting them
 			else if (row->fields_[0] == "reference"s)
@@ -145,16 +145,16 @@ namespace ZoneTool
 			// add assets that are required for maps
 			else if (row->fields_[0] == "map"s)
 			{
-				zone->AddAssetOfType("techset", "wc_l_hsm_r0c0n0s0");
+				zone->add_asset_of_type("techset", "wc_l_hsm_r0c0n0s0");
 			}
 			// this will use a directory iterator to automatically add assets
 			else if (row->fields_[0] == "iterate"s)
 			{
 				try
 				{
-					AddAssetsUsingIterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
-					AddAssetsUsingIterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone.get());
-					AddAssetsUsingIterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
+					add_assets_using_iterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
+					add_assets_using_iterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone.get());
+					add_assets_using_iterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
 				}
 				catch (std::exception& ex)
 				{
@@ -184,7 +184,7 @@ namespace ZoneTool
 					loc->name = _strdup(row->fields_[1]);
 					loc->value = _strdup(row->fields_[2]);
 
-					auto type = zone->GetTypeByName(row->fields_[0]);
+					auto type = zone->get_type_by_name(row->fields_[0]);
 					if (type == -1)
 					{
 						ZONETOOL_ERROR("Could not translate typename %s to an integer!", row->fields_[0]);
@@ -192,7 +192,7 @@ namespace ZoneTool
 
 					try
 					{
-						zone->AddAssetOfTypePtr(type, loc);
+						zone->add_asset_of_type_by_pointer(type, loc);
 					}
 					catch (std::exception& ex)
 					{
@@ -203,11 +203,11 @@ namespace ZoneTool
 				{
 					if (row->numOfFields_ >= 2)
 					{
-						if (linker->IsValidAssetType(std::string(row->fields_[0])))
+						if (linker->is_valid_asset_type(std::string(row->fields_[0])))
 						{
 							try
 							{
-								zone->AddAssetOfType(
+								zone->add_asset_of_type(
 									row->fields_[0],
 									((isReferencing) ? ","s : ""s) + row->fields_[1]
 								);
@@ -231,21 +231,21 @@ namespace ZoneTool
 		CsvParser_destroy(parser);
 
 		// allocate zone buffer
-		auto buffer = linker->AllocBuffer();
+		auto buffer = linker->alloc_buffer();
 
 		// add branding asset
-		zone->AddAssetOfType("rawfile", fastfile);
+		zone->add_asset_of_type("rawfile", fastfile);
 
 		// compile zone
-		zone->Build(buffer);
+		zone->build(buffer.get());
 
 		// unload fastfiles
 		// linker->UnloadZones();
 	}
 
-	ILinker* currentLinker;
+	ILinker* current_linker;
 
-	void CreateConsole()
+	void create_console()
 	{
 #ifdef USE_VMPROTECT
 		VMProtectBeginUltra("CreateConsole");
@@ -261,14 +261,14 @@ namespace ZoneTool
 		SetConsoleTitleA("ZoneTool");
 
 		// Spawn command thread
-		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(CommandThread), nullptr, 0, nullptr);
+		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(command_thread), nullptr, 0, nullptr);
 
 		// Commands
-		RegisterCommand("quit"s, [](std::vector<std::string>)
+		register_command("quit"s, [](std::vector<std::string>)
 		{
 			ExitProcess(0);
 		});
-		RegisterCommand("buildzone"s, [](std::vector<std::string> args)
+		register_command("buildzone"s, [](std::vector<std::string> args)
 		{
 			// Check if enough arguments have been passed to the command
 			if (args.size() == 1)
@@ -277,19 +277,19 @@ namespace ZoneTool
 				return;
 			}
 
-			if (currentLinker)
+			if (current_linker)
 			{
-                if(currentLinker->SupportsBuilding())
-                {
-                    BuildZone(currentLinker, args[1]);
-                }
-                else
-                {
-                    ZONETOOL_ERROR("Current linker does not support zone building.");
-                }
+				if(current_linker->supports_building())
+				{
+					build_zone(current_linker, args[1]);
+				}
+				else
+				{
+					ZONETOOL_ERROR("Current linker does not support zone building.");
+				}
 			}
 		});
-		RegisterCommand("loadzone"s, [](std::vector<std::string> args)
+		register_command("loadzone"s, [](std::vector<std::string> args)
 		{
 			// Check if enough arguments have been passed to the command
 			if (args.size() == 1)
@@ -299,12 +299,12 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			if (currentLinker)
+			if (current_linker)
 			{
-				currentLinker->LoadZone(args[1]);
+				current_linker->load_zone(args[1]);
 			}
 		});
-		RegisterCommand("verifyzone"s, [](std::vector<std::string> args)
+		register_command("verifyzone"s, [](std::vector<std::string> args)
 		{
 			// Check if enough arguments have been passed to the command
 			if (args.size() == 1)
@@ -314,12 +314,12 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			if (currentLinker)
+			if (current_linker)
 			{
-				currentLinker->VerifyZone(args[1]);
+				current_linker->verify_zone(args[1]);
 			}
 		});
-		RegisterCommand("dumpzone"s, [](std::vector<std::string> args)
+		register_command("dumpzone"s, [](std::vector<std::string> args)
 		{
 			// Check if enough arguments have been passed to the command
 			if (args.size() == 1)
@@ -329,9 +329,9 @@ namespace ZoneTool
 			}
 
 			// Load zone
-			if (currentLinker)
+			if (current_linker)
 			{
-				currentLinker->DumpZone(args[1]);
+				current_linker->dump_zone(args[1]);
 			}
 		});
 
@@ -341,12 +341,12 @@ namespace ZoneTool
 	}
 
 	template <typename T>
-	void RegisterLinker()
+	void register_linker()
 	{
 		linkers.push_back(std::make_shared<T>());
 	}
 
-	void Branding(ILinker* linker)
+	void branding(ILinker* linker)
 	{
 		ZONETOOL_INFO("ZoneTool initialization complete!");
 		ZONETOOL_INFO("Welcome to ZoneTool v" ZONETOOL_VERSION " written by RektInator.");
@@ -354,7 +354,7 @@ namespace ZoneTool
 
 		if (linker)
 		{
-			ZONETOOL_INFO("Initializing linker for game \"%s\"...\n", linker->Version());
+			ZONETOOL_INFO("Initializing linker for game \"%s\"...\n", linker->version());
 		}
 		else
 		{
@@ -362,7 +362,7 @@ namespace ZoneTool
 		}
 	}
 
-	std::vector<std::string> GetCommandLineArguments()
+	std::vector<std::string> get_command_line_arguments()
 	{
 		LPWSTR* szArglist;
 		int nArgs;
@@ -383,13 +383,13 @@ namespace ZoneTool
 		return args;
 	}
 
-	void HandleParams()
+	void handle_params()
 	{
 		// Wait until the game is loaded
 		Sleep(5000);
 
 		// Execute command line commands?
-		auto& args = GetCommandLineArguments();
+		auto args = get_command_line_arguments();
 		if (args.size() > 1)
 		{
 			for (auto i = 0u; i < args.size(); i++)
@@ -398,17 +398,17 @@ namespace ZoneTool
 				{
 					if (args[i] == "-buildzone")
 					{
-						BuildZone(currentLinker, args[i + 1]);
+						build_zone(current_linker, args[i + 1]);
 						i++;
 					}
 					else if (args[i] == "-loadzone")
 					{
-						currentLinker->LoadZone(args[i + 1]);
+						current_linker->load_zone(args[i + 1]);
 						i++;
 					}
 					else if (args[i] == "-dumpzone")
 					{
-						currentLinker->DumpZone(args[i + 1]);
+						current_linker->dump_zone(args[i + 1]);
 						i++;
 					}
 				}
@@ -418,60 +418,60 @@ namespace ZoneTool
 		}
 	}
 
-	bool IsCustomLinkerPresent()
+	bool is_custom_linker_present()
 	{
 		return std::filesystem::exists("linker.dll") && std::filesystem::is_regular_file("linker.dll");
 	}
 
-	void Startup()
+	void startup()
 	{
 #ifdef USE_VMPROTECT
 		VMProtectBeginUltra("Startup");
 #endif
 
 		// Create stdout console
-		CreateConsole();
+		create_console();
 
 		// Register linkers
-		RegisterLinker<IW3::Linker>();
-		RegisterLinker<IW4::Linker>();
-		RegisterLinker<IW5::Linker>();
-		RegisterLinker<CODO::Linker>();
+		register_linker<IW3::Linker>();
+		register_linker<IW4::Linker>();
+		register_linker<IW5::Linker>();
+		register_linker<CODO::Linker>();
 
 		// check if a custom linker is present in the current game directory
-		if (IsCustomLinkerPresent())
+		if (is_custom_linker_present())
 		{
-			auto linkerModule = LoadLibraryA("linker.dll");
+			const auto linker_module = LoadLibraryA("linker.dll");
 
-			if (linkerModule != nullptr && linkerModule != INVALID_HANDLE_VALUE)
+			if (linker_module != nullptr && linker_module != INVALID_HANDLE_VALUE)
 			{
-				auto getLinkerFunc = GetProcAddress(linkerModule, "GetLinker");
+				const auto get_linker_func = GetProcAddress(linker_module, "GetLinker");
 
-				if (getLinkerFunc != nullptr && getLinkerFunc != INVALID_HANDLE_VALUE)
+				if (get_linker_func != nullptr && get_linker_func != INVALID_HANDLE_VALUE)
 				{
-					currentLinker = Function<ILinker * ()>(getLinkerFunc)();
+					current_linker = Function<ILinker * ()>(get_linker_func)();
 				}
 			}
 		}
 
-		if (!currentLinker)
+		if (!current_linker)
 		{
 			// Startup compatible linkers
 			for (auto& linker : linkers)
 			{
-				linker->Startup();
+				linker->startup();
 
-				if (linker->InUse())
+				if (linker->is_used())
 				{
-					currentLinker = linker.get();
+					current_linker = linker.get();
 				}
 			}
 		}
 
 		// Startup complete, show branding
-		Branding(currentLinker);
+		branding(current_linker);
 
-		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(HandleParams), nullptr, 0, nullptr);
+		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(handle_params), nullptr, 0, nullptr);
 
 #ifdef USE_VMPROTECT
 		VMProtectEnd();

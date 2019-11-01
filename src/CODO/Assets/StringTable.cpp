@@ -108,7 +108,7 @@ namespace ZoneTool::CODO
 		return hash;
 	}
 
-	StringTable* StringTable_Parse(std::string name, std::shared_ptr<ZoneMemory>& mem)
+	StringTable* StringTable_Parse(std::string name, ZoneMemory* mem)
 	{
 		auto table = std::make_unique<CSV>(name);
 		auto stringtable = mem->Alloc<StringTable>();
@@ -139,7 +139,7 @@ namespace ZoneTool::CODO
 	{
 	}
 
-	void IStringTable::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+	void IStringTable::init(const std::string& name, ZoneMemory* mem)
 	{
 		this->m_name = name;
 		this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).stringtable;
@@ -151,7 +151,7 @@ namespace ZoneTool::CODO
 		}
 	}
 
-	void IStringTable::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+	void IStringTable::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 	{
 	}
 
@@ -169,7 +169,7 @@ namespace ZoneTool::CODO
 		return stringtable;
 	}
 
-	void IStringTable::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+	void IStringTable::write(IZone* zone, ZoneBuffer* buf)
 	{
 		auto data = this->m_asset;
 		auto dest = buf->write(data);

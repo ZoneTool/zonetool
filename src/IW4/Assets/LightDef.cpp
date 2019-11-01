@@ -21,7 +21,7 @@ namespace ZoneTool
 		{
 		}
 
-		GfxLightDef* ILightDef::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		GfxLightDef* ILightDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			// parse iw5 lightdef
 			auto iw5_asset = IW5::ILightDef::parse(name, mem);
@@ -40,7 +40,7 @@ namespace ZoneTool
 			return asset;
 		}
 
-		void ILightDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ILightDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -51,7 +51,7 @@ namespace ZoneTool
 			}
 		}
 
-		void ILightDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ILightDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -61,7 +61,7 @@ namespace ZoneTool
 
 			if (asset->attenuation.image)
 			{
-				zone->AddAssetOfType(image, asset->attenuation.image->name);
+				zone->add_asset_of_type(image, asset->attenuation.image->name);
 			}
 		}
 
@@ -75,7 +75,7 @@ namespace ZoneTool
 			return lightdef;
 		}
 
-		void ILightDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ILightDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			assert(sizeof(GfxLightDef), 16);
 
@@ -89,7 +89,7 @@ namespace ZoneTool
 
 			if (data->attenuation.image)
 			{
-				dest->attenuation.image = reinterpret_cast<GfxImage*>(zone->GetAssetPointer(
+				dest->attenuation.image = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
 					image, data->attenuation.image->name));
 			}
 
@@ -99,7 +99,7 @@ namespace ZoneTool
 
 		void ILightDef::dump(GfxLightDef* asset)
 		{
-			// allocate memory for the asset
+			// allocate memory_ for the asset
 			auto iw5_asset = new IW5::GfxLightDef;
 
 			// copy data
@@ -110,7 +110,7 @@ namespace ZoneTool
 			// dump data
 			IW5::ILightDef::dump(iw5_asset);
 
-			// free memory
+			// free memory_
 			delete[] iw5_asset;
 		}
 	}

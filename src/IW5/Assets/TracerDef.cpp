@@ -20,13 +20,13 @@ namespace ZoneTool
 		{
 		}
 
-		void ITracerDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ITracerDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).tracer;
 		}
 
-		void ITracerDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ITracerDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -44,7 +44,7 @@ namespace ZoneTool
 			return tracer;
 		}
 
-		void ITracerDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ITracerDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -56,7 +56,7 @@ namespace ZoneTool
 
 			if (data->material)
 			{
-				dest->material = reinterpret_cast<Material*>(zone->GetAssetPointer(material, data->material->name));
+				dest->material = reinterpret_cast<Material*>(zone->get_asset_pointer(material, data->material->name));
 			}
 
 			END_LOG_STREAM;

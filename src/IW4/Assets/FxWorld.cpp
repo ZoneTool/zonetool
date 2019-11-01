@@ -13,7 +13,7 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		FxWorld* IFxWorld::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		FxWorld* IFxWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto iw5_fxworld = IW5::IFxWorld::parse(name, mem);
 
@@ -34,7 +34,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IFxWorld::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IFxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 			this->m_asset = this->parse(name, mem);
@@ -45,7 +45,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxWorld::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IFxWorld::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -58,15 +58,15 @@ namespace ZoneTool
 				{
 					if (data->glassSys.defs[i].physPreset)
 					{
-						zone->AddAssetOfType(physpreset, data->glassSys.defs[i].physPreset->name);
+						zone->add_asset_of_type(physpreset, data->glassSys.defs[i].physPreset->name);
 					}
 					if (data->glassSys.defs[i].material)
 					{
-						zone->AddAssetOfType(material, data->glassSys.defs[i].material->name);
+						zone->add_asset_of_type(material, data->glassSys.defs[i].material->name);
 					}
 					if (data->glassSys.defs[i].materialShattered)
 					{
-						zone->AddAssetOfType(material, data->glassSys.defs[i].materialShattered->name);
+						zone->add_asset_of_type(material, data->glassSys.defs[i].materialShattered->name);
 					}
 				}
 			}
@@ -82,7 +82,7 @@ namespace ZoneTool
 			return fx_map;
 		}
 
-		void IFxWorld::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IFxWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -101,17 +101,17 @@ namespace ZoneTool
 				{
 					if (data->glassSys.defs[i].physPreset)
 					{
-						glass_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->GetAssetPointer(
+						glass_def[i].physPreset = reinterpret_cast<PhysPreset*>(zone->get_asset_pointer(
 							physpreset, data->glassSys.defs[i].physPreset->name));
 					}
 					if (data->glassSys.defs[i].material)
 					{
-						glass_def[i].material = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						glass_def[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->glassSys.defs[i].material->name));
 					}
 					if (data->glassSys.defs[i].materialShattered)
 					{
-						glass_def[i].materialShattered = reinterpret_cast<Material*>(zone->GetAssetPointer(
+						glass_def[i].materialShattered = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->glassSys.defs[i].materialShattered->name));
 					}
 				}

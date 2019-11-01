@@ -229,7 +229,7 @@ namespace ZoneTool
 		{
 		}
 
-		void IStructuredDataDef::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IStructuredDataDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).structureddatadef;
@@ -246,7 +246,7 @@ namespace ZoneTool
 			manipulate(this->m_asset);
 		}
 
-		void IStructuredDataDef::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IStructuredDataDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -264,7 +264,7 @@ namespace ZoneTool
 			return structureddatadef;
 		}
 
-		void IStructuredDataDef::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IStructuredDataDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);

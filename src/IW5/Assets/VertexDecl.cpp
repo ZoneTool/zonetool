@@ -20,26 +20,26 @@ namespace ZoneTool
 		{
 		}
 
-		VertexDecl* IVertexDecl::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem, bool preferLocal)
+		VertexDecl* IVertexDecl::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "techsets\\" + name + ".vertexdecl";
 
 			AssetReader read(mem);
-			if (!read.Open(path, preferLocal))
+			if (!read.open(path, preferLocal))
 			{
 				return nullptr;
 			}
 
 			ZONETOOL_INFO("Parsing vertexdecl \"%s\"...", name.data());
 
-			auto asset = read.Array<VertexDecl>();
-			asset->name = read.String();
-			read.Close();
+			auto asset = read.read_array<VertexDecl>();
+			asset->name = read.read_string();
+			read.close();
 
 			return asset;
 		}
 
-		void IVertexDecl::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexDecl::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -51,7 +51,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IVertexDecl::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexDecl::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -69,7 +69,7 @@ namespace ZoneTool
 			return vertexdecl;
 		}
 
-		void IVertexDecl::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IVertexDecl::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);
@@ -91,14 +91,14 @@ namespace ZoneTool
 			}
 
 			AssetDumper write;
-			if (!write.Open("techsets\\"s + asset->name + ".vertexdecl"s))
+			if (!write.open("techsets\\"s + asset->name + ".vertexdecl"s))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
-			write.String(asset->name);
-			write.Close();
+			write.dump_array(asset, 1);
+			write.dump_string(asset->name);
+			write.close();
 		}
 	}
 }

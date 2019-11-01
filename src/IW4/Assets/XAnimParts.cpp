@@ -11,7 +11,7 @@
 
 namespace ZoneTool::IW4
 {
-	void IXAnimParts::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+	void IXAnimParts::init(const std::string& name, ZoneMemory* mem)
 	{
 		this->m_name = name;
 		this->m_asset = reinterpret_cast<IW4::XAnimParts*>(IW5::IXAnimParts::parse(name, mem, SL_AllocString)); // 
@@ -22,7 +22,7 @@ namespace ZoneTool::IW4
 		}
 	}
 
-	void IXAnimParts::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+	void IXAnimParts::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 	{
 		// fixup scriptstrings
 		auto xanim = mem->Alloc<XAnimParts>();
@@ -72,7 +72,7 @@ namespace ZoneTool::IW4
 		return xanim;
 	}
 
-	void IXAnimParts::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+	void IXAnimParts::write(IZone* zone, ZoneBuffer* buf)
 	{
 		auto data = this->m_asset;
 		auto dest = buf->write(data);

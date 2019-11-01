@@ -20,21 +20,21 @@ namespace ZoneTool
 		{
 		}
 
-		VertexDecl* IVertexDecl::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem, bool preferLocal)
+		VertexDecl* IVertexDecl::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "techsets\\" + name + ".vertexdecl";
 
 			AssetReader read(mem);
-			if (!read.Open(path, preferLocal))
+			if (!read.open(path, preferLocal))
 			{
 				return nullptr;
 			}
 
 			ZONETOOL_INFO("Parsing vertexdecl \"%s\"...", name.data());
 
-			auto asset = read.Array<VertexDecl>();
-			asset->name = read.String();
-			read.Close();
+			auto asset = read.read_array<VertexDecl>();
+			asset->name = read.read_string();
+			read.close();
 
 			if (asset->streamCount > 13)
 			{
@@ -55,7 +55,7 @@ namespace ZoneTool
 			return asset;
 		}
 
-		void IVertexDecl::init(void* asset, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexDecl::init(void* asset, ZoneMemory* mem)
 		{
 			this->m_asset = reinterpret_cast<VertexDecl*>(asset);
 			this->m_name = this->m_asset->name + "_IW5"s;
@@ -63,7 +63,7 @@ namespace ZoneTool
 
 		std::unordered_map<std::uint32_t, std::uint32_t> mappedStreams;
 
-		void IVertexDecl::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexDecl::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -79,7 +79,7 @@ namespace ZoneTool
 			fclose(vertexDecls);
 		}
 
-		void IVertexDecl::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void IVertexDecl::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -97,7 +97,7 @@ namespace ZoneTool
 			return vertexdecl;
 		}
 
-		void IVertexDecl::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void IVertexDecl::write(IZone* zone, ZoneBuffer* buf)
 		{
 			sizeof VertexDecl;
 
@@ -116,14 +116,14 @@ namespace ZoneTool
 		void IVertexDecl::dump(VertexDecl* asset)
 		{
 			AssetDumper write;
-			if (!write.Open("techsets\\"s + asset->name + ".vertexdecl"s))
+			if (!write.open("techsets\\"s + asset->name + ".vertexdecl"s))
 			{
 				return;
 			}
 
-			write.Array(asset, 1);
-			write.String(asset->name);
-			write.Close();
+			write.dump_array(asset, 1);
+			write.dump_string(asset->name);
+			write.close();
 		}
 	}
 }

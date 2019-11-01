@@ -25,14 +25,14 @@ namespace ZoneTool
 		{
 		}
 
-		const char* Linker::Version()
+		const char* Linker::version()
 		{
 			return "CoD4";
 		}
 
-		bool Linker::InUse()
+		bool Linker::is_used()
 		{
-			return !strncmp(reinterpret_cast<char *>(0x006CF584), this->Version(), 4);
+			return !strncmp(reinterpret_cast<char *>(0x006CF584), this->version(), 4);
 		}
 
 		typedef void*(__cdecl * Dvar_RegisterBool_t)(const char*, bool, unsigned int, const char*);
@@ -170,7 +170,7 @@ namespace ZoneTool
 			HandleAsset(asset);
 
 			// call original function
-			return Memory::Func<void*(XAsset* asset, int unk)>(0x489B00)(asset, unk);
+			return Memory::func<void*(XAsset* asset, int unk)>(0x489B00)(asset, unk);
 		}
 
 		void* ReallocateAssetPool(uint32_t type, unsigned int newSize)
@@ -201,9 +201,9 @@ namespace ZoneTool
 			printf(data);
 		}
 		
-		void Linker::Startup()
+		void Linker::startup()
 		{
-			if (this->InUse())
+			if (this->is_used())
 			{
 				// Realloc asset pools
 				ReallocateAssetPoolM(localize, 2);
@@ -227,77 +227,77 @@ namespace ZoneTool
 				ReallocateAssetPoolM(sound, 2);
 
 				// Asset dump hook
-				Memory(0x00489E72).Call(DB_AddXAsset);
+				Memory(0x00489E72).call(DB_AddXAsset);
 
 				// Always use dedicated mode
-				Memory(0x4FEA9E).Call(Dedicated_RegisterDvarBool);
-				Memory(0x4FEAC2).Call(Dedicated_RegisterDvarBool);
-				Memory(0x4FFE37).Call(Dedicated_RegisterDvarBool);
-				Memory(0x4FFE5D).Call(Dedicated_RegisterDvarBool);
+				Memory(0x4FEA9E).call(Dedicated_RegisterDvarBool);
+				Memory(0x4FEAC2).call(Dedicated_RegisterDvarBool);
+				Memory(0x4FFE37).call(Dedicated_RegisterDvarBool);
+				Memory(0x4FFE5D).call(Dedicated_RegisterDvarBool);
 
 				// idc if you can't initialise PunkBuster
-				Memory(0x5776DF).Nop(5);
-				Memory(0x5776EC).Nop(5);
+				Memory(0x5776DF).nop(5);
+				Memory(0x5776EC).nop(5);
 
 				// Initialise console_mp.log
-				Memory(0x4FCBA3).Nop(2);
+				Memory(0x4FCBA3).nop(2);
 
 				// We don't need recommended settings
-				Memory(0x4FE99A).Set<std::uint8_t>(0xEB);
-				Memory(0x4FE993).Nop(7);
+				Memory(0x4FE99A).set<std::uint8_t>(0xEB);
+				Memory(0x4FE993).nop(7);
 
 				// We do not need to load the config_mp.cfg
-				Memory(0x55EEA6).Set<std::uint8_t>(0xEB);
+				Memory(0x55EEA6).set<std::uint8_t>(0xEB);
 
 				// Don't give a frametime warning
-				Memory(0x4FFD9D).Nop(5);
+				Memory(0x4FFD9D).nop(5);
 
 				// Disabling loadedsound touching
-				Memory(0x4794C2).Nop(5);
+				Memory(0x4794C2).nop(5);
 
 				// No huffmann message
-				Memory(0x507982).Nop(5);
+				Memory(0x507982).nop(5);
 
 				// Disable console window
-				Memory(0x0046CE55).Nop(5);
+				Memory(0x0046CE55).nop(5);
 
 				// Obtain console output from IW3
-				Memory(0x4FCC00).Call(Com_PrintfHook);
+				Memory(0x4FCC00).call(Com_PrintfHook);
 			}
 		}
 
-		std::shared_ptr<IZone> Linker::AllocZone(std::string& zone)
+		std::shared_ptr<IZone> Linker::alloc_zone(const std::string& zone)
 		{
 			ZONETOOL_ERROR("AllocZone called but IW3 is not intended to compile zones!");
 			return nullptr;
 		}
 
-		std::shared_ptr<ZoneBuffer> Linker::AllocBuffer()
+		std::shared_ptr<ZoneBuffer> Linker::alloc_buffer()
 		{
 			ZONETOOL_ERROR("AllocBuffer called but IW3 is not intended to compile zones!");
 			return nullptr;
 		}
 
-		void Linker::LoadZone(std::string& name)
+		void Linker::load_zone(const std::string& name)
 		{
 			static XZoneInfo zone;
 			zone.zone = _strdup(&name[0]);
 			zone.loadFlags = 0;
 			zone.unloadFlags = 0;
 
-			Memory::Func<void(XZoneInfo*, int, int)>(0x48A2B0)(&zone, 1, 0);
+			Memory::func<void(XZoneInfo*, int, int)>(0x48A2B0)(&zone, 1, 0);
 		}
 
-		void Linker::UnloadZones()
+		void Linker::unload_zones()
 		{
 		}
 
-		bool Linker::IsValidAssetType(std::string& type)
+		bool Linker::is_valid_asset_type(std::string& type)
 		{
-			return this->TypeToInt(type) >= 0;
+			return this->type_to_int(type) >= 0;
 		}
 
-		std::int32_t Linker::TypeToInt(std::string type)
+		std::int32_t Linker::type_to_int(std::string type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x00726840);
 
@@ -310,29 +310,29 @@ namespace ZoneTool
 			return -1;
 		}
 
-		std::string Linker::TypeToString(std::int32_t type)
+		std::string Linker::type_to_string(std::int32_t type)
 		{
 			auto xassettypes = reinterpret_cast<char**>(0x00726840);
 			return xassettypes[type];
 		}
 
-        bool Linker::SupportsBuilding()
+        bool Linker::supports_building()
         {
             return false;
         }
 
-        void Linker::DumpZone(std::string& name)
+        void Linker::dump_zone(const std::string& name)
 		{
 			isDumping = true;
 			currentDumpingZone = name;
-			LoadZone(name);
+			load_zone(name);
 		}
 
-		void Linker::VerifyZone(std::string& name)
+		void Linker::verify_zone(const std::string& name)
 		{
 			isVerifying = true;
 			currentDumpingZone = name;
-			LoadZone(name);
+			load_zone(name);
 		}
 	}
 }

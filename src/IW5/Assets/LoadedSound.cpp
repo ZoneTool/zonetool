@@ -20,7 +20,7 @@ namespace ZoneTool
 		{
 		}
 
-		LoadedSound* ILoadedSound::parse(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		LoadedSound* ILoadedSound::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = "loaded_sound/" + name;
 
@@ -41,7 +41,7 @@ namespace ZoneTool
 			if (chunkIDBuffer != 0x46464952) // RIFF
 			{
 				ZONETOOL_FATAL("%s: Invalid RIFF Header.", name.c_str());
-				/*fclose(fp);
+				/*fclose(fp_);
 				return nullptr;*/
 			}
 
@@ -51,7 +51,7 @@ namespace ZoneTool
 			if (chunkIDBuffer != 0x45564157) // WAVE
 			{
 				ZONETOOL_FATAL("%s: Invalid WAVE Header.", name.c_str());
-				/*fclose(fp);
+				/*fclose(fp_);
 				return nullptr;*/
 			}
 
@@ -71,7 +71,7 @@ namespace ZoneTool
 						if (format != 1 && format != 17)
 						{
 							ZONETOOL_FATAL("%s: Invalid wave format %i.", name.c_str(), format);
-							/*fclose(fp);
+							/*fclose(fp_);
 							return nullptr;*/
 						}
 						result->sound.info.format = format;
@@ -121,7 +121,7 @@ namespace ZoneTool
 			if (!result->sound.data)
 			{
 				ZONETOOL_FATAL("%s: Could not read sounddata.", name.c_str());
-				//fclose(fp);
+				//fclose(fp_);
 				//return nullptr;
 			}
 
@@ -131,7 +131,7 @@ namespace ZoneTool
 			return result;
 		}
 
-		void ILoadedSound::init(const std::string& name, std::shared_ptr<ZoneMemory>& mem)
+		void ILoadedSound::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
@@ -143,7 +143,7 @@ namespace ZoneTool
 			}
 		}
 
-		void ILoadedSound::prepare(std::shared_ptr<ZoneBuffer>& buf, std::shared_ptr<ZoneMemory>& mem)
+		void ILoadedSound::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}
 
@@ -161,7 +161,7 @@ namespace ZoneTool
 			return loaded_sound;
 		}
 
-		void ILoadedSound::write(IZone* zone, std::shared_ptr<ZoneBuffer>& buf)
+		void ILoadedSound::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto data = this->m_asset;
 			auto dest = buf->write(data);

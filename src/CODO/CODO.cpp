@@ -11,12 +11,12 @@
 
 namespace ZoneTool::CODO
 {
-	const char* Linker::Version()
+	const char* Linker::version()
 	{
 		return "CODO";
 	}
 
-	bool Linker::InUse()
+	bool Linker::is_used()
 	{
 		return false;
 	}
@@ -40,29 +40,29 @@ namespace ZoneTool::CODO
 		 return "";
 	}
 
-	void Linker::Startup()
+	void Linker::startup()
 	{
-		if (this->InUse())
+		if (this->is_used())
 		{
 			// todo
 		}
 	}
 
-	std::shared_ptr<IZone> Linker::AllocZone(std::string& zone)
+	std::shared_ptr<IZone> Linker::alloc_zone(const std::string& zone)
 	{
 		// allocate zone
 		auto ptr = std::make_shared<Zone>(zone, this);
 		return ptr;
 	}
 
-	std::shared_ptr<ZoneBuffer> Linker::AllocBuffer()
+	std::shared_ptr<ZoneBuffer> Linker::alloc_buffer()
 	{
 		auto ptr = std::make_shared<ZoneBuffer>();
 		ptr->init_streams(8);
 		return ptr;
 	}
 
-	void Linker::LoadZone(std::string& name)
+	void Linker::load_zone(const std::string& name)
 	{
 		ZONETOOL_INFO("Loading zone \"%s\"...", name.data());
 
@@ -72,16 +72,16 @@ namespace ZoneTool::CODO
 		ZONETOOL_INFO("Zone \"%s\" loaded.", name.data());
 	}
 
-	void Linker::UnloadZones()
+	void Linker::unload_zones()
 	{
 	}
 
-	bool Linker::IsValidAssetType(std::string& type)
+	bool Linker::is_valid_asset_type(std::string& type)
 	{
-		return this->TypeToInt(type) >= 0;
+		return this->type_to_int(type) >= 0;
 	}
 
-	std::int32_t Linker::TypeToInt(std::string type)
+	std::int32_t Linker::type_to_int(std::string type)
 	{
 		auto xassettypes = reinterpret_cast<char**>(0x00799278);
 
@@ -94,35 +94,35 @@ namespace ZoneTool::CODO
 		return -1;
 	}
 
-	std::string Linker::TypeToString(std::int32_t type)
+	std::string Linker::type_to_string(std::int32_t type)
 	{
 		auto xassettypes = reinterpret_cast<char**>(0x00799278);
 		return xassettypes[type];
 	}
 
-    bool Linker::SupportsBuilding()
+    bool Linker::supports_building()
     {
         return false;
     }
 
-    void Linker::DumpZone(std::string& name)
+    void Linker::dump_zone(const std::string& name)
 	{
-		//isDumpingComplete = false;
-		//isDumping = true;
+		//is_dumping_complete = false;
+		//is_dumping = true;
 		//currentDumpingZone = name;
-		LoadZone(name);
+		load_zone(name);
 
-		//while (!isDumpingComplete)
+		//while (!is_dumping_complete)
 		//{
 		//	Sleep(1);
 		//}
 	}
 
-	void Linker::VerifyZone(std::string& name)
+	void Linker::verify_zone(const std::string& name)
 	{
 		//isVerifying = true;
 		//currentDumpingZone = name;
-		LoadZone(name);
+		load_zone(name);
 	}
 
 	Linker::Linker()

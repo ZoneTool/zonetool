@@ -212,7 +212,7 @@ namespace ZoneTool
 				ReallocateAssetPoolM(font, 2);
 				ReallocateAssetPoolM(image, 2);
 				ReallocateAssetPoolM(techset, 2);
-				ReallocateAssetPoolM(fx, 2);
+				ReallocateAssetPoolM(fx, 4);
 				ReallocateAssetPoolM(xanim, 2);
 				ReallocateAssetPoolM(xmodel, 2);
 				ReallocateAssetPoolM(physpreset, 2);
@@ -226,6 +226,7 @@ namespace ZoneTool
 				ReallocateAssetPoolM(rawfile, 2);
 				ReallocateAssetPoolM(loaded_sound, 2);
 				ReallocateAssetPoolM(sound, 2);
+				ReallocateAssetPoolM(stringtable, 2);
 
 				// Asset dump hook
 				Memory(0x00489E72).call(DB_AddXAsset);

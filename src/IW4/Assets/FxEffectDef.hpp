@@ -27,9 +27,6 @@ namespace ZoneTool
 			FxEffectDef* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IFxEffectDef();
-			~IFxEffectDef();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

@@ -470,6 +470,9 @@ char**>(0x00799278)[type]);
 				ReallocateAssetPoolM(rawfile, 2);
 				ReallocateAssetPoolM(lightdef, 2);
 
+				// Kill "missing asset" errors from the game to prevent confusion
+				Memory(0x5BB380).set<std::uint8_t>(0xC3);
+				
 				// Kill Com_Error
 				Memory(0x004B22D0).jump(ExitZoneTool);
 

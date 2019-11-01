@@ -7,23 +7,21 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include "IW5/Assets/FxEffectDef.hpp"
 
 namespace ZoneTool
 {
 	namespace IW4
 	{
-		IFxEffectDef::IFxEffectDef()
-		{
-		}
-
-		IFxEffectDef::~IFxEffectDef()
-		{
-		}
-
 		void IFxEffectDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
-			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).fx;
+			this->m_asset = this->parse(name, mem);
+
+			if (!this->m_asset)
+			{
+				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).fx;
+			}
 		}
 
 		void IFxEffectDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -32,42 +30,35 @@ namespace ZoneTool
 
 		FxEffectDef* IFxEffectDef::parse(const std::string& name, ZoneMemory* mem)
 		{
-			auto path = "fx\\" + name;
-			if (!FileSystem::FileExists(path))
+			const auto iw5_fx = IW5::IFxEffectDef::parse(name, mem);
+
+			if (!iw5_fx)
 			{
-				path = "fx\\" + name + ".fxe";
-				FileSystem::PreferLocalOverExternal(true);
-
-				if (!FileSystem::FileExists(name))
-				{
-					FileSystem::PreferLocalOverExternal(false);
-					return nullptr;
-				}
-
-				AssetReader read(mem);
-				if (!read.open(path))
-				{
-					FileSystem::PreferLocalOverExternal(false);
-					return nullptr;
-				}
-
-				ZONETOOL_INFO("Parsing \"%s\"", name.data());
-
-				auto fx = read.read_array<FxEffectDef>();
-				fx->elemDefCountEmission = read.read_int();
-				fx->elemDefCountLooping = read.read_int();
-				fx->elemDefCountOneShot = read.read_int();
-				fx->elemDefs = read.read_array<FxElemDef>();
-				fx->flags = read.read_int();
-				fx->msecLoopingLife = read.read_int();
-				fx->name = read.read_string();
-				fx->totalSize = read.read_int();
-				read.close();
-
-				FileSystem::PreferLocalOverExternal(false);
-
-				return fx;
+				return nullptr;
 			}
+			
+			const auto fx = mem->Alloc<FxEffectDef>();
+
+			memcpy(fx, iw5_fx, sizeof FxEffectDef);
+
+			// transform elem defs
+			const auto elem_count = fx->elemDefCountLooping + fx->elemDefCountEmission + fx->elemDefCountOneShot;
+			fx->elemDefs = mem->Alloc<FxElemDef>(elem_count);
+			for (auto i = 0; i < elem_count; i++)
+			{
+				memcpy(&fx->elemDefs[i], &iw5_fx->elemDefs[i], sizeof FxElemDef);
+
+				if (fx->elemDefs[i].extended.trailDef)
+				{
+					// iw5 feature, unsupported on iw4
+					if (fx->elemDefs[i].elemType == 9)
+					{
+						fx->elemDefs[i].extended.trailDef = nullptr;
+					}
+				}
+			}
+			
+			return fx;
 		}
 
 		void IFxEffectDef::load_depending(IZone* zone)
@@ -362,68 +353,25 @@ namespace ZoneTool
 
 		void IFxEffectDef::dump(FxEffectDef* asset)
 		{
-			AssetDumper dump;
+			const auto iw5_fx = new IW5::FxEffectDef;
+			memcpy(iw5_fx, asset, sizeof FxEffectDef);
+			memset(iw5_fx->pad, 0, sizeof iw5_fx->pad);
 
-			if (!dump.open("fx\\"s + asset->name + ".fxe"))
+			// alloc elemdefs
+			const auto elem_def_count = iw5_fx->elemDefCountEmission + iw5_fx->elemDefCountLooping + iw5_fx->elemDefCountOneShot;
+			iw5_fx->elemDefs = new IW5::FxElemDef[elem_def_count];
+
+			// transform elemdefs to iw5 format
+			for (auto i = 0; i < elem_def_count; i++)
 			{
-				return;
+				memcpy(&iw5_fx->elemDefs[i], &asset->elemDefs[i], sizeof IW4::FxElemDef);
+				iw5_fx->elemDefs[i].pad = 0;
 			}
+			
+			IW5::IFxEffectDef::dump(iw5_fx);
 
-			dump.dump_array(asset, 1);
-			dump.dump_string(asset->name);
-			dump.dump_array(asset->elemDefs,
-			           asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot);
-
-			// dump elemDefs
-			for (int i = 0; i < asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot; i
-			     ++)
-			{
-				auto def = &asset->elemDefs[i];
-
-				// dump elem samples
-				dump.dump_array(def->velSamples, def->velIntervalCount + 1);
-				dump.dump_array(def->visSamples, def->visStateIntervalCount + 1);
-
-				// todo: dump visuals!
-
-				// dump reference FX defs
-				dump.dump_asset(def->effectOnImpact);
-				dump.dump_asset(def->effectOnDeath);
-				dump.dump_asset(def->effectEmitted);
-
-				// dump extended FX data
-				if (def->extended.trailDef)
-				{
-					if (def->elemType == FX_ELEM_TYPE_TRAIL)
-					{
-						dump.dump_array(def->extended.trailDef, 1);
-
-						if (def->extended.trailDef->verts)
-						{
-							dump.dump_array(def->extended.trailDef->verts, def->extended.trailDef->vertCount);
-						}
-
-						if (def->extended.trailDef->inds)
-						{
-							dump.dump_array(def->extended.trailDef->inds, def->extended.trailDef->indCount);
-						}
-					}
-					else if (def->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
-					{
-						dump.dump_array(def->extended.sparkFountain, 1);
-					}
-					else if (def->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
-					{
-						dump.dump_array(def->extended.unknownDef, 24);
-					}
-					else
-					{
-						dump.dump_array(def->extended.unknownDef, 1);
-					}
-				}
-			}
-
-			dump.close();
+			delete[] iw5_fx->elemDefs;
+			delete iw5_fx;
 		}
 	}
 }

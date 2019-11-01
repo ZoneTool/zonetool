@@ -12,18 +12,148 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IFxEffectDef::IFxEffectDef()
+		void parse_visuals(AssetReader* read, FxElemDef* def, FxElemVisuals* vis)
 		{
+			switch (def->elemType)
+			{
+			case FX_ELEM_TYPE_RUNNER:
+				if (vis->effectDef)
+				{
+					vis->effectDef = read->read_asset<FxEffectDefRef>();
+				}
+				break;
+			case FX_ELEM_TYPE_SOUND:
+				if (vis->soundName)
+				{
+					vis->soundName = read->read_string();
+				}
+				break;
+			case FX_ELEM_TYPE_SPOT_LIGHT:
+				if (vis->lightDef)
+				{
+					vis->lightDef = read->read_asset<GfxLightDef>();
+				}
+				break;
+			case FX_ELEM_TYPE_MODEL:
+				if (vis->xmodel)
+				{
+					vis->xmodel = read->read_asset<XModel>();
+				}
+				break;
+			default:
+				if (def->elemType != FX_ELEM_TYPE_OMNI_LIGHT)
+				{
+					if (vis->material)
+					{
+						vis->material = read->read_asset<Material>();
+					}
+				}
+			}
 		}
-
-		IFxEffectDef::~IFxEffectDef()
+		
+		FxEffectDef* IFxEffectDef::parse(const std::string& name, ZoneMemory* mem)
 		{
-		}
+			AssetReader read(mem);
+			if (!read.open("fx\\"s + name + ".fxe"))
+			{
+				return nullptr;
+			}
 
+			ZONETOOL_INFO("Parsing fx \"%s\"...", name.data());
+			
+			const auto asset = read.read_single<FxEffectDef>();
+			asset->name = read.read_string();
+			asset->elemDefs = read.read_array<FxElemDef>();
+
+			for (auto i = 0; i < asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot; i++)
+			{
+				auto def = &asset->elemDefs[i];
+
+				def->velSamples = read.read_array<FxElemVelStateSample>();
+				def->visSamples = read.read_array<FxElemVisStateSample>();
+
+				if (def->elemType == FX_ELEM_TYPE_DECAL)
+				{
+					if (def->visuals.markArray)
+					{
+						def->visuals.markArray = read.read_array<FxElemMarkVisuals>();
+
+						for (int i = 0; i < def->visualCount; i++)
+						{
+							if (def->visuals.markArray[i][0])
+							{
+								def->visuals.markArray[i][0] = read.read_asset<Material>();
+							}
+							if (def->visuals.markArray[i][1])
+							{
+								def->visuals.markArray[i][1] = read.read_asset<Material>();
+							}
+						}
+					}
+				}
+				else if (def->visualCount > 1)
+				{
+					def->visuals.array = read.read_array<FxElemVisuals>();
+					
+					for (auto vis = 0; vis < def->visualCount; vis++)
+					{
+						parse_visuals(&read, def, &def->visuals.array[vis]);
+					}
+				}
+				else
+				{
+					parse_visuals(&read, def, &def->visuals.instance);
+				}
+
+				def->effectOnImpact = read.read_asset<FxEffectDefRef>();
+				def->effectOnDeath = read.read_asset<FxEffectDefRef>();
+				def->effectEmitted = read.read_asset<FxEffectDefRef>();
+
+				if (def->extended.trailDef)
+				{
+					if (def->elemType == FX_ELEM_TYPE_TRAIL)
+					{
+						def->extended.trailDef = read.read_single<FxTrailDef>();
+
+						if (def->extended.trailDef->verts)
+						{
+							def->extended.trailDef->verts = read.read_array<FxTrailVertex>();
+						}
+
+						if (def->extended.trailDef->inds)
+						{
+							def->extended.trailDef->inds = read.read_array<unsigned short>();
+						}
+					}
+					else if (def->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
+					{
+						def->extended.sparkFountain = read.read_single<FxSparkFountainDef>();
+					}
+					else if (def->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
+					{
+						def->extended.unknownDef = read.read_array<char>();
+					}
+					else
+					{
+						def->extended.unknownDef = read.read_single<char>();
+					}
+				}
+			}
+
+			read.close();
+
+			return asset;
+		}
+		
 		void IFxEffectDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->m_name = name;
-			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).fx;
+			this->m_asset = this->parse(name, mem);
+
+			if (!this->m_asset)
+			{
+				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).fx;
+			}
 		}
 
 		void IFxEffectDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -85,7 +215,7 @@ namespace ZoneTool
 			// Loop through frames
 			for (int i = 0; i < data->elemDefCountEmission + data->elemDefCountLooping + data->elemDefCountOneShot; i++)
 			{
-				FxElemDef& def = data->elemDefs[i];
+				auto& def = data->elemDefs[i];
 
 				// Sub-FX effects
 				if (def.effectEmitted)
@@ -474,10 +604,47 @@ count.amplitude)[0]);
 			FileSystem::FileClose(fp);
 		}
 
+		void dump_visuals(AssetDumper* dump, FxElemDef* def, FxElemVisuals* vis)
+		{
+			switch (def->elemType)
+			{
+			case FX_ELEM_TYPE_RUNNER:
+				if (vis->effectDef)
+				{
+					dump->dump_asset(vis->effectDef);
+				}
+				break;
+			case FX_ELEM_TYPE_SOUND:
+				if (vis->soundName)
+				{
+					dump->dump_string(vis->soundName);
+				}
+				break;
+			case FX_ELEM_TYPE_SPOT_LIGHT:
+				if (vis->lightDef)
+				{
+					dump->dump_asset(vis->lightDef);
+				}
+				break;
+			case FX_ELEM_TYPE_MODEL:
+				if (vis->xmodel)
+				{
+					dump->dump_asset(vis->xmodel);
+				}
+				break;
+			default:
+				if (def->elemType != FX_ELEM_TYPE_OMNI_LIGHT)
+				{
+					if (vis->material)
+					{
+						dump->dump_asset(vis->material);
+					}
+				}
+			}
+		}
+		
 		void IFxEffectDef::dump(FxEffectDef* asset)
 		{
-			dumpToLegacyFormat(asset);
-
 			AssetDumper dump;
 
 			if (!dump.open("fx\\"s + asset->name + ".fxe"))
@@ -485,13 +652,13 @@ count.amplitude)[0]);
 				return;
 			}
 
-			dump.dump_array(asset, 1);
+			dump.dump_single(asset);
 			dump.dump_string(asset->name);
 			dump.dump_array(asset->elemDefs,
 			           asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot);
 
 			// dump elemDefs
-			for (int i = 0; i < asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot; i
+			for (auto i = 0; i < asset->elemDefCountEmission + asset->elemDefCountLooping + asset->elemDefCountOneShot; i
 			     ++)
 			{
 				auto def = &asset->elemDefs[i];
@@ -500,8 +667,39 @@ count.amplitude)[0]);
 				dump.dump_array(def->velSamples, def->velIntervalCount + 1);
 				dump.dump_array(def->visSamples, def->visStateIntervalCount + 1);
 
-				// todo: dump visuals!
-
+				// dump visuals
+				if (def->elemType == FX_ELEM_TYPE_DECAL)
+				{
+					if (def->visuals.markArray)
+					{
+						dump.dump_array(def->visuals.markArray, def->visualCount);
+						
+						for (int i = 0; i < def->visualCount; i++)
+						{
+							if (def->visuals.markArray[i][0])
+							{
+								dump.dump_asset(def->visuals.markArray[i][0]);
+							}
+							if (def->visuals.markArray[i][1])
+							{
+								dump.dump_asset(def->visuals.markArray[i][1]);
+							}
+						}
+					}
+				}
+				else if (def->visualCount > 1)
+				{
+					dump.dump_array(def->visuals.array, def->visualCount);
+					for (auto vis = 0; vis < def->visualCount; vis++)
+					{
+						dump_visuals(&dump, def, &def->visuals.array[vis]);
+					}
+				}
+				else
+				{
+					dump_visuals(&dump, def, &def->visuals.instance);
+				}
+				
 				// dump reference FX defs
 				dump.dump_asset(def->effectOnImpact);
 				dump.dump_asset(def->effectOnDeath);
@@ -512,7 +710,7 @@ count.amplitude)[0]);
 				{
 					if (def->elemType == FX_ELEM_TYPE_TRAIL)
 					{
-						dump.dump_array(def->extended.trailDef, 1);
+						dump.dump_single(def->extended.trailDef);
 
 						if (def->extended.trailDef->verts)
 						{
@@ -526,7 +724,7 @@ count.amplitude)[0]);
 					}
 					else if (def->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
 					{
-						dump.dump_array(def->extended.sparkFountain, 1);
+						dump.dump_single(def->extended.sparkFountain);
 					}
 					else if (def->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
 					{
@@ -534,7 +732,7 @@ count.amplitude)[0]);
 					}
 					else
 					{
-						dump.dump_array(def->extended.unknownDef, 1);
+						dump.dump_single(def->extended.unknownDef);
 					}
 				}
 			}

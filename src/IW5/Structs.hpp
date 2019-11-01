@@ -1789,9 +1789,11 @@ namespace ZoneTool
 			const char* name;
 		};
 
+		struct GfxLightDef;
 		union FxElemVisuals
 		{
 			const void* anonymous;
+			GfxLightDef* lightDef;
 			Material* material;
 			XModel* xmodel;
 			FxEffectDefRef* effectDef;

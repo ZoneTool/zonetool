@@ -233,6 +233,8 @@ namespace ZoneTool
 				// write asset
 				asset->write(this, buf);
 
+				sizeof snd_alias_t;
+				
 				// pop stream
 				buf->pop_stream();
 			}

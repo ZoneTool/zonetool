@@ -21,6 +21,7 @@
 #include "Assets/GameWorldMp.hpp"
 #include "Assets/LoadedSound.hpp"
 #include "Assets/Sound.hpp"
+#include "Assets/FxEffectDef.hpp"
 
 // oh nee toch niet
 

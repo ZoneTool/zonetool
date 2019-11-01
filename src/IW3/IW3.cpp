@@ -161,6 +161,7 @@ namespace ZoneTool
 					DECLARE_ASSET(techset, ITechset);
 					DECLARE_ASSET(loaded_sound, ILoadedSound);
 					DECLARE_ASSET(sound, ISound);
+					DECLARE_ASSET(fx, IFxEffectDef);
 				}
 			}
 		}

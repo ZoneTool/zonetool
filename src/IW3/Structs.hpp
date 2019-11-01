@@ -1699,8 +1699,7 @@ namespace ZoneTool
 			FxElemVelStateSample* velSamples;
 			FxElemVisStateSample* visSamples;
 			FxElemDefVisuals visuals;
-			float collMins[3];
-			float collMaxs[3];
+			Bounds collBounds;
 			FxEffectDefRef effectOnImpact;
 			FxEffectDefRef effectOnDeath;
 			FxEffectDefRef effectEmitted;

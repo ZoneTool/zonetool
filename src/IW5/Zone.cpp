@@ -242,7 +242,7 @@ namespace ZoneTool
 			}
 
 			// Dump zone to disk (for debugging)
-			// buf->save("debug\\" + this->m_name + ".zone");
+			// buf->save("debug\\" + this->name_ + ".zone");
 
 			// Compress buffer
 			auto buf_compressed = buf->compress_zstd();

@@ -12,42 +12,22 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-#define min(a, b) (a < b) ? a : b
-
-		void* malloc_n(size_t size)
+		void IStructuredDataDef::add_entry(const enum_type type, const int stat_index_offset, const std::string& entry_name, ZoneMemory* mem)
 		{
-			void* ret = malloc(size);
-			memset(ret, 0, size);
-			return ret;
+			const auto new_entry = mem->Alloc<newEnumEntry>();
+			new_entry->name = _strdup(entry_name.data());
+			new_entry->statIndexOffset = stat_index_offset;
+			newEntries[type][newEntries[type].size()] = new_entry;
 		}
 
-		void IStructuredDataDef::addEntry(enumType_s type, int statIndexOffset, char* entryName)
+		bool check_alphabetical_order(std::string entry1, std::string entry2)
 		{
-			newEnumEntry* newEntry = (newEnumEntry*)malloc_n(sizeof(newEnumEntry));
-			newEntry->name = entryName;
-			newEntry->statIndexOffset = statIndexOffset;
-			newEntries[type][newEntries[type].size()] = newEntry;
-		}
+			std::transform(entry1.begin(), entry1.end(), entry1.begin(), tolower);
+			std::transform(entry2.begin(), entry2.end(), entry2.begin(), tolower);
 
-		char* strToLower(char* str)
-		{
-			int len = strlen(str);
-			char* newStr = (char*)malloc_n(len + 1);
-
-			for (int i = 0; i < len; i++)
-			{
-				newStr[i] = tolower(str[i]);
-			}
-
-			return newStr;
-		}
-
-		bool checkAlphabeticalOrder(char* entry1, char* entry2)
-		{
-			char* e1_l = strToLower(entry1);
-			char* e2_l = strToLower(entry2);
-
-			int len = min(strlen(e1_l), strlen(e2_l));
+			const auto len = std::min(entry1.size(), entry2.size());
+			const auto e1_l = entry1.data();
+			const auto e2_l = entry2.data();
 
 			for (int i = 0; i < len; i++)
 			{
@@ -57,19 +37,19 @@ namespace ZoneTool
 					return true;
 			}
 
-			return (strlen(e1_l) <= strlen(e2_l));
+			return entry1.size() <= entry2.size();
 		}
 
-		void IStructuredDataDef::patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex,
-		                                          std::map<int, newEnumEntry*> map)
+		void IStructuredDataDef::patch_enum_with_map(StructuredDataDefSet* data, enum_type enumIndex,
+		                                          std::map<int, newEnumEntry*> map, ZoneMemory* mem)
 		{
-			StructuredDataEnum* currentEnum = &data->defs->enums[enumIndex];
+			const auto current_enum = &data->defs->enums[enumIndex];
 
 			// Check if new enum has already been built
 			if (newIndexCount[enumIndex])
 			{
-				currentEnum->entryCount = newIndexCount[enumIndex];
-				currentEnum->entries = newIndices[enumIndex];
+				current_enum->entryCount = newIndexCount[enumIndex];
+				current_enum->entries = newIndices[enumIndex];
 				return;
 			}
 
@@ -94,62 +74,62 @@ namespace ZoneTool
 			}
 
 			// Define new amount of indices
-			newIndexCount[enumIndex] = currentEnum->entryCount + map.size();
+			newIndexCount[enumIndex] = current_enum->entryCount + map.size();
 
 			// Find last cac index
-			int lastCacIndex = 0;
-			for (int i = 0; i < currentEnum->entryCount; i++)
+			auto last_cac_index = 0;
+			for (auto i = 0; i < current_enum->entryCount; i++)
 			{
-				if (currentEnum->entries[i].index > lastCacIndex)
+				if (current_enum->entries[i].index > last_cac_index)
 				{
-					lastCacIndex = currentEnum->entries[i].index;
+					last_cac_index = current_enum->entries[i].index;
 				}
 			}
 
 			// Create new enum
-			newIndices[enumIndex] = (StructuredDataEnumEntry*)malloc_n(
-				sizeof(StructuredDataEnumEntry) * (currentEnum->entryCount + map.size() + 1));
-			memcpy(newIndices[enumIndex], currentEnum->entries,
-			       sizeof(StructuredDataEnumEntry) * currentEnum->entryCount);
+			newIndices[enumIndex] = mem->ManualAlloc<StructuredDataEnumEntry>(sizeof(StructuredDataEnumEntry) * (current_enum->entryCount + map.size() + 1));
+			memcpy(newIndices[enumIndex], current_enum->entries, sizeof(StructuredDataEnumEntry) * current_enum->entryCount);
 
 			// Apply new weapons to enum
 			for (std::size_t i = 0; i < map.size(); i++)
 			{
-				int entryPos = 0;
+				auto entry_pos = 0;
 
-				for (; entryPos < currentEnum->entryCount + i; entryPos++)
+				for (; entry_pos < current_enum->entryCount + i; entry_pos++)
 				{
-					if (!strcmp(map[i]->name, newIndices[enumIndex][entryPos].name))
+					if (!strcmp(map[i]->name, newIndices[enumIndex][entry_pos].name))
 					{
-						ZONETOOL_ERROR("Duplicate playerdatadef entry found: %s", map[i]->name);
+						ZONETOOL_FATAL("Duplicate playerdatadef entry found: %s", map[i]->name);
 					}
 
 					// Search weapon position
-					if (checkAlphabeticalOrder(map[i]->name, (char*)newIndices[enumIndex][entryPos].name))
+					if (check_alphabetical_order(map[i]->name, (char*)newIndices[enumIndex][entry_pos].name))
+					{
 						break;
+					}
 				}
 
-				for (int j = currentEnum->entryCount + i; j > entryPos; j--)
+				for (int j = current_enum->entryCount + i; j > entry_pos; j--)
 				{
 					newIndices[enumIndex][j] = newIndices[enumIndex][j - 1];
 				}
 
-				newIndices[enumIndex][entryPos].index = map[i]->statIndexOffset + lastCacIndex;
-				newIndices[enumIndex][entryPos].name = map[i]->name;
+				newIndices[enumIndex][entry_pos].index = map[i]->statIndexOffset + last_cac_index;
+				newIndices[enumIndex][entry_pos].name = map[i]->name;
 			}
 
 			// Apply stuff to current player data
-			currentEnum->entryCount = newIndexCount[enumIndex];
-			currentEnum->entries = newIndices[enumIndex];
+			current_enum->entryCount = newIndexCount[enumIndex];
+			current_enum->entries = newIndices[enumIndex];
 		}
 
 		// Adds new entries to the structuredDataDef
-		void IStructuredDataDef::manipulate(StructuredDataDefSet* data)
+		void IStructuredDataDef::manipulate(StructuredDataDefSet* data, ZoneMemory* mem)
 		{
 			// clear existing data if present
-			for (int i = 0; i < ENUM_COUNT; i++)
+			for (auto i = 0; i < enum_type::count; i++)
 			{
-				if (newEntries[i].size() > 0)
+				if (!newEntries[i].empty())
 				{
 					newEntries[i].clear();
 				}
@@ -159,6 +139,7 @@ namespace ZoneTool
 			if (!strcmp(data->name, "mp/playerdata.def"))
 			{
 				// add new entries here
+				add_entry(enum_type::weapons, 0, "cm901", mem);
 
 				ZONETOOL_INFO("Statfiles patched.");
 			}
@@ -167,30 +148,30 @@ namespace ZoneTool
 			data->defs->version += 1;
 
 			// Patch enums
-			for (int i = 0; i < ENUM_COUNT; i++)
+			for (auto i = 0; i < enum_type::count; i++)
 			{
-				if (newEntries[i].size() > 0)
+				if (!newEntries[i].empty())
 				{
-					patchEnumWithMap(data, static_cast<enumType_s>(i), newEntries[i]);
+					patch_enum_with_map(data, static_cast<enum_type>(i), newEntries[i], mem);
 				}
 			}
 		}
 
 		void IStructuredDataDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).structureddatadef;
+			this->name_ = name;
+			this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).structureddatadef;
 
-			memset(newIndices, 0, sizeof(StructuredDataEnumEntry*) * ENUM_COUNT);
-			memset(newIndexCount, 0, sizeof(int) * ENUM_COUNT);
+			memset(newIndices, 0, sizeof(StructuredDataEnumEntry*) * enum_type::count);
+			memset(newIndexCount, 0, sizeof(int) * enum_type::count);
 
-			for (int i = 0; i < ENUM_COUNT; i++)
+			for (int i = 0; i < enum_type::count; i++)
 			{
 				newEntries[i].clear();
 			}
 
 			// touch the asset
-			manipulate(this->m_asset);
+			manipulate(this->asset_, mem);
 		}
 
 		void IStructuredDataDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -203,7 +184,7 @@ namespace ZoneTool
 
 		std::string IStructuredDataDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IStructuredDataDef::type()
@@ -213,7 +194,7 @@ namespace ZoneTool
 
 		void IStructuredDataDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

@@ -296,7 +296,7 @@ namespace ZoneTool
 
 		void IMapEnts::load_depending(IZone* zone)
 		{
-			// IW5::IMapEnts::load_depending_internal(zone, this->m_asset->entityString);
+			// IW5::IMapEnts::load_depending_internal(zone, this->asset_->entityString);
 		}
 
 		std::string IMapEnts::name()

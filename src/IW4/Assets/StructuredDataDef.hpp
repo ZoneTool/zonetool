@@ -18,41 +18,37 @@ namespace ZoneTool
 			int statIndexOffset;
 		};
 
-		enum enumType_s
+		enum enum_type
 		{
-			ENUM_FEATURES,
-			ENUM_WEAPONS,
-			ENUM_ATTACHEMENTS,
-			ENUM_CHALLENGES,
-			ENUM_CAMOS,
-			ENUM_PERKS,
-			ENUM_KILLSTREAKS,
-			ENUM_ACCOLADES,
-			ENUM_CARDICONS,
-			ENUM_CARDTITLES,
-			ENUM_CARDNAMEPLATES,
-			ENUM_TEAMS,
-			ENUM_GAMETYPES,
-			ENUM_MAX
+			features,
+			weapons,
+			attachments,
+			challenges,
+			camos,
+			perks,
+			killstreaks,
+			accolades,
+			cardicons,
+			cardtitles,
+			cardnameplates,
+			teams,
+			gametypes,
+			count,
 		};
-
-#define ENUM_COUNT ENUM_MAX
 
 		class IStructuredDataDef : public IAsset
 		{
 		private:
-			StructuredDataEnumEntry* newIndices[ENUM_COUNT];
-			int newIndexCount[ENUM_COUNT];
-			std::map<int, newEnumEntry*> newEntries[ENUM_COUNT];
+			StructuredDataEnumEntry* newIndices[enum_type::count];
+			int newIndexCount[enum_type::count];
+			std::map<int, newEnumEntry*> newEntries[enum_type::count];
 
-			std::string m_name;
-			StructuredDataDefSet* m_asset;
+			std::string name_;
+			StructuredDataDefSet* asset_;
 
-			void addEntry(enumType_s type, int statIndexOffset, char* entryName);
-
-			void patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex, std::map<int, newEnumEntry*> map);
-
-			void IStructuredDataDef::manipulate(StructuredDataDefSet* data);
+			void add_entry(enum_type type, int stat_index_offset, const std::string& entry_name, ZoneMemory* mem);
+			void patch_enum_with_map(StructuredDataDefSet* data, enum_type enumIndex, std::map<int, newEnumEntry*> map, ZoneMemory* mem);
+			void manipulate(StructuredDataDefSet* data, ZoneMemory* mem);
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

@@ -201,9 +201,9 @@ namespace ZoneTool
 				addEntry((enumType_s)5, 4, "ret10");
 
 				// Gametypes
-				// addEntry((enumType_s)9, 1, "oneflag");
-				// addEntry((enumType_s)9, 2, "vip");
-				// addEntry((enumType_s)9, 3, "gtnw");
+				// addEntry((enum_type)9, 1, "oneflag");
+				// addEntry((enum_type)9, 2, "vip");
+				// addEntry((enum_type)9, 3, "gtnw");
 
 				ZONETOOL_INFO("Recipes patched.");
 			}

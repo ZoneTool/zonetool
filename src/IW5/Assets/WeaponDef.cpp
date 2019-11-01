@@ -916,7 +916,7 @@ namespace ZoneTool
 				// if (i >= 4) continue;
 				// if (data->attachment2[i])
 				// {
-				// 	zone->AddAssetOfType(attachment, this->m_asset->attachment2[i]->szInternalName);
+				// 	zone->AddAssetOfType(attachment, this->asset_->attachment2[i]->szInternalName);
 				// }
 			}
 

@@ -127,9 +127,7 @@ namespace ZoneTool
 			DECLARE_ASSET(col_map_mp, IClipMap);
 			DECLARE_ASSET(fx, IFxEffectDef);
 			DECLARE_ASSET(lightdef, ILightDef);
-
-			//DECLARE_ASSET(weapon, IWeaponDef); //still a work in progress, the CPP file isnt complete
-			//DECLARE_ASSET(structureddatadef, IStructuredDataDef);
+			DECLARE_ASSET(structureddatadef, IStructuredDataDef);
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();

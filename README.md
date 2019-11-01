@@ -97,7 +97,7 @@ The following asset types can be ported across different games:
 | Localize    | ✔️    |
 | Attachment  | ✔️    |
 | Weapon      | ✔️    |
-| FxEffectDef | ❌    |
+| FxEffectDef | ✔️    |
 | ImpactFx    | ❌    |
 | RawFile     | ✔️    |
 | ScriptFile  | ✔️    |

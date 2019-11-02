@@ -12,19 +12,18 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
+		short SL_AllocString(const std::string& str);
+		const char* SL_ConvertToString(std::uint16_t index);
+		
 		class IXModel : public IAsset
 		{
 		private:
 			std::string m_name;
 			XModel* m_asset;
-			bool isXME5OrNewer;
-
-			XModel* parse_new(const std::string& name, ZoneMemory* mem, const std::string& filename);
-			XModel* parse(std::string name, ZoneMemory* mem);
 
 		public:
-			IXModel();
-			~IXModel();
+			static XModel* parse_new(const std::string& name, ZoneMemory* mem, const std::string& filename, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);
+			static XModel* parse(std::string name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
@@ -35,7 +34,8 @@ namespace ZoneTool
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
-			static void dump(XModel* asset);
+			static void dump(XModel* asset,
+				const std::function<const char* (std::uint16_t)>& convertToString = SL_ConvertToString);
 		};
 	}
 }

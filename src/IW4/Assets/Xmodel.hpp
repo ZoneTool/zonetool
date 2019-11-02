@@ -29,9 +29,6 @@ namespace ZoneTool
 			IXSurface* dependingSurfaces[4];
 
 		public:
-			IXModel();
-			~IXModel();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
@@ -42,7 +39,6 @@ namespace ZoneTool
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static XModel* remove_attachments(XModel* asset);
-			static void dump_internal(XModel* asset, const std::function<const char*(uint16_t)>& convertToString);
 			static void dump(XModel* asset,
 			                 const std::function<const char*(uint16_t)>& convertToString = SL_ConvertToString);
 		};

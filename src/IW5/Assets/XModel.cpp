@@ -45,10 +45,8 @@ namespace ZoneTool
 		}
 
 		XModel* IXModel::parse_new(const std::string& name, ZoneMemory* mem,
-		                           const std::string& filename)
+		                           const std::string& filename, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
-			auto asset = mem->Alloc<XModel>();
-
 			AssetReader read(mem);
 
 			if (!read.open(filename))
@@ -62,30 +60,15 @@ namespace ZoneTool
 
 			ZONETOOL_INFO("Parsing xmodel \"%s\"...", name.c_str());
 
+			const auto asset = read.read_single<XModel>();
 			asset->name = read.read_string();
-			asset->scale = read.read_float();
-			asset->radius = read.read_float();
-
-			auto bounds = read.read_array<Bounds>();
-			memcpy(&asset->bounds, bounds, sizeof Bounds);
-
-			asset->contents = read.read_int();
-			asset->flags = read.read_int();
-			asset->contents = read.read_int();
-
-			for (int i = 0; i < 6; i++)
-			{
-				asset->noScalePartBits[i] = read.read_int();
-			}
-
-			// tags
-			asset->numBones = read.read_int();
-			asset->numRootBones = read.read_int();
+			
 			asset->boneNames = read.read_array<short>();
 			for (int i = 0; i < asset->numBones; i++)
 			{
-				asset->boneNames[i] = SL_AllocString(read.read_string());
+				asset->boneNames[i] = allocString(read.read_string());
 			}
+			
 			asset->parentList = read.read_array<unsigned char>();
 			asset->tagAngles = read.read_array<XModelAngle>();
 			asset->tagPositions = read.read_array<XModelTagPos>();
@@ -94,7 +77,6 @@ namespace ZoneTool
 			asset->boneInfo = read.read_array<XBoneInfo>();
 
 			// surfaces
-			asset->numSurfaces = read.read_int();
 			asset->materials = read.read_array<Material*>();
 			for (int i = 0; i < asset->numSurfaces; i++)
 			{
@@ -102,18 +84,12 @@ namespace ZoneTool
 			}
 
 			// lods
-			asset->numLods = read.read_int();
-			asset->maxLoadedLod = read.read_int();
-			asset->lodRampType = read.read_int();
-			auto lods = read.read_array<XSurfaceLod>();
-			memcpy(asset->lods, lods, sizeof XSurfaceLod * 4);
 			for (int i = 0; i < asset->numLods; i++)
 			{
 				asset->lods[i].surfaces = read.read_asset<ModelSurface>();
 			}
 
 			// colSurfs
-			asset->numColSurfs = read.read_int();
 			asset->colSurf = read.read_array<XModelCollSurf_s>();
 			for (int i = 0; i < asset->numColSurfs; i++)
 			{
@@ -131,15 +107,13 @@ namespace ZoneTool
 			return asset;
 		}
 
-		XModel* IXModel::parse(std::string name, ZoneMemory* mem)
+		XModel* IXModel::parse(std::string name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
-			return this->parse_new(name, mem, "XModel\\" + name + ".xme5");
+			return IXModel::parse_new(name, mem, "XModel\\" + name + ".xme6", allocString);
 		}
 
 		void IXModel::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->isXME5OrNewer = true;
-
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
 
@@ -197,14 +171,7 @@ namespace ZoneTool
 				if (data->lods[i].surfaces)
 				{
 					// Add the pointer rather than re-finding it by name, because it might have been parsed.
-					if (isXME5OrNewer)
-					{
-						zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
-					}
-					else
-					{
-						zone->add_asset_of_type_by_pointer(xmodelsurfs, data->lods[i].surfaces);
-					}
+					zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
 				}
 			}
 
@@ -312,8 +279,6 @@ namespace ZoneTool
 				if (!data->lods[i].surfaces) continue;
 				dest->lods[i].surfaces = reinterpret_cast<ModelSurface*>(zone->get_asset_pointer(
 					xmodelsurfs, data->lods[i].surfaces->name));
-
-				sizeof XSurfaceLod;
 			}
 
 			if (data->colSurf)
@@ -356,39 +321,24 @@ namespace ZoneTool
 #endif
 		}
 
-		void IXModel::dump(XModel* asset)
+		void IXModel::dump(XModel* asset, const std::function<const char* (std::uint16_t)>& convertToString)
 		{
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW5::IXModel::dump");
 #endif
 
 			AssetDumper dump;
-			dump.open("XModel\\"s + asset->name + ".xme5");
+			dump.open("XModel\\"s + asset->name + ".xme6");
 
 			// name
+			dump.dump_single(asset);
 			dump.dump_string(asset->name);
 
-			// generic data
-			dump.dump_float(asset->scale);
-			dump.dump_float(asset->radius);
-			dump.dump_array(&asset->bounds, 1);
-			dump.dump_int(asset->contents);
-			dump.dump_int(asset->flags);
-			dump.dump_int(asset->contents);
-
-			// partbits
-			for (int i = 0; i < 6; i++)
-			{
-				dump.dump_int(asset->noScalePartBits[i]);
-			}
-
 			// tags
-			dump.dump_int(asset->numBones);
-			dump.dump_int(asset->numRootBones);
 			dump.dump_array(asset->boneNames, asset->numBones);
 			for (int i = 0; i < asset->numBones; i++)
 			{
-				dump.dump_string(SL_ConvertToString(asset->boneNames[i]));
+				dump.dump_string(convertToString(asset->boneNames[i]));
 			}
 			dump.dump_array(asset->parentList, asset->numBones - asset->numRootBones);
 			dump.dump_array(asset->tagAngles, asset->numBones - asset->numRootBones);
@@ -398,7 +348,6 @@ namespace ZoneTool
 			dump.dump_array(asset->boneInfo, asset->numBones);
 
 			// surfaces
-			dump.dump_int(asset->numSurfaces);
 			dump.dump_array(asset->materials, asset->numSurfaces);
 			for (int i = 0; i < asset->numSurfaces; i++)
 			{
@@ -406,17 +355,12 @@ namespace ZoneTool
 			}
 
 			// lods
-			dump.dump_int(asset->numLods);
-			dump.dump_int(asset->maxLoadedLod);
-			dump.dump_int(asset->lodRampType);
-			dump.dump_array(asset->lods, 4);
 			for (int i = 0; i < asset->numLods; i++)
 			{
 				dump.dump_asset(asset->lods[i].surfaces);
 			}
 
 			// colSurfs
-			dump.dump_int(asset->numColSurfs);
 			dump.dump_array(asset->colSurf, asset->numColSurfs);
 			for (int i = 0; i < asset->numColSurfs; i++)
 			{
@@ -432,14 +376,6 @@ namespace ZoneTool
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
 #endif
-		}
-
-		IXModel::IXModel()
-		{
-		}
-
-		IXModel::~IXModel()
-		{
 		}
 	}
 }

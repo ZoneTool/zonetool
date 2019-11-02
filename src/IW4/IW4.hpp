@@ -23,9 +23,6 @@ namespace ZoneTool
 		class Linker : public ILinker
 		{
 		public:
-			Linker();
-			~Linker();
-
 			const char* version() override;
 			bool is_used() override;
 			void startup() override;

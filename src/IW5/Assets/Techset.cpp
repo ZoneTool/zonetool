@@ -30,6 +30,8 @@ namespace ZoneTool
 				return nullptr;
 			}
 
+			ZONETOOL_INFO("Parsing technique \"%s\"...", name.data());
+
 			const auto header = reader.read_single<MaterialTechniqueHeader>();
 			const auto passes = reader.read_array<MaterialPass>();
 
@@ -288,16 +290,19 @@ namespace ZoneTool
 				if (asset->pass[i].pixelShader)
 				{
 					dumper.dump_asset(asset->pass[i].pixelShader);
+					IPixelShader::dump(asset->pass[i].pixelShader);
 				}
 
 				if (asset->pass[i].vertexShader)
 				{
 					dumper.dump_asset(asset->pass[i].vertexShader);
+					IVertexShader::dump(asset->pass[i].vertexShader);
 				}
 
 				if (asset->pass[i].vertexDecl)
 				{
 					dumper.dump_asset(asset->pass[i].vertexDecl);
+					IVertexDecl::dump(asset->pass[i].vertexDecl);
 				}
 
 				if (asset->pass[i].argumentDef)

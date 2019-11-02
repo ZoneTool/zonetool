@@ -215,6 +215,7 @@ char**>(0x00799278)[type]);
 
 						if (ref_asset == nullptr)
 						{
+							ZONETOOL_ERROR("Could not find referenced asset \"%s\"!", asset_name);
 							continue;
 						}
 
@@ -395,10 +396,10 @@ char**>(0x00799278)[type]);
 		void Linker::Load_XSurfaceArray(int shouldLoad, int count)
 		{
 			// read the actual count from the varXModelSurfs ptr
-			auto surface = *reinterpret_cast<ModelSurface**>(0x0112A95C);
+			auto surface = *reinterpret_cast<XModelSurfs**>(0x0112A95C);
 
 			// call original read function with the correct count
-			return Memory::func<void(int, int)>(0x004925B0)(shouldLoad, surface->xSurficiesCount);
+			return Memory::func<void(int, int)>(0x004925B0)(shouldLoad, surface->numsurfs);
 		}
 
         const char* Linker::GetZonePath(const char* zoneName)
@@ -661,14 +662,6 @@ char**>(0x00799278)[type]);
 			isVerifying = true;
 			currentDumpingZone = name;
 			load_zone(name);
-		}
-
-		Linker::Linker()
-		{
-		}
-
-		Linker::~Linker()
-		{
 		}
 	}
 }

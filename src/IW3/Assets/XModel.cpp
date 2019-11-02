@@ -67,17 +67,19 @@ namespace ZoneTool
 				xmodel->lods[i].dist = asset->lodInfo[i].dist;
 				xmodel->lods[i].numSurfacesInLod = asset->lodInfo[i].numsurfs;
 				xmodel->lods[i].surfIndex = asset->lodInfo[i].surfIndex;
-
+				memcpy(xmodel->lods[i].partBits, asset->lodInfo[i].partBits, sizeof(int[4]));
+				memcpy(&xmodel->lods[i].lod, &asset->lodInfo[i].lod, 3);
+				
 				// generate ModelSurface object
-				xmodel->lods[i].surfaces = new IW4::ModelSurface;
-				memset(xmodel->lods[i].surfaces, 0, sizeof IW4::ModelSurface);
+				xmodel->lods[i].surfaces = new IW4::XModelSurfs;
+				memset(xmodel->lods[i].surfaces, 0, sizeof IW4::XModelSurfs);
 
 				xmodel->lods[i].surfaces->name = _strdup(va("zonetool_%s_%u", xmodel->name, i).data());
-				xmodel->lods[i].surfaces->xSurficiesCount = xmodel->lods[i].numSurfacesInLod;
+				xmodel->lods[i].surfaces->numsurfs = xmodel->lods[i].numSurfacesInLod;
 				memcpy(xmodel->lods[i].surfaces->partBits, asset->lodInfo[i].partBits, sizeof(int[4]));
 
 				// allocate xsurficies
-				xmodel->lods[i].surfaces->xSurficies = new IW4::XSurface[xmodel->lods[i].numSurfacesInLod];
+				xmodel->lods[i].surfaces->surfs = new IW4::XSurface[xmodel->lods[i].numSurfacesInLod];
 
 				// loop through surfaces in current Level-of-Detail
 				for (int surf = xmodel->lods[i].surfIndex; surf <
@@ -88,7 +90,7 @@ namespace ZoneTool
 
 					// copy XSurface into iw4 structure
 					memcpy(
-						&xmodel->lods[i].surfaces->xSurficies[surf - xmodel->lods[i].surfIndex],
+						&xmodel->lods[i].surfaces->surfs[surf - xmodel->lods[i].surfIndex],
 						surface,
 						sizeof IW4::XSurface
 					);

@@ -445,23 +445,27 @@ namespace ZoneTool
 			int partBits[6];
 		};
 
-		struct ModelSurface
+		struct XModelSurfs
 		{
-			char* name;
-			XSurface* xSurficies;
-			short xSurficiesCount;
-			//This is a copy of the count, the actual count is loaded from the parent XModelStreamInfo
-			short _pad;
-			int partBits[6]; // partbits etc
+			const char* name;
+			XSurface* surfs;
+			unsigned __int16 numsurfs;
+			unsigned __int16 pad;
+			int partBits[6];
 		};
 
-		struct XSurfaceLod
+		struct XModelLodInfo
 		{
 			float dist;
 			short numSurfacesInLod;
 			short surfIndex;
-			ModelSurface* surfaces;
-			char pad3[32];
+			XModelSurfs* surfaces;
+			int partBits[6];
+			XSurface* surfs;
+			char lod;
+			char smcBaseIndexPlusOne;
+			char smcSubIndexMask;
+			char smcBucket;
 		};
 
 		struct XModelCollTri_s
@@ -499,7 +503,7 @@ namespace ZoneTool
 			char* partClassification;
 			DObjAnimMat* animMatrix;
 			Material** materials;
-			XSurfaceLod lods[4];
+			XModelLodInfo lods[4];
 			char maxLoadedLod;
 			char numLods;
 			char collLod;
@@ -3159,8 +3163,8 @@ namespace ZoneTool
 			PhysCollmap* phys_collmap;
 			XAnimParts* xanimparts;
 			XAnimParts* xanim;
-			ModelSurface* xsurface;
-			ModelSurface* xmodelsurfs;
+			XModelSurfs* xsurface;
+			XModelSurfs* xmodelsurfs;
 			clipMap_t* clipmap;
 			clipMap_t* col_map_mp;
 			GfxWorld* gfxworld;

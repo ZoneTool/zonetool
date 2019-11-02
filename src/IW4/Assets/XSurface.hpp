@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string m_name;
-			ModelSurface* m_asset;
+			XModelSurfs* m_asset;
 
 			void write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data, XSurface* dest,
 			                     std::uint16_t count);
@@ -25,7 +25,7 @@ namespace ZoneTool
 			IXSurface();
 			~IXSurface();
 
-			ModelSurface* parse(const std::string& name, ZoneMemory* mem);
+			XModelSurfs* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void init(void* asset, ZoneMemory* mem) override;
@@ -38,7 +38,7 @@ namespace ZoneTool
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
-			static void dump(ModelSurface* asset);
+			static void dump(XModelSurfs* asset);
 		};
 	}
 }

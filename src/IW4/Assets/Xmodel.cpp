@@ -73,11 +73,11 @@ namespace ZoneTool
 			asset->numLods = read.read_int();
 			asset->maxLoadedLod = read.read_int();
 			asset->lodRampType = read.read_int();
-			auto lods = read.read_array<XSurfaceLod>();
-			memcpy(asset->lods, lods, sizeof XSurfaceLod * 4);
+			auto lods = read.read_array<XModelLodInfo>();
+			memcpy(asset->lods, lods, sizeof XModelLodInfo * 4);
 			for (int i = 0; i < asset->numLods; i++)
 			{
-				asset->lods[i].surfaces = read.read_asset<ModelSurface>();
+				asset->lods[i].surfaces = read.read_asset<XModelSurfs>();
 
 				//if (asset->lods[i].surfaces && strlen(asset->lods[i].surfaces->name))
 				//{
@@ -350,7 +350,7 @@ namespace ZoneTool
 			for (int i = 0; i < 4; i++)
 			{
 				if (!data->lods[i].surfaces) continue;
-				dest->lods[i].surfaces = reinterpret_cast<ModelSurface*>(zone->get_asset_pointer(
+				dest->lods[i].surfaces = reinterpret_cast<XModelSurfs*>(zone->get_asset_pointer(
 					xmodelsurfs, data->lods[i].surfaces->name));
 
 				//if (data->lods[i].surfaces && dependingSurfaces[i])
@@ -553,7 +553,7 @@ namespace ZoneTool
 							{
 								// add surface to vector
 								new_surfaces.emplace_back(
-									lod, model->lods[lod].surfaces->xSurficies[i - model->lods[lod].surfIndex]);
+									lod, model->lods[lod].surfaces->surfs[i - model->lods[lod].surfIndex]);
 							}
 						}
 					}
@@ -593,14 +593,14 @@ namespace ZoneTool
 				model->lods[lod].surfIndex = surface_start_index;
 
 				// alloc new XModelSurfs asset
-				const auto new_model_surface = new ModelSurface;
-				memcpy(new_model_surface, model->lods[lod].surfaces, sizeof ModelSurface);
+				const auto new_model_surface = new XModelSurfs;
+				memcpy(new_model_surface, model->lods[lod].surfaces, sizeof XModelSurfs);
 
 				new_model_surface->name = _strdup(va("%s_no_attach", new_model_surface->name).data());
-				new_model_surface->xSurficiesCount = model_surfaces_for_lod.size();
+				new_model_surface->numsurfs = model_surfaces_for_lod.size();
 
-				new_model_surface->xSurficies = new XSurface[model_surfaces_for_lod.size()];
-				memcpy(new_model_surface->xSurficies, model_surfaces_for_lod.data(),
+				new_model_surface->surfs = new XSurface[model_surfaces_for_lod.size()];
+				memcpy(new_model_surface->surfs, model_surfaces_for_lod.data(),
 				       sizeof(XSurface) * model_surfaces_for_lod.size());
 
 				// patch surfaces ptr

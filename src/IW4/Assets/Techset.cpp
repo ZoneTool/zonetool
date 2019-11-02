@@ -94,7 +94,7 @@ namespace ZoneTool
 
 			if (!this->m_asset)
 			{
-				ZONETOOL_ERROR("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
+				ZONETOOL_FATAL("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
 
 				this->m_parsed = false;
 				this->m_asset = DB_FindXAssetHeader(this->type(), &this->name()[0]).techset;

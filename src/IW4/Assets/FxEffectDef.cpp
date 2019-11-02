@@ -74,9 +74,13 @@ namespace ZoneTool
 						if (vis->markArray[i])
 						{
 							if (vis->markArray[i][0])
+							{
 								zone->add_asset_of_type(material, vis->markArray[i][0]->name);
+							}
 							if (vis->markArray[i][1])
+							{
 								zone->add_asset_of_type(material, vis->markArray[i][1]->name);
+							}
 						}
 					}
 				}
@@ -84,31 +88,47 @@ namespace ZoneTool
 				{
 					for (int i = 0; i < def->visualCount; i++)
 					{
-						if (def->elemType == 12)
+						if (def->elemType == 12 && vis->array[i].effectDef)
+						{
 							zone->add_asset_of_type(fx, vis->array[i].effectDef->name);
-						else if (def->elemType == 10)
+						}
+						else if (def->elemType == 10 && vis->array[i].soundName)
+						{
 							zone->add_asset_of_type(sound, vis->array[i].soundName);
-						else if (def->elemType == 7)
+						}
+						else if (def->elemType == 7 && vis->array[i].xmodel)
+						{
 							zone->add_asset_of_type(xmodel, vis->array[i].xmodel->name);
+						}
 						else
 						{
-							if (def->elemType != 8)
+							if (def->elemType != 8 && vis->array[i].material)
+							{
 								zone->add_asset_of_type(material, vis->array[i].material->name);
+							}
 						}
 					}
 				}
 				else
 				{
-					if (def->elemType == 12)
+					if (def->elemType == 12 && vis->instance.effectDef)
+					{
 						zone->add_asset_of_type(fx, vis->instance.effectDef->name);
-					else if (def->elemType == 10)
+					}
+					else if (def->elemType == 10 && vis->instance.soundName)
+					{
 						zone->add_asset_of_type(sound, vis->instance.soundName);
-					else if (def->elemType == 7)
+					}
+					else if (def->elemType == 7 && vis->instance.xmodel)
+					{
 						zone->add_asset_of_type(xmodel, vis->instance.xmodel->name);
+					}
 					else
 					{
-						if (def->elemType != 8)
+						if (def->elemType != 8 && vis->instance.material)
+						{
 							zone->add_asset_of_type(material, vis->instance.material->name);
+						}
 					}
 				}
 			};

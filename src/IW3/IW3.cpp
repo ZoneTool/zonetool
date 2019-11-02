@@ -121,6 +121,7 @@ namespace ZoneTool
 
 					if (ref_asset == nullptr)
 					{
+						ZONETOOL_ERROR("Could not find referenced asset \"%s\"!", asset_name);
 						continue;
 					}
 					

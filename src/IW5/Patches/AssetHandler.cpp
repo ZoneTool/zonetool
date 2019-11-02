@@ -142,8 +142,6 @@ namespace ZoneTool
 				// check if we're done loading the fastfile
 				if (type == rawfile && GetAssetName(type, ptr) == fastfile)
 				{
-					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
-
 					for (auto& asset : referencedAssets)
 					{
 						if (asset.second.length() <= 1)
@@ -156,6 +154,7 @@ namespace ZoneTool
 
 						if (ref_asset == nullptr)
 						{
+							ZONETOOL_ERROR("Could not find referenced asset \"%s\"!", asset_name);
 							continue;
 						}
 
@@ -163,6 +162,8 @@ namespace ZoneTool
 
 						DB_LogLoadedAsset(ref_asset, asset.first);
 					}
+
+					ZONETOOL_INFO("Zone \"%s\" dumped.", &fastfile[0]);
 
 					referencedAssets.clear();
 					FileSystem::FileClose(csvFile);

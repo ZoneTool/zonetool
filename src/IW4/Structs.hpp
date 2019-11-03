@@ -3100,7 +3100,6 @@ namespace ZoneTool
 			const char* name;
 			StructuredDataType item;
 			int offset;
-			int validation;
 		};
 #pragma pack(pop)
 		struct StructuredDataStruct

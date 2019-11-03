@@ -139,7 +139,7 @@ namespace ZoneTool
 			if (!strcmp(data->name, "mp/playerdata.def"))
 			{
 				// add new entries here
-				add_entry(enum_type::weapons, 0, "cm901", mem);
+				add_entry(enum_type::weapons, 1, "cm901", mem);
 
 				ZONETOOL_INFO("Statfiles patched.");
 			}

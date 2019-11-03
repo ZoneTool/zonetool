@@ -144,7 +144,7 @@ namespace ZoneTool
 				{
 					for (auto& asset : referencedAssets)
 					{
-						if (asset.second.length() <= 1)
+						if (asset.second.length() <= 1 || asset.first == XAssetType::loaded_sound)
 						{
 							continue;
 						}

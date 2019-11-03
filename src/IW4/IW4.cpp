@@ -205,7 +205,7 @@ char**>(0x00799278)[type]);
 				{
 					for (auto& ref : referencedAssets)
 					{
-						if (ref.second.length() <= 1)
+						if (ref.second.length() <= 1 || ref.first == XAssetType::loaded_sound)
 						{
 							continue;
 						}

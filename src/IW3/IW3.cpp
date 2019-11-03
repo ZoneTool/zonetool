@@ -110,8 +110,6 @@ namespace ZoneTool
 		__ASSET__::dump(asset->ptr.__TYPE__, memory.get()); \
 	}
 
-			// ZoneMemory mem();
-
 			// fastfile name
 			auto fastfile = static_cast<std::string>(*(const char**)0xE344CC);
 
@@ -119,7 +117,7 @@ namespace ZoneTool
 			{
 				for (auto& ref : referencedAssets)
 				{
-					if (/*ref.first != XAssetType::techset ||*/ ref.second.length() <= 1)
+					if (ref.second.length() <= 1 || ref.first == XAssetType::loaded_sound)
 					{
 						continue;
 					}

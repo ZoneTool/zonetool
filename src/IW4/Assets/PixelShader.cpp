@@ -7,6 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include "IW5/Assets/PixelShader.hpp"
 
 namespace ZoneTool
 {
@@ -14,42 +15,7 @@ namespace ZoneTool
 	{
 		PixelShader* IPixelShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
-			auto path = "pixelshader\\" + name;
-
-			if (!FileSystem::FileExists(path))
-			{
-				path = "techsets\\" + name + ".pixelshader";
-
-				AssetReader read(mem);
-				if (!read.open(path, preferLocal))
-				{
-					return nullptr;
-				}
-
-				ZONETOOL_INFO("Parsing pixelshader \"%s\"...", name.data());
-
-				auto asset = read.read_array<PixelShader>();
-				asset->name = read.read_string();
-				asset->bytecode = read.read_array<DWORD>();
-				read.close();
-
-				return asset;
-			}
-
-			ZONETOOL_INFO("Parsing custom DirectX pixelshader \"%s\"...", name.data());
-
-			auto fp = FileSystem::FileOpen(path, "rb");
-
-			auto asset = mem->Alloc<PixelShader>();
-			asset->name = mem->StrDup(name);
-			asset->codeLen = FileSystem::FileSize(fp);
-			asset->bytecode = mem->ManualAlloc<DWORD>(asset->codeLen);
-			asset->shader = nullptr;
-			fread(asset->bytecode, asset->codeLen, 1, fp);
-
-			FileSystem::FileClose(fp);
-
-			return asset;
+			return reinterpret_cast<PixelShader*>(IW5::IPixelShader::parse(name, mem, preferLocal));
 		}
 
 		void IPixelShader::init(void* asset, ZoneMemory* mem)
@@ -109,16 +75,7 @@ namespace ZoneTool
 
 		void IPixelShader::dump(PixelShader* asset)
 		{
-			AssetDumper write;
-			if (!write.open("techsets\\"s + asset->name + ".pixelshader"s))
-			{
-				return;
-			}
-
-			write.dump_array(asset, 1);
-			write.dump_string(asset->name);
-			write.dump_array(asset->bytecode, asset->codeLen);
-			write.close();
+			return IW5::IPixelShader::dump(reinterpret_cast<IW5::PixelShader*>(asset));
 		}
 	}
 }

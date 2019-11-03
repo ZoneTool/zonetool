@@ -18,11 +18,8 @@ namespace ZoneTool
 			std::string m_name;
 			PixelShader* m_asset;
 
-			PixelShader* parse(const std::string& name, ZoneMemory* mem, bool preferLocal = false);
-
 		public:
-			IPixelShader();
-			~IPixelShader();
+			static PixelShader* parse(const std::string& name, ZoneMemory* mem, bool preferLocal = false);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

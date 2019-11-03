@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IPixelShader::IPixelShader()
-		{
-		}
-
-		IPixelShader::~IPixelShader()
-		{
-		}
-
 		PixelShader* IPixelShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "pixelshader\\" + name;
@@ -102,9 +94,6 @@ namespace ZoneTool
 
 			if (data->bytecode)
 			{
-				/*buf->align(3);
-				buf->write(
-				ZoneBuffer::ClearPointer(&dest->bytecode);*/
 				dest->bytecode = buf->write_s(3, data->bytecode, data->codeLen);
 			}
 

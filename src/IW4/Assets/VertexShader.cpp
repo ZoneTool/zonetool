@@ -7,72 +7,15 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include "IW5/Assets/VertexShader.hpp"
 
 namespace ZoneTool
 {
 	namespace IW4
 	{
-		IVertexShader::IVertexShader()
-		{
-		}
-
-		IVertexShader::~IVertexShader()
-		{
-		}
-
 		VertexShader* IVertexShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
-			auto path = "vertexshader\\" + name;
-
-			if (!FileSystem::FileExists(path))
-			{
-				path = "techsets\\" + name + ".vertexshader";
-
-				FileSystem::PreferLocalOverExternal(true);
-				if (!FileSystem::FileExists(path))
-				{
-					FileSystem::PreferLocalOverExternal(false);
-					return nullptr;
-				}
-
-				AssetReader read(mem);
-				if (!read.open(path))
-				{
-					FileSystem::PreferLocalOverExternal(false);
-					return nullptr;
-				}
-
-				ZONETOOL_INFO("Parsing vertexshader \"%s\"...", name.data());
-
-				auto asset = read.read_array<VertexShader>();
-				asset->name = read.read_string();
-				asset->bytecode = read.read_array<DWORD>();
-				read.close();
-
-				FileSystem::PreferLocalOverExternal(false);
-
-				return asset;
-			}
-
-			ZONETOOL_INFO("Parsing custom DirectX vertexshader \"%s\"...", name.data());
-
-			const auto fp = FileSystem::FileOpen(path, "rb");
-			const auto asset = mem->Alloc<VertexShader>();
-			asset->name = mem->StrDup(name);
-			asset->codeLen = FileSystem::FileSize(fp);
-			asset->bytecode = mem->ManualAlloc<DWORD>(asset->codeLen);
-			asset->shader = nullptr;
-			fread(asset->bytecode, asset->codeLen, 1, fp);
-
-			FileSystem::FileClose(fp);
-
-			return asset;
-		}
-
-		void IVertexShader::init(void* asset, ZoneMemory* mem)
-		{
-			this->m_asset = reinterpret_cast<VertexShader*>(asset);
-			this->m_name = this->m_asset->name + "_IW5"s;
+			return reinterpret_cast<VertexShader*>(IW5::IVertexShader::parse(name, mem, preferLocal));
 		}
 
 		void IVertexShader::init(const std::string& name, ZoneMemory* mem)
@@ -128,16 +71,7 @@ namespace ZoneTool
 
 		void IVertexShader::dump(VertexShader* asset)
 		{
-			AssetDumper write;
-			if (!write.open("techsets\\"s + asset->name + ".vertexshader"s))
-			{
-				return;
-			}
-
-			write.dump_array(asset, 1);
-			write.dump_string(asset->name);
-			write.dump_array(asset->bytecode, asset->codeLen);
-			write.close();
+			IW5::IVertexShader::dump(reinterpret_cast<IW5::VertexShader*>(asset));
 		}
 	}
 }

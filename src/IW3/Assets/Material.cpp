@@ -82,7 +82,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IMaterial::dump(Material* mat)
+		void IMaterial::dump(Material* mat, ZoneMemory* mem)
 		{
 			if (mat)
 			{

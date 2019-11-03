@@ -45,7 +45,7 @@ namespace ZoneTool
 
 			ZONETOOL_INFO("Parsing phys_collmap \"%s\"...", name.c_str());
 
-			auto physcollmap = read.read_array<PhysCollmap>(); // mem->Alloc<PhysCollmap>();
+			auto physcollmap = read.read_array<PhysCollmap>();
 			physcollmap->name = mem->StrDup(name);
 
 			if (read.read_int())
@@ -216,9 +216,6 @@ namespace ZoneTool
 						{
 							dump.dump_int(1);
 							dump.dump_array(asset->info[i].brush->plane, asset->info[i].brush->numPlaneSide);
-
-							printf("phys_collmap \"%s\"[%i] has %i collision planes.\n", asset->name, i,
-							       asset->info[i].brush->numPlaneSide);
 						}
 						else
 						{
@@ -227,9 +224,6 @@ namespace ZoneTool
 
 						if (asset->info[i].brush->side)
 						{
-							printf("phys_collmap \"%s\"[%i] has %i collision sides.\n", asset->name, i,
-							       asset->info[i].brush->numPlaneSide);
-
 							dump.dump_int(1);
 							dump.dump_array(asset->info[i].brush->side, asset->info[i].brush->numPlaneSide);
 
@@ -253,9 +247,6 @@ namespace ZoneTool
 
 						if (asset->info[i].brush->edge)
 						{
-							printf("phys_collmap \"%s\"[%i] has %i collision edges.\n", asset->name, i,
-							       asset->info[i].brush->numEdge);
-
 							dump.dump_int(1);
 							dump.dump_array(asset->info[i].brush->edge, asset->info[i].brush->numEdge);
 						}

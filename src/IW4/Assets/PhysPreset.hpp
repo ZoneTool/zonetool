@@ -19,9 +19,6 @@ namespace ZoneTool
 			PhysPreset* m_asset;
 
 		public:
-			IPhysPreset();
-			~IPhysPreset();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

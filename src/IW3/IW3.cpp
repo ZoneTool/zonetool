@@ -88,8 +88,14 @@ namespace ZoneTool
 
 		void Linker::HandleAsset(XAsset* asset)
 		{
+			static std::shared_ptr<ZoneMemory> memory;
 			static std::vector<std::pair<XAssetType, std::string>> referencedAssets;
 
+			if (!memory)
+			{
+				memory = std::make_shared<ZoneMemory>(1024 * 1024 * 128);		// 128mb
+			}
+			
 			// nice meme
 			if (isVerifying)
 			{
@@ -101,8 +107,10 @@ namespace ZoneTool
 #define DECLARE_ASSET(__TYPE__, __ASSET__) \
 	if (asset->type == __TYPE__) \
 	{ \
-		__ASSET__::dump(asset->ptr.__TYPE__); \
+		__ASSET__::dump(asset->ptr.__TYPE__, memory.get()); \
 	}
+
+			// ZoneMemory mem();
 
 			// fastfile name
 			auto fastfile = static_cast<std::string>(*(const char**)0xE344CC);
@@ -139,6 +147,10 @@ namespace ZoneTool
 				// clear referenced assets array because we are done dumping
 				referencedAssets.clear();
 
+				// free memory
+				memory->Free();
+				memory = nullptr;
+				
 				FileSystem::SetFastFile("");
 				isDumping = false;
 				isVerifying = false;

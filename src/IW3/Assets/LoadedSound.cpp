@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void ILoadedSound::dump(LoadedSound* asset)
+		void ILoadedSound::dump(LoadedSound* asset, ZoneMemory* mem)
 		{
 			if (asset->struct1.waveFormat != 1) 
 			{
@@ -20,7 +20,7 @@ namespace ZoneTool
 				return;
 			}
 
-			auto fp = FileSystem::FileOpen("loaded_sound\\"s + asset->name, "wb");
+			const auto fp = FileSystem::FileOpen("loaded_sound\\"s + asset->name, "wb");
 			if (!fp)
 			{
 				return;

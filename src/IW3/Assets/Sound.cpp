@@ -13,12 +13,12 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void ISound::dump(snd_alias_list_t* asset)
+		void ISound::dump(snd_alias_list_t* asset, ZoneMemory* mem)
 		{
-			auto iw4_asset = new IW4::snd_alias_list_t;
+			const auto iw4_asset = mem->Alloc<IW4::snd_alias_list_t>(); // new IW4::snd_alias_list_t;
 			memcpy(iw4_asset, asset, sizeof snd_alias_list_t);
 
-			iw4_asset->head = new IW4::snd_alias_t[iw4_asset->count];
+			iw4_asset->head = mem->Alloc<IW4::snd_alias_t>(iw4_asset->count);
 			memset(iw4_asset->head, 0, sizeof IW4::snd_alias_t * iw4_asset->count);
 
 			for (auto i = 0; i < asset->count; i++)
@@ -29,9 +29,6 @@ namespace ZoneTool
 			}
 
 			IW4::ISound::dump(iw4_asset);
-
-			delete[] iw4_asset->head;
-			delete[] iw4_asset;
 		}
 	}
 }

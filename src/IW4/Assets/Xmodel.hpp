@@ -21,12 +21,9 @@ namespace ZoneTool
 		private:
 			std::string m_name;
 			XModel* m_asset;
-			bool isXME5OrNewer;
 
 			XModel* parse_new(const std::string& name, ZoneMemory* mem, const std::string& filename);
 			XModel* parse(std::string name, ZoneMemory* mem);
-
-			IXSurface* dependingSurfaces[4];
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

@@ -91,13 +91,12 @@ namespace ZoneTool
 			return name;
 		}
 
-		IW4::VertexDecl* ITechset::dump_vertex_decl(const std::string& name, MaterialVertexDeclaration* vertex)
+		IW4::VertexDecl* ITechset::dump_vertex_decl(const std::string& name, MaterialVertexDeclaration* vertex, ZoneMemory* mem)
 		{
 			// convert to IW4
-			auto asset = new IW4::VertexDecl;
-			memset(asset, 0, sizeof IW4::VertexDecl);
+			const auto asset = mem->Alloc<IW4::VertexDecl>();
 			
-			asset->name = _strdup(name.data());
+			asset->name = mem->StrDup(name);
 
 			asset->hasOptionalSource = vertex->hasOptionalSource;
 			asset->streamCount = vertex->streamCount;
@@ -125,11 +124,10 @@ namespace ZoneTool
 			return asset;
 		}
 
-		IW4::VertexShader* ITechset::dump_vertex_shader(MaterialVertexShader* shader)
+		IW4::VertexShader* ITechset::dump_vertex_shader(MaterialVertexShader* shader, ZoneMemory* mem)
 		{
 			// convert to IW4
-			auto asset = new IW4::VertexShader;
-			memset(asset, 0, sizeof IW4::VertexShader);
+			const auto asset = mem->Alloc<IW4::VertexShader>();
 
 			asset->name = shader->name;
 			asset->shader = shader->prog.vs;
@@ -142,11 +140,10 @@ namespace ZoneTool
 			return asset;
 		}
 
-		IW4::PixelShader* ITechset::dump_pixel_shader(MaterialPixelShader* shader)
+		IW4::PixelShader* ITechset::dump_pixel_shader(MaterialPixelShader* shader, ZoneMemory* mem)
 		{
 			// convert to IW4
-			auto asset = new IW4::PixelShader;
-			memset(asset, 0, sizeof IW4::PixelShader);
+			const auto asset = mem->Alloc<IW4::PixelShader>();
 
 			asset->name = shader->name;
 			asset->shader = shader->prog.ps;
@@ -366,10 +363,9 @@ namespace ZoneTool
 			IW4::ITechset::dump_statebits(techset, iw4_statebits);
 		}
 		
-		void ITechset::dump(MaterialTechniqueSet* asset)
+		void ITechset::dump(MaterialTechniqueSet* asset, ZoneMemory* mem)
 		{
-			auto iw4_techset = new IW4::MaterialTechniqueSet;
-			memset(iw4_techset, 0, sizeof IW4::MaterialTechniqueSet);
+			auto iw4_techset = mem->Alloc<IW4::MaterialTechniqueSet>();
 
 			iw4_techset->name = asset->name;
 			iw4_techset->pad = asset->pad;
@@ -402,14 +398,14 @@ namespace ZoneTool
 
 							auto vertex_decl_name = GenerateNameForVertexDecl(iw3_pass_def->vertexDecl);
 
-							if (iw3_pass_def->pixelShader) pass_def->pixelShader = dump_pixel_shader(iw3_pass_def->pixelShader);
-							if (iw3_pass_def->vertexDecl) pass_def->vertexDecl = dump_vertex_decl(vertex_decl_name, iw3_pass_def->vertexDecl);
-							if (iw3_pass_def->vertexShader) pass_def->vertexShader = dump_vertex_shader(iw3_pass_def->vertexShader);
+							if (iw3_pass_def->pixelShader) pass_def->pixelShader = dump_pixel_shader(iw3_pass_def->pixelShader, mem);
+							if (iw3_pass_def->vertexDecl) pass_def->vertexDecl = dump_vertex_decl(vertex_decl_name, iw3_pass_def->vertexDecl, mem);
+							if (iw3_pass_def->vertexShader) pass_def->vertexShader = dump_vertex_shader(iw3_pass_def->vertexShader, mem);
 
 							const auto arg_count = pass_def->perPrimArgCount + pass_def->perObjArgCount + pass_def->stableArgCount;
 							if (arg_count > 0)
 							{
-								pass_def->argumentDef = new IW4::ShaderArgumentDef[arg_count];
+								pass_def->argumentDef = mem->Alloc<IW4::ShaderArgumentDef>(arg_count);
 								memcpy(pass_def->argumentDef, iw3_pass_def->args, sizeof(IW4::ShaderArgumentDef) * arg_count);
 							}
 							
@@ -430,29 +426,6 @@ namespace ZoneTool
 			}
 
 			IW4::ITechset::dump(iw4_techset);
-
-			for (int i = 0; i < 48; i++)
-			{
-				if (iw4_techset->techniques[i])
-				{
-					if (i >= 5 && i <= 36 && i % 2 == 0)
-					{
-						continue;
-					}
-					
-					for (short pass = 0; pass < iw4_techset->techniques[i]->hdr.numPasses; pass++)
-					{
-						delete iw4_techset->techniques[i]->pass[pass].pixelShader;
-						delete iw4_techset->techniques[i]->pass[pass].vertexDecl;
-						delete iw4_techset->techniques[i]->pass[pass].vertexShader;
-						delete iw4_techset->techniques[i]->pass[pass].argumentDef;
-					}
-
-					delete iw4_techset->techniques[i];
-				}
-			}
-			
-			delete iw4_techset;
 		}
 	}
 }

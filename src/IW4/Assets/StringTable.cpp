@@ -115,7 +115,7 @@ namespace ZoneTool
 			auto table = std::make_unique<CSV>(name);
 			auto stringtable = mem->Alloc<StringTable>();
 
-			stringtable->name = _strdup(name.c_str());
+			stringtable->name = mem->StrDup(name.c_str());
 			stringtable->rows = table->rows();
 			stringtable->columns = table->max_columns();
 			stringtable->strings = mem->Alloc<StringTableCell>(stringtable->rows * stringtable->columns);
@@ -125,7 +125,7 @@ namespace ZoneTool
 				for (int col = 0; col < table->columns(row); col++)
 				{
 					int entry = (row * stringtable->columns) + col;
-					stringtable->strings[entry].string = strdup(table->entry(row, col).c_str());
+					stringtable->strings[entry].string = mem->StrDup(table->entry(row, col).c_str());
 					stringtable->strings[entry].hash = StringTable_Hash(stringtable->strings[entry].string);
 				}
 			}
@@ -179,10 +179,6 @@ namespace ZoneTool
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			// TODO
-
-			StringTable;
-
 			dest->name = buf->write_str(this->name());
 
 			if (data->strings)
@@ -194,7 +190,10 @@ namespace ZoneTool
 				{
 					for (int i = 0; i < data->columns * data->rows; i++)
 					{
-						destStrings[i].string = buf->write_str(data->strings[i].string);
+						if (data->strings[i].string)
+						{
+							destStrings[i].string = buf->write_str(data->strings[i].string);
+						}
 					}
 				}
 

@@ -51,7 +51,7 @@ namespace ZoneTool
 	{
 	private:
 		std::vector < ZoneMemPtrInternal >	m_pointers;
-		std::mutex							m_mutex;
+		std::mutex							mutex_;
 
 	public:
 		ZoneMemory()
@@ -60,7 +60,7 @@ namespace ZoneTool
 
 		char* StrDup(const char* name)
 		{
-			std::lock_guard < std::mutex > g(this->m_mutex);
+			std::lock_guard < std::mutex > g(this->mutex_);
 
 			// dup string
 			auto pointer = ZoneMemPtrArr < char >(strlen(name) + 1);
@@ -79,7 +79,7 @@ namespace ZoneTool
 
 		template <typename T> T* Alloc(std::size_t count)
 		{
-			std::lock_guard < std::mutex > g(this->m_mutex);
+			std::lock_guard < std::mutex > g(this->mutex_);
 
 			// alloc pointer and zero it out
 			auto pointer = ZoneMemPtrArr < T >(count);
@@ -97,7 +97,7 @@ namespace ZoneTool
 
 		template <typename T> T* Alloc()
 		{
-			std::lock_guard < std::mutex > g(this->m_mutex);
+			std::lock_guard < std::mutex > g(this->mutex_);
 
 			// alloc pointer and zero it out
 			auto pointer = ZoneMemPtr < T >();
@@ -115,7 +115,7 @@ namespace ZoneTool
 
 		template <typename T> T* ManualAlloc(std::size_t size, std::size_t count = 1)
 		{
-			std::lock_guard < std::mutex > g(this->m_mutex);
+			std::lock_guard < std::mutex > g(this->mutex_);
 
 			// alloc pointer and zero it out
 			auto pointer = ZoneMemPtrArr < char >(size * count); // reinterpret_cast<T*>(malloc(size * count));
@@ -135,24 +135,24 @@ namespace ZoneTool
 	class ZoneMemory
 	{
 	private:
-		LPVOID m_memoryPool;
-		std::size_t m_memorySize;
-		std::size_t m_memPos;
-		std::recursive_mutex m_mutex;
+		LPVOID memory_pool_;
+		std::size_t memory_size_;
+		std::size_t mem_pos_;
+		std::recursive_mutex mutex_;
 
 	public:
-		ZoneMemory(const ZoneMemory& mem) : m_memoryPool(mem.m_memoryPool), m_memorySize(mem.m_memorySize),
-		                                    m_memPos(mem.m_memPos)
+		ZoneMemory(const ZoneMemory& mem) : memory_pool_(mem.memory_pool_), memory_size_(mem.memory_size_),
+		                                    mem_pos_(mem.mem_pos_)
 		{
 		}
 
 		ZoneMemory(const std::size_t& size)
 		{
-			m_memPos = 0;
-			m_memorySize = size;
-			m_memoryPool = VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+			mem_pos_ = 0;
+			memory_size_ = size;
+			memory_pool_ = VirtualAlloc(nullptr, size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 
-			if (!m_memoryPool)
+			if (!memory_pool_)
 			{
 				char buffer[256];
 				_snprintf(buffer, sizeof buffer,
@@ -164,22 +164,27 @@ namespace ZoneTool
 			}
 		}
 
+		void Free()
+		{
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
+			VirtualFree(memory_pool_, memory_size_, MEM_DECOMMIT | MEM_RELEASE);
+
+			printf("ZoneTool memory statistics: build used %ub of ram (%fmb).\n", mem_pos_,
+				static_cast<float>(mem_pos_) / 1024 / 1024);
+
+			memory_pool_ = nullptr;
+			memory_size_ = 0;
+			mem_pos_ = 0;
+		}
+		
 		~ZoneMemory()
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
-			VirtualFree(m_memoryPool, m_memorySize, MEM_DECOMMIT | MEM_RELEASE);
-
-			printf("ZoneTool post-build memory statistics: build used %ub of ram (%fmb).\n", m_memPos,
-			       static_cast<float>(m_memPos) / 1024 / 1024);
-
-			m_memoryPool = nullptr;
-			m_memorySize = 0;
-			m_memPos = 0;
+			this->Free();
 		}
 
 		char* StrDup(const char* name)
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
 
 			// get string length
 			auto len = strlen(name) + 1;
@@ -192,33 +197,33 @@ namespace ZoneTool
 
 		char* StrDup(const std::string& name)
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
 			return this->StrDup(name.data());
 		}
 
 		template <typename T>
 		T* Alloc(std::size_t count)
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
 			return this->ManualAlloc<T>(sizeof T, count);
 		}
 
 		template <typename T>
 		T* Alloc()
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
 			return this->Alloc<T>(1);
 		}
 
 		template <typename T>
 		T* ManualAlloc(std::size_t size, std::size_t count = 1)
 		{
-			std::lock_guard<std::recursive_mutex> g(this->m_mutex);
+			std::lock_guard<std::recursive_mutex> g(this->mutex_);
 
 			// alloc pointer and zero it out
-			auto pointer = reinterpret_cast<char*>(m_memoryPool) + m_memPos;
+			auto pointer = reinterpret_cast<char*>(memory_pool_) + mem_pos_;
 			memset(pointer, 0, size * count);
-			m_memPos += size * count;
+			mem_pos_ += size * count;
 
 			// return pointer
 			return reinterpret_cast<T*>(pointer);

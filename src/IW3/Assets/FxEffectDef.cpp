@@ -13,7 +13,7 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void IFxEffectDef::dump(FxEffectDef* asset)
+		void IFxEffectDef::dump(FxEffectDef* asset, ZoneMemory* mem)
 		{
 			const auto iw4_fx = new IW4::FxEffectDef;
 			memcpy(iw4_fx, asset, sizeof IW4::FxEffectDef);
@@ -39,9 +39,6 @@ namespace ZoneTool
 			}
 			
 			IW4::IFxEffectDef::dump(iw4_fx);
-
-			delete[] iw4_fx->elemDefs;
-			delete iw4_fx;
 		}
 	}
 }

@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		IPixelShader::IPixelShader()
-		{
-		}
-
-		IPixelShader::~IPixelShader()
-		{
-		}
-
 		PixelShader* IPixelShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "pixelshader\\" + name;

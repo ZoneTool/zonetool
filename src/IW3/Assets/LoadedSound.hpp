@@ -15,7 +15,7 @@ namespace ZoneTool
 		class ILoadedSound
 		{
 		public:
-			static void dump(LoadedSound* asset);
+			static void dump(LoadedSound* asset, ZoneMemory* mem);
 		};
 	}
 }

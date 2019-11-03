@@ -15,7 +15,7 @@ namespace ZoneTool
 		class IFxEffectDef
 		{
 		public:
-			static void dump(FxEffectDef* asset);
+			static void dump(FxEffectDef* asset, ZoneMemory* mem);
 		};
 	}
 }

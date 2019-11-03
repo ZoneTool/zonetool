@@ -283,13 +283,5 @@ namespace ZoneTool
 
 			dump.close();
 		}
-
-		IXSurface::IXSurface()
-		{
-		}
-
-		IXSurface::~IXSurface()
-		{
-		}
 	}
 }

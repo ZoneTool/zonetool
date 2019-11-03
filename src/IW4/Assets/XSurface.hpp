@@ -22,9 +22,6 @@ namespace ZoneTool
 			                     std::uint16_t count);
 
 		public:
-			IXSurface();
-			~IXSurface();
-
 			XModelSurfs* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;

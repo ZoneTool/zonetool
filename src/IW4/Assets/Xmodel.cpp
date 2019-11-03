@@ -20,9 +20,6 @@ namespace ZoneTool
 
 		void IXModel::init(const std::string& name, ZoneMemory* mem)
 		{
-			memset(this->dependingSurfaces, 0, sizeof this->dependingSurfaces);
-
-			this->isXME5OrNewer = false;
 			this->m_name = name;
 			this->m_asset = this->parse(name, mem);
 
@@ -79,21 +76,8 @@ namespace ZoneTool
 			{
 				if (data->lods[i].surfaces)
 				{
-					// Add the pointer rather than re-finding it by name, because it might have been parsed.
-					if (isXME5OrNewer)
-					{
-						zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
-					}
-					else
-					{
-						zone->add_asset_of_type_by_pointer(xmodelsurfs, data->lods[i].surfaces);
-					}
+					zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
 				}
-
-				//if (data->lods[i].surfaces && dependingSurfaces[i] != nullptr)
-				//{
-				//	dependingSurfaces[i]->load_depending(zone);
-				//}
 			}
 
 			// PhysCollmap
@@ -413,7 +397,7 @@ size(), asset->numSurfaces, asset->name);
 					memcpy(iw5_model, new_model, sizeof XModel);
 					iw5_model->unk = 0;
 					
-					IW5::IXModel::dump(iw5_model, SL_ConvertToString);
+					IW5::IXModel::dump(iw5_model, convertToString);
 
 					delete iw5_model;
 					

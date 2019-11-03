@@ -15,7 +15,7 @@ namespace ZoneTool
 		class IXAnimParts
 		{
 		public:
-			static void dump(XAnimParts* anim);
+			static void dump(XAnimParts* anim, ZoneMemory* mem);
 		};
 	}
 }

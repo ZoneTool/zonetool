@@ -250,6 +250,15 @@ namespace ZoneTool
 
 	LONG NTAPI exception_handler(_EXCEPTION_POINTERS* info)
 	{
+		if (info->ExceptionRecord->ExceptionCode == STATUS_INTEGER_OVERFLOW ||
+			info->ExceptionRecord->ExceptionCode == STATUS_FLOAT_OVERFLOW ||
+			info->ExceptionRecord->ExceptionCode == 0x406D1388)
+		{
+			return EXCEPTION_CONTINUE_EXECUTION;
+		}
+
+		MessageBoxA(nullptr, va("0x%08X", info->ExceptionRecord->ExceptionCode).data(), 0, 0);
+		
 		if (ZONETOOL_VERSION == "0.0.0"s)
 		{
 			MessageBoxA(nullptr, "An exception occured and ZoneTool must be restarted to continue. However, ZoneTool has detected that you are using a custom DLL. If you want to submit an issue, try to reproduce the bug with the latest release of ZoneTool. The latest version can be found here: https://github.com/ZoneTool/zonetool/releases", "ZoneTool", MB_ICONERROR);

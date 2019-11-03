@@ -13,17 +13,9 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		IVertexDecl::IVertexDecl()
-		{
-		}
-
-		IVertexDecl::~IVertexDecl()
-		{
-		}
-
 		VertexDecl* IVertexDecl::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
-			return (VertexDecl*)IW5::IVertexDecl::parse(name, mem, preferLocal);
+			return reinterpret_cast<VertexDecl*>(IW5::IVertexDecl::parse(name, mem, preferLocal));
 		}
 
 		void IVertexDecl::init(const std::string& name, ZoneMemory* mem)

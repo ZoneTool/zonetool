@@ -22,7 +22,6 @@ namespace ZoneTool
 			static VertexDecl* parse(const std::string& name, ZoneMemory* mem,
 			                         bool preferLocal = false);
 
-			void init(void* asset, ZoneMemory* mem) override;
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

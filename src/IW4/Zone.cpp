@@ -33,7 +33,6 @@ namespace ZoneTool
 				{
 					auto ptr = reinterpret_cast<void*>((3 << 28) | ((this->m_assetbase + (8 * idx) + 4) & 0x0FFFFFFF) +
 						1);
-					// ZONETOOL_INFO("Asset pointer is %u", ptr);
 					return ptr;
 				}
 			}
@@ -68,9 +67,6 @@ namespace ZoneTool
 			// declare asset interfaces
 			DECLARE_ASSET(xmodelsurfs, IXSurface);
 			DECLARE_ASSET(image, IGfxImage);
-			DECLARE_ASSET(pixelshader, IPixelShader);
-			DECLARE_ASSET(vertexshader, IVertexShader);
-			DECLARE_ASSET(vertexdecl, IVertexDecl);
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();

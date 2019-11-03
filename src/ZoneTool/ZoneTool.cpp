@@ -7,6 +7,9 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include <Dbghelp.h>
+
+#pragma comment(lib, "Dbghelp")
 
 std::string currentzone;
 
@@ -245,12 +248,51 @@ namespace ZoneTool
 
 	ILinker* current_linker;
 
+	LONG NTAPI exception_handler(_EXCEPTION_POINTERS* info)
+	{
+		if (ZONETOOL_VERSION == "0.0.0"s)
+		{
+			MessageBoxA(nullptr, "An exception occured and ZoneTool must be restarted to continue. However, ZoneTool has detected that you are using a custom DLL. If you want to submit an issue, try to reproduce the bug with the latest release of ZoneTool. The latest version can be found here: https://github.com/ZoneTool/zonetool/releases", "ZoneTool", MB_ICONERROR);
+			std::exit(0);
+		}
+		
+		std::filesystem::create_directories("zonetool/crashdumps");
+
+		const auto exception_time = std::time(nullptr);
+		const auto linker_name = (current_linker) ? current_linker->version() : "unknown";
+		const auto file_name = va("zonetool/crashdumps/zonetool-exception-%s-%s-%llu.dmp", linker_name, ZONETOOL_VERSION, exception_time);
+		
+		DWORD dump_type = MiniDumpIgnoreInaccessibleMemory;
+		dump_type |= MiniDumpWithHandleData;
+		dump_type |= MiniDumpScanMemory;
+		dump_type |= MiniDumpWithProcessThreadData;
+		dump_type |= MiniDumpWithFullMemoryInfo;
+		dump_type |= MiniDumpWithThreadInfo;
+		dump_type |= MiniDumpWithCodeSegs;
+		dump_type |= MiniDumpWithDataSegs;
+		
+		const DWORD file_share = FILE_SHARE_READ | FILE_SHARE_WRITE;
+		const HANDLE file_handle = CreateFileA(file_name.data(), GENERIC_WRITE | GENERIC_READ, file_share, nullptr, (file_share & FILE_SHARE_WRITE) > 0 ? OPEN_ALWAYS : OPEN_EXISTING, NULL, nullptr);
+		MINIDUMP_EXCEPTION_INFORMATION ex = { GetCurrentThreadId(), info, FALSE };
+		if (!MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), file_handle, static_cast<MINIDUMP_TYPE>(dump_type), &ex, nullptr, nullptr))
+		{
+			
+		}
+
+		const auto message = va("An exception occured and ZoneTool must be restarted to continue. If this keeps happening, create an issue on https://github.com/ZoneTool/zonetool with the crashdump attached. The crashdump can be found at: \"%s\".", file_name.data());
+		MessageBoxA(nullptr, message.data(), "ZoneTool", MB_ICONERROR);
+		std::exit(0);
+	}
+	
 	void create_console()
 	{
 #ifdef USE_VMPROTECT
 		VMProtectBeginUltra("CreateConsole");
 #endif
 
+		// Catch exceptions
+		AddVectoredExceptionHandler(TRUE, exception_handler);
+		
 		// Allocate console
 		AllocConsole();
 		freopen("CONIN$", "r", stdin);

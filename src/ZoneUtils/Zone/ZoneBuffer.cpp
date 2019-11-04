@@ -212,7 +212,7 @@ namespace ZoneTool
 		return this->m_scriptstrings.size();
 	}
 
-	void ZoneBuffer::save(std::string& filename)
+	void ZoneBuffer::save(const std::string& filename)
 	{
 		// Alloc file
 		std::filebuf _fb;

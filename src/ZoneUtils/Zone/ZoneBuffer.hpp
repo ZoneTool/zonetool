@@ -329,7 +329,7 @@ namespace ZoneTool
 			*reinterpret_cast<std::uintptr_t*>(ptr) = -1;
 		}
 
-		void save(std::string& filename);
+		void save(const std::string& filename);
 
 		std::vector<std::uint8_t> compress_zstd();
 		std::vector<std::uint8_t> compress_zlib();

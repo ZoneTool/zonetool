@@ -31,19 +31,19 @@ namespace ZoneTool
 			for (int i = 0; i < 54; i++)
 			{
 				auto dest_index = i;
-				if (i >= 46)
+				if (i >= (46 + 6))
 				{
 					dest_index -= 6;
 				}
-				else if (i >= 44)
+				else if (i >= (44 + 5))
 				{
 					dest_index -= 5;
 				}
-				else if (i >= 31)
+				else if (i >= (31 + 4))
 				{
 					dest_index -= 4;
 				}
-				else if (i >= 19)
+				else if (i >= (19 + 2))
 				{
 					dest_index -= 2;
 				}
@@ -248,23 +248,24 @@ namespace ZoneTool
 		{
 			auto iw5_statebits = IW5::ITechset::parse_statebits(techset, mem);
 			auto statebits = mem->Alloc<char>(48);
+			memset(statebits, 0xFF, 48);
 
 			for (int i = 0; i < 54; i++)
 			{
 				auto dest_index = i;
-				if (i >= 46)
+				if (i >= (46 + 6))
 				{
 					dest_index -= 6;
 				}
-				else if (i >= 44)
+				else if (i >= (44 + 5))
 				{
 					dest_index -= 5;
 				}
-				else if (i >= 31)
+				else if (i >= (31 + 4))
 				{
 					dest_index -= 4;
 				}
-				else if (i >= 19)
+				else if (i >= (19 + 2))
 				{
 					dest_index -= 2;
 				}

@@ -111,7 +111,7 @@ namespace ZoneTool
 			IW5::ILightDef::dump(iw5_asset);
 
 			// free memory_
-			delete[] iw5_asset;
+			delete iw5_asset;
 		}
 	}
 }

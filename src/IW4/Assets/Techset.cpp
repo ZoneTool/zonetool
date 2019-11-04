@@ -24,7 +24,8 @@ namespace ZoneTool
 			}
 			
 			auto asset = mem->Alloc<MaterialTechniqueSet>();
-			memcpy(asset, iw5_techset, sizeof MaterialTechniqueSet);
+			memcpy(asset, iw5_techset, 12);
+			memset(asset->techniques, 0, sizeof asset->techniques);
 			
 			// port techniques to the correct index
 			for (int i = 0; i < 54; i++)
@@ -47,15 +48,25 @@ namespace ZoneTool
 					dest_index -= 2;
 				}
 
-				asset->techniques[dest_index] = reinterpret_cast<MaterialTechnique*>(iw5_techset->techniques[i]);
-
-				if (asset->techniques[dest_index])
+				if (iw5_techset->techniques[i])
 				{
+					const auto technique_size = sizeof(MaterialTechnique) + (sizeof(MaterialPass) * iw5_techset->techniques[i]->hdr.numPasses);
+					asset->techniques[dest_index] = mem->ManualAlloc<MaterialTechnique>(technique_size);
+					memcpy(asset->techniques[dest_index], iw5_techset->techniques[i], technique_size);
+					
 					auto& technique = asset->techniques[dest_index];
 					for (short pass = 0; pass < technique->hdr.numPasses; pass++)
 					{
 						auto passDef = &technique->pass[pass];
-						for (int arg = 0; arg < passDef->perObjArgCount + passDef->perPrimArgCount + passDef->stableArgCount; arg++)
+
+						const auto arg_count = passDef->perObjArgCount + passDef->perPrimArgCount + passDef->stableArgCount;
+						if (arg_count)
+						{
+							passDef->argumentDef = mem->Alloc<ShaderArgumentDef>(arg_count);
+							memcpy(passDef->argumentDef, iw5_techset->techniques[i]->pass[pass].argumentDef, sizeof(ShaderArgumentDef) * arg_count);
+						}
+						
+						for (int arg = 0; arg < arg_count; arg++)
 						{
 							auto argDef = &passDef->argumentDef[arg];
 							
@@ -258,7 +269,7 @@ namespace ZoneTool
 					dest_index -= 2;
 				}
 
-				statebits[i] = iw5_statebits[dest_index];
+				statebits[dest_index] = iw5_statebits[i];
 			}
 			
 			return statebits;

@@ -471,6 +471,11 @@ namespace ZoneTool
 
 		void IMaterial::dump(Material* asset)
 		{
+			if (asset->name == "mc/mtl_weapon_cm901"s)
+			{
+				__debugbreak();
+			}
+			
 			if (asset && asset->techniqueSet)
 			{
 				ITechset::dump_statebits(asset->techniqueSet->name, asset->stateBitsEntry);

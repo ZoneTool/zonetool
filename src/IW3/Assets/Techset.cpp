@@ -352,9 +352,14 @@ namespace ZoneTool
 					{
 						iw4_statebits[itr->second] = statebits[i];
 
+						if (iw4_statebits[itr->second] >= 7)
+						{
+							iw4_statebits[itr->second] += 1;
+						}
+						
 						if (itr->second >= 5 && itr->second <= 36)
 						{
-							iw4_statebits[itr->second + 1] = statebits[i];
+							iw4_statebits[itr->second + 1] = iw4_statebits[itr->second];
 						}
 					}
 				}

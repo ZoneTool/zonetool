@@ -37,7 +37,7 @@ namespace ZoneTool
 
 			void dump_zone(const std::string& name) override;
 			void verify_zone(const std::string& name) override;
-
+			
 			static void run();
 			static void load_default_zones();
 			static const char* get_asset_name(XAssetType type, XAssetHeader header);
@@ -49,6 +49,9 @@ namespace ZoneTool
 			static void ReadHeader(void* ptr, int size);
 			static void Load_XSurfaceArray(int shouldLoad, int count);
             static const char* GetZonePath(const char* zoneName);
+
+		private:
+			
 		};
 	}
 }

@@ -583,7 +583,7 @@ char**>(0x00799278)[type]);
                 Memory(0x44DA90).jump(GetZonePath);
 			}
 		}
-
+		
 		std::shared_ptr<IZone> Linker::alloc_zone(const std::string& zone)
 		{
 			// Patch current thread
@@ -591,6 +591,7 @@ char**>(0x00799278)[type]);
 
 			// allocate zone
 			auto ptr = std::make_shared<Zone>(zone, this);
+			
 			return ptr;
 		}
 

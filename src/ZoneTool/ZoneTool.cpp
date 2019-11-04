@@ -108,6 +108,9 @@ namespace ZoneTool
 			return;
 		}
 
+		// set default zone target to PC
+		zone->set_target(zone_target::pc);
+		
 		auto path = "zone_source\\" + fastfile + ".csv";
 		const auto parser = CsvParser_new(path.data(), ",", false);
 
@@ -136,6 +139,26 @@ namespace ZoneTool
 			if (row->fields_[0] == "require"s)
 			{
 				linker->load_zone(std::string(row->fields_[1]));
+			}
+			// 
+			else if (row->fields_[0] == "target"s)
+			{
+				if (row->fields_[1] == "xbox360"s)
+				{
+					zone->set_target(zone_target::xbox360);
+				}
+				else if (row->fields_[1] == "ps3"s)
+				{
+					zone->set_target(zone_target::ps3);
+				}
+				else if (row->fields_[1] == "pc"s)
+				{
+					zone->set_target(zone_target::pc);
+				}
+				else
+				{
+					ZONETOOL_ERROR("Invalid zone target \"%s\"!", row->fields_[1]);
+				}
 			}
 			// this allows us to reference assets instead of rewriting them
 			else if (row->fields_[0] == "reference"s)

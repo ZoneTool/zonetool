@@ -28,7 +28,7 @@ namespace ZoneTool
 		virtual bool is_valid_asset_type(std::string& type) = 0;
 		virtual std::int32_t type_to_int(std::string type) = 0;
 		virtual std::string type_to_string(std::int32_t type) = 0;
-
+		
 	private:
 	};
 }

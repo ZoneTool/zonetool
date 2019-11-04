@@ -143,7 +143,7 @@ namespace ZoneTool
 
 		void Zone::build(ZoneBuffer* buf)
 		{
-			auto startTime = GetTickCount64();
+			const auto start_time = GetTickCount64();
 
 			// make a folder in main, for the map images
 			std::filesystem::create_directories("main\\" + this->name_ + "\\images");
@@ -151,16 +151,16 @@ namespace ZoneTool
 			ZONETOOL_INFO("Compiling fastfile \"%s\"...", this->name_.data());
 
 			constexpr std::size_t num_streams = 8;
-			XZoneMemory<num_streams> mem;
+			XZoneMemory<num_streams> mem = {};
 
-			std::size_t headersize = sizeof XZoneMemory<num_streams>;
-			memset(&mem, 0, headersize);
+			const auto header_size = sizeof XZoneMemory<num_streams>;
+			memset(&mem, 0, header_size);
 
 			auto zone = buf->at<XZoneMemory<num_streams>>();
 
 			// write zone header
-			buf->write(&mem);
-
+			auto mem_ptr = buf->write(&mem);
+			
 			std::uintptr_t pad = 0xFFFFFFFF;
 			std::uintptr_t zero = 0;
 
@@ -171,15 +171,21 @@ namespace ZoneTool
 			}
 
 			// write scriptstring count
-			std::uint32_t stringcount = buf->scriptstring_count();
-			buf->write<std::uint32_t>(&stringcount);
+			auto stringcount = buf->scriptstring_count();
+			const auto stringcount_ptr = buf->write<std::uint32_t>(&stringcount);
 			buf->write<std::uintptr_t>(stringcount > 0 ? (&pad) : (&zero));
 
 			// write asset count
-			std::uint32_t asset_count = m_assets.size();
-			buf->write<std::uint32_t>(&asset_count);
+			auto asset_count = m_assets.size();
+			const auto asset_count_ptr = buf->write<std::uint32_t>(&asset_count);
 			buf->write<std::uintptr_t>(asset_count > 0 ? (&pad) : (&zero));
 
+			if (target_ != zone_target::pc)
+			{
+				endian_convert(asset_count_ptr);
+				endian_convert(stringcount_ptr);
+			}
+			
 			// push stream
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -208,15 +214,19 @@ namespace ZoneTool
 
 			// set asset ptr base
 			this->m_assetbase = buf->stream_offset(3);
-			// ZONETOOL_INFO("m_assetbase: %u", this->m_assetbase);
 
 			// write asset types to header
 			for (auto i = 0u; i < asset_count; i++)
 			{
 				// write asset data to zone
 				auto type = m_assets[i]->type();
-				buf->write(&type);
+				const auto type_ptr = buf->write(&type);
 				buf->write(&pad);
+
+				if (target_ != zone_target::pc)
+				{
+					endian_convert(type_ptr);
+				}
 			}
 
 			// write assets
@@ -228,8 +238,6 @@ namespace ZoneTool
 
 				// write asset
 				asset->write(this, buf);
-
-				sizeof snd_alias_t;
 				
 				// pop stream
 				buf->pop_stream();
@@ -240,13 +248,23 @@ namespace ZoneTool
 			buf->pop_stream();
 
 			// update zone header
-			zone->size = buf->size() - headersize;
+			zone->size = buf->size() - header_size;
 			zone->externalsize = 0;
 
 			// Update stream data
 			for (int i = 0; i < num_streams; i++)
 			{
 				zone->streams[i] = buf->stream_offset(i);
+			}
+
+			if (target_ != zone_target::pc)
+			{
+				endian_convert(&mem_ptr->size);
+				endian_convert(&mem_ptr->externalsize);
+				for (auto& stream : mem_ptr->streams)
+				{
+					endian_convert(&stream);
+				}
 			}
 
 			// Dump zone to disk (DEBUGGING PURPOSES)
@@ -261,9 +279,11 @@ namespace ZoneTool
 			header->version = 276;
 			header->allowOnlineUpdate = 0;
 
-			// Encrypt fastfile
-			// ZoneBuffer encrypted(buf_compressed);
-			// encrypted.encrypt();
+			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
+			{
+				header->version = 269;
+				endian_convert(&header->version);
+			}
 
 			// Save fastfile
 			ZoneBuffer fastfile(buf_compressed.size() + 21);
@@ -277,7 +297,7 @@ namespace ZoneTool
 			fastfile.save("zone\\english\\" + this->name_ + ".ff");
 
 			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->name_.data());
-			ZONETOOL_INFO("Compiling took %u msec.", GetTickCount64() - startTime);
+			ZONETOOL_INFO("Compiling took %u msec.", GetTickCount64() - start_time);
 
 			// this->m_linker->UnloadZones();
 		}

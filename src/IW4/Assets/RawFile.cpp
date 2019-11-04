@@ -104,6 +104,14 @@ namespace ZoneTool
 				ZoneBuffer::ClearPointer(&dest->buffer);
 			}
 
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->compressedLen);
+				endian_convert(&dest->len);
+				endian_convert(&dest->buffer);
+			}
+
 			END_LOG_STREAM;
 			buf->pop_stream();
 		}

@@ -29,5 +29,18 @@ namespace ZoneTool
 		virtual std::int32_t get_type_by_name(const std::string& type) = 0;
 
 		virtual void build(ZoneBuffer* buf) = 0;
+
+		virtual zone_target get_target()
+		{
+			return target_;
+		}
+		virtual void set_target(const zone_target target)
+		{
+			target_ = target;
+		}
+
+	protected:
+		zone_target target_ = zone_target::pc;
+		
 	};
 }

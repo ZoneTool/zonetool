@@ -68,6 +68,7 @@ namespace ZoneTool
 			std::int32_t get_type_by_name(const std::string& type) override;
 
 			void build(ZoneBuffer* buf) override;
+			
 		};
 	}
 }

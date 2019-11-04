@@ -278,7 +278,7 @@ namespace ZoneTool
 		void ITechset::dump_statebits(const std::string& techset, char* statebits)
 		{
 			char iw5_statebits[54];
-			memset(iw5_statebits, 0, sizeof iw5_statebits);
+			memset(iw5_statebits, 0xFF, sizeof iw5_statebits);
 
 			for (int i = 0; i < 48; i++)
 			{
@@ -310,7 +310,7 @@ namespace ZoneTool
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
 			auto iw5_techset = new IW5::MaterialTechniqueSet;
-			memset(iw5_techset, 0, sizeof IW5::MaterialTechniqueSet);
+			memset(iw5_techset, 0xFF, sizeof IW5::MaterialTechniqueSet);
 
 			iw5_techset->name = asset->name;
 			iw5_techset->pad = asset->pad;

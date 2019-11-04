@@ -341,7 +341,7 @@ namespace ZoneTool
 		void ITechset::dump_statebits(const std::string& techset, char* statebits)
 		{
 			char iw4_statebits[48];
-			memset(iw4_statebits, 0, sizeof iw4_statebits);
+			memset(iw4_statebits, 0xFF, sizeof iw4_statebits);
 
 			for (int i = 0; i < 34; i++)
 			{

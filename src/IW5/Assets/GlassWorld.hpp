@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IGlassWorld : public IAsset
 		{
 		private:
-			std::string m_name;
-			GlassWorld* m_asset;
+			std::string name_;
+			GlassWorld* asset_;
 
 		public:
 			IGlassWorld();

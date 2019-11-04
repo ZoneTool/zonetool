@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IFontDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			Font_s* m_asset;
+			std::string name_;
+			Font_s* asset_;
 
 		public:
 			IFontDef();

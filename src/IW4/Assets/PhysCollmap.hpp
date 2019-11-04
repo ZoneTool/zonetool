@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IPhysCollmap : public IAsset
 		{
 		private:
-			std::string m_name;
-			PhysCollmap* m_asset;
+			std::string name_;
+			PhysCollmap* asset_;
 
 		public:
 			IPhysCollmap();

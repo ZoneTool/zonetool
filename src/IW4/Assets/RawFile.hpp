@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IRawFile : public IAsset
 		{
 		private:
-			std::string m_name;
-			RawFile* m_asset;
+			std::string name_;
+			RawFile* asset_;
 
 			RawFile* parse(const std::string& name, ZoneMemory* mem);
 

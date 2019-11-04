@@ -196,12 +196,12 @@ namespace ZoneTool
 
 		void ISound::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).sound;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).sound;
 			}
 		}
 
@@ -211,7 +211,7 @@ namespace ZoneTool
 
 		void ISound::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			for (auto i = 0u; i < data->count; i++)
 			{
@@ -234,7 +234,7 @@ namespace ZoneTool
 
 		std::string ISound::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t ISound::type()
@@ -326,7 +326,7 @@ namespace ZoneTool
 
 		void ISound::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

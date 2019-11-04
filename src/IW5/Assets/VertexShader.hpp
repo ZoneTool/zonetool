@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IVertexShader : public IAsset
 		{
 		private:
-			std::string m_name;
-			VertexShader* m_asset;
+			std::string name_;
+			VertexShader* asset_;
 
 		public:
 			IVertexShader();

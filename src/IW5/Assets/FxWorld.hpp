@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IFxWorld : public IAsset
 		{
 		private:
-			std::string m_name;
-			FxWorld* m_asset;
+			std::string name_;
+			FxWorld* asset_;
 			GlassWorld* glassmap;
 
 		public:

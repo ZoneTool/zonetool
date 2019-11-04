@@ -15,13 +15,10 @@ namespace ZoneTool
 		class IFontDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			Font_s* m_asset;
+			std::string name_;
+			Font_s* asset_;
 
 		public:
-			IFontDef();
-			~IFontDef();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

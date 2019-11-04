@@ -14,19 +14,19 @@ namespace ZoneTool
 	{
 		void IGameWorldSp::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
+			this->name_ = name;
 			const auto mp_asset = IGameWorldMp::parse(name, mem);
 
 			if (!mp_asset)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).game_map_sp;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).game_map_sp;
 			}
 			else
 			{
 				// generate sp asset based on mp one
-				this->m_asset = mem->Alloc<GameWorldSp>();
-				this->m_asset->name = mp_asset->name;
-				this->m_asset->g_glassData = reinterpret_cast<G_GlassData*>(mp_asset->g_glassData);
+				this->asset_ = mem->Alloc<GameWorldSp>();
+				this->asset_->name = mp_asset->name;
+				this->asset_->g_glassData = reinterpret_cast<G_GlassData*>(mp_asset->g_glassData);
 			}
 		}
 
@@ -40,12 +40,12 @@ namespace ZoneTool
 
 		std::string IGameWorldSp::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		void IGameWorldSp::write(IZone* zone, ZoneBuffer* buf)
 		{
-			const auto data = this->m_asset;
+			const auto data = this->asset_;
 			const auto dest = buf->write(data);
 
 			assert(sizeof GameWorldSp, 56);

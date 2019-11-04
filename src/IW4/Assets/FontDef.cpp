@@ -12,18 +12,10 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		IFontDef::IFontDef()
-		{
-		}
-
-		IFontDef::~IFontDef()
-		{
-		}
-
 		void IFontDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).font;
+			this->name_ = name;
+			this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).font;
 		}
 
 		void IFontDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -32,7 +24,7 @@ namespace ZoneTool
 
 		void IFontDef::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			if (data->material)
 			{
@@ -47,7 +39,7 @@ namespace ZoneTool
 
 		std::string IFontDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IFontDef::type()
@@ -57,7 +49,7 @@ namespace ZoneTool
 
 		void IFontDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			Font_s;
@@ -65,7 +57,6 @@ namespace ZoneTool
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			// TODO
 			dest->fontName = buf->write_str(this->name());
 
 			if (data->material)

@@ -67,10 +67,10 @@ namespace ZoneTool
 
 		void IVertexShader::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
 				ZONETOOL_FATAL("VertexShader %s not found.", &name[0]);
 				// this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).vertexshader;
@@ -87,7 +87,7 @@ namespace ZoneTool
 
 		std::string IVertexShader::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IVertexShader::type()
@@ -97,7 +97,7 @@ namespace ZoneTool
 
 		void IVertexShader::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

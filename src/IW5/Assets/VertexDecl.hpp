@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IVertexDecl : public IAsset
 		{
 		private:
-			std::string m_name;
-			VertexDecl* m_asset;
+			std::string name_;
+			VertexDecl* asset_;
 
 		public:
 			IVertexDecl();

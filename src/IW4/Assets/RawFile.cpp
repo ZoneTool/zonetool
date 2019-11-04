@@ -56,12 +56,12 @@ namespace ZoneTool
 
 		void IRawFile::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = parse(name, mem);
+			this->name_ = name;
+			this->asset_ = parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data()).rawfile;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data()).rawfile;
 			}
 		}
 
@@ -75,7 +75,7 @@ namespace ZoneTool
 
 		std::string IRawFile::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IRawFile::type()
@@ -85,7 +85,7 @@ namespace ZoneTool
 
 		void IRawFile::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write<RawFile>(data);
 
 			buf->push_stream(3);

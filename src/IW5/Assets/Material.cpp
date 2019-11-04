@@ -368,12 +368,12 @@ namespace ZoneTool
 
 		void IMaterial::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data(), 1).material;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data(), 1).material;
 			}
 		}
 
@@ -383,7 +383,7 @@ namespace ZoneTool
 
 		void IMaterial::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			if (data->techniqueSet)
 			{
@@ -402,7 +402,7 @@ namespace ZoneTool
 
 		std::string IMaterial::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IMaterial::type()
@@ -413,7 +413,7 @@ namespace ZoneTool
 		void IMaterial::write(IZone* zone, ZoneBuffer* buf)
 		{
 			auto dest = buf->at<Material>();
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			buf->write(data);
 			buf->push_stream(3);

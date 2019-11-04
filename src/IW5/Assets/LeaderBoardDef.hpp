@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ILeaderBoardDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			LeaderBoardDef* m_asset;
+			std::string name_;
+			LeaderBoardDef* asset_;
 
 		public:
 			ILeaderBoardDef();

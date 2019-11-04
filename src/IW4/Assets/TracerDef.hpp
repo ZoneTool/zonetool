@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ITracerDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			TracerDef* m_asset;
+			std::string name_;
+			TracerDef* asset_;
 
 		public:
 			ITracerDef();

@@ -693,22 +693,22 @@ namespace ZoneTool
 
 		void IWeaponDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).weapon;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).weapon;
 			}
 		}
 
 		void IWeaponDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 			auto weapon = mem->Alloc<WeaponCompleteDef>();
-			memcpy(weapon, this->m_asset, sizeof WeaponCompleteDef);
+			memcpy(weapon, this->asset_, sizeof WeaponCompleteDef);
 
 			weapon->hideTags = mem->Alloc<short>(32);
-			memcpy(weapon->hideTags, this->m_asset->hideTags, sizeof(short) * 32);
+			memcpy(weapon->hideTags, this->asset_->hideTags, sizeof(short) * 32);
 
 			if (weapon->hideTags)
 			{
@@ -730,14 +730,14 @@ namespace ZoneTool
 					{
 						weapon->notetrackOverrides[i].notetrackSoundMapKeys = mem->Alloc<short>(24);
 						memcpy(weapon->notetrackOverrides[i].notetrackSoundMapKeys,
-						       this->m_asset->notetrackOverrides[i].notetrackSoundMapKeys, sizeof(short) * 24);
+						       this->asset_->notetrackOverrides[i].notetrackSoundMapKeys, sizeof(short) * 24);
 
 						for (int nt = 0; nt < 24; nt++)
 						{
 							if (weapon->notetrackOverrides[i].notetrackSoundMapKeys[nt])
 							{
 								std::string tag = SL_ConvertToString(
-									this->m_asset->notetrackOverrides[i].notetrackSoundMapKeys[nt]);
+									this->asset_->notetrackOverrides[i].notetrackSoundMapKeys[nt]);
 								weapon->notetrackOverrides[i].notetrackSoundMapKeys[nt] = buf->write_scriptstring(tag);
 							}
 						}
@@ -747,14 +747,14 @@ namespace ZoneTool
 					{
 						weapon->notetrackOverrides[i].notetrackSoundMapValues = mem->Alloc<short>(24);
 						memcpy(weapon->notetrackOverrides[i].notetrackSoundMapValues,
-						       this->m_asset->notetrackOverrides[i].notetrackSoundMapValues, sizeof(short) * 24);
+						       this->asset_->notetrackOverrides[i].notetrackSoundMapValues, sizeof(short) * 24);
 
 						for (int nt = 0; nt < 24; nt++)
 						{
 							if (weapon->notetrackOverrides[i].notetrackSoundMapValues[nt])
 							{
 								std::string tag = SL_ConvertToString(
-									this->m_asset->notetrackOverrides[i].notetrackSoundMapValues[nt]);
+									this->asset_->notetrackOverrides[i].notetrackSoundMapValues[nt]);
 								weapon->notetrackOverrides[i].notetrackSoundMapValues[nt] = buf->
 									write_scriptstring(tag);
 							}
@@ -771,7 +771,7 @@ namespace ZoneTool
 			if (data->__field__) \
 			{ \
 				data->__field__ = mem->Alloc<short>(__count__); \
-				memcpy(data->__field__, this->m_asset->WeaponDef->__field__, sizeof(short) * __count__); \
+				memcpy(data->__field__, this->asset_->WeaponDef->__field__, sizeof(short) * __count__); \
 \
 				for (int nt = 0; nt < __count__; nt++) \
 				{ \
@@ -786,7 +786,7 @@ namespace ZoneTool
 			WEAPON_SCRIPTSTRING_ARRAY(notetrackRumbleMapValues, 16);
 
 			weapon->WeaponDef = data;
-			this->m_asset = weapon;
+			this->asset_ = weapon;
 		}
 
 		void IWeaponDef::load_depending_WeaponDef(IZone* zone, WeaponDef* data)
@@ -897,19 +897,19 @@ namespace ZoneTool
 
 		void IWeaponDef::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			for (auto i = 0u; i < 6; i++)
 			{
 				if (data->attachment1 && data->attachment1[i])
 				{
-					zone->add_asset_of_type(attachment, this->m_asset->attachment1[i]->szInternalName);
+					zone->add_asset_of_type(attachment, this->asset_->attachment1[i]->szInternalName);
 				}
 
 				if (i >= 3) continue;
 				if (data->attachment3 && data->attachment3[i])
 				{
-					zone->add_asset_of_type(attachment, this->m_asset->attachment3[i]->szInternalName);
+					zone->add_asset_of_type(attachment, this->asset_->attachment3[i]->szInternalName);
 				}
 
 				// Projectile attachments require fixing.
@@ -978,7 +978,7 @@ namespace ZoneTool
 
 		std::string IWeaponDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IWeaponDef::type()
@@ -1300,7 +1300,7 @@ namespace ZoneTool
 		{
 			sizeof(WeaponCompleteDef);
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

@@ -13,8 +13,8 @@ namespace ZoneTool::CODO
 	class ILocalizeEntry : public IAsset
 	{
 	private:
-		std::string m_name;
-		LocalizeEntry* m_asset;
+		std::string name_;
+		LocalizeEntry* asset_;
 
 	public:
 		ILocalizeEntry();

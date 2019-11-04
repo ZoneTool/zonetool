@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IGfxWorld : public IAsset
 		{
 		private:
-			std::string m_name;
-			GfxWorld* m_asset;
+			std::string name_;
+			GfxWorld* asset_;
 
 		public:
 			static GfxWorld* parse(const std::string& name, ZoneMemory* mem);

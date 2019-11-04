@@ -13,8 +13,8 @@ namespace ZoneTool::CODO
 	class IStringTable : public IAsset
 	{
 	private:
-		std::string m_name;
-		StringTable* m_asset;
+		std::string name_;
+		StringTable* asset_;
 
 	public:
 		IStringTable();

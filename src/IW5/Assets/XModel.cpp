@@ -114,12 +114,12 @@ namespace ZoneTool
 
 		void IXModel::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data(), 1).xmodel;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data(), 1).xmodel;
 			}
 		}
 
@@ -127,25 +127,25 @@ namespace ZoneTool
 		{
 			// fixup scriptstrings
 			auto xmodel = mem->Alloc<XModel>();
-			memcpy(xmodel, this->m_asset, sizeof XModel);
+			memcpy(xmodel, this->asset_, sizeof XModel);
 
 			// allocate bonenames
-			if (this->m_asset->boneNames)
+			if (this->asset_->boneNames)
 			{
 				xmodel->boneNames = mem->Alloc<short>(xmodel->numBones);
-				memcpy(xmodel->boneNames, this->m_asset->boneNames, sizeof(short) * xmodel->numBones);
+				memcpy(xmodel->boneNames, this->asset_->boneNames, sizeof(short) * xmodel->numBones);
 
 				for (int i = 0; i < xmodel->numBones; i++)
 				{
 					if (xmodel->boneNames[i])
 					{
-						std::string bone = SL_ConvertToString(this->m_asset->boneNames[i]);
+						std::string bone = SL_ConvertToString(this->asset_->boneNames[i]);
 						xmodel->boneNames[i] = buf->write_scriptstring(bone);
 					}
 				}
 			}
 
-			this->m_asset = xmodel;
+			this->asset_ = xmodel;
 		}
 
 		void IXModel::load_depending(IZone* zone)
@@ -154,7 +154,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW5::IXModel::load_depending");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			// Materials
 			for (std::int32_t i = 0; i < data->numSurfaces; i++)
@@ -194,7 +194,7 @@ namespace ZoneTool
 
 		std::string IXModel::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IXModel::type()
@@ -210,7 +210,7 @@ namespace ZoneTool
 
 			assert(sizeof XModel, 308);
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write<XModel>(data);
 
 			buf->push_stream(3);

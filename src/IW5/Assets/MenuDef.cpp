@@ -22,8 +22,8 @@ namespace ZoneTool
 
 		void IMenuDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).menu;
+			this->name_ = name;
+			this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).menu;
 		}
 
 		void IMenuDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -36,7 +36,7 @@ namespace ZoneTool
 
 		std::string IMenuDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IMenuDef::type()
@@ -53,7 +53,7 @@ namespace ZoneTool
 		void IMenuDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			// the only purpose for this is to decrease load time of the game...
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

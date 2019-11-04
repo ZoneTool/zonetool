@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IFxEffectDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			FxEffectDef* m_asset;
+			std::string name_;
+			FxEffectDef* asset_;
 
 			static void write_FxElemDefVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 			                                   FxElemDefVisuals* dest);

@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IMenuDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			menuDef_t* m_asset;
+			std::string name_;
+			menuDef_t* asset_;
 
 		public:
 			IMenuDef();

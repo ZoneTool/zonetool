@@ -281,12 +281,12 @@ namespace ZoneTool
 
 		void IMapEnts::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), name.data()).mapents;
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data()).mapents;
 			}
 		}
 
@@ -301,7 +301,7 @@ namespace ZoneTool
 
 		std::string IMapEnts::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IMapEnts::type()
@@ -327,7 +327,7 @@ namespace ZoneTool
 
 		void IMapEnts::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

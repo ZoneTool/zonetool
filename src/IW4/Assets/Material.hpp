@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IMaterial : public IAsset
 		{
 		private:
-			std::string m_name;
-			Material* m_asset;
+			std::string name_;
+			Material* asset_;
 
 			Material* parse(std::string name, ZoneMemory* mem);
 

@@ -62,18 +62,18 @@ namespace ZoneTool
 
 		void IGlassWorld::init(void* asset, ZoneMemory* mem)
 		{
-			this->m_asset = reinterpret_cast<GlassWorld*>(asset);
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = reinterpret_cast<GlassWorld*>(asset);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
 		}
 
 		void IGlassWorld::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), name.data(), 1).glassworld;
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data(), 1).glassworld;
 			}
 		}
 
@@ -87,7 +87,7 @@ namespace ZoneTool
 
 		std::string IGlassWorld::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IGlassWorld::type()
@@ -97,7 +97,7 @@ namespace ZoneTool
 
 		void IGlassWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			assert(sizeof GlassWorld, 8);

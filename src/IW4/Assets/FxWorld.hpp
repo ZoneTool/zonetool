@@ -15,15 +15,12 @@ namespace ZoneTool
 		class IFxWorld : public IAsset
 		{
 		private:
-			std::string m_name;
-			FxWorld* m_asset;
+			std::string name_;
+			FxWorld* asset_;
 
 			FxWorld* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IFxWorld();
-			~IFxWorld();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

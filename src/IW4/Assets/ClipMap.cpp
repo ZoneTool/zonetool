@@ -109,13 +109,13 @@ namespace ZoneTool
 
 		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = this->parse(name, mem);
 			this->m_filename = name;
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), name.data()).clipmap;
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data()).clipmap;
 			}
 		}
 
@@ -129,7 +129,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW4::IClipMap::load_depending");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			if (data->staticModelList)
 			{
@@ -182,7 +182,7 @@ namespace ZoneTool
 
 			if (data->mapEnts)
 			{
-				zone->add_asset_of_type(map_ents, this->m_asset->mapEnts->name);
+				zone->add_asset_of_type(map_ents, this->asset_->mapEnts->name);
 			}
 
 #ifdef USE_VMPROTECT
@@ -192,7 +192,7 @@ namespace ZoneTool
 
 		std::string IClipMap::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IClipMap::type()
@@ -206,7 +206,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW4::IClipMap::write");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto offset = buf->get_zone_offset();
 			auto dest = buf->write<clipMap_t>(data);
 

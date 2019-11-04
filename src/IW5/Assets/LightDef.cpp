@@ -68,12 +68,12 @@ namespace ZoneTool
 
 		void ILightDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).lightdef;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).lightdef;
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace ZoneTool
 
 		void ILightDef::load_depending(IZone* zone)
 		{
-			auto asset = this->m_asset;
+			auto asset = this->asset_;
 
 			if (asset->attenuation.image)
 			{
@@ -97,7 +97,7 @@ namespace ZoneTool
 
 		std::string ILightDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t ILightDef::type()
@@ -109,7 +109,7 @@ namespace ZoneTool
 		{
 			assert(sizeof(GfxLightDef), 24);
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

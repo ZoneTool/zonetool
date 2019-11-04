@@ -272,12 +272,12 @@ namespace ZoneTool
 
 		void IGfxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), name.data(), 1).gfxworld;
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data(), 1).gfxworld;
 			}
 		}
 
@@ -291,7 +291,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW5::IGfxWorld::load_depending");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			// Skies
 			if (data->skyCount)
@@ -406,7 +406,7 @@ namespace ZoneTool
 
 		std::string IGfxWorld::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IGfxWorld::type()
@@ -420,7 +420,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW5::IGfxWorld::write");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

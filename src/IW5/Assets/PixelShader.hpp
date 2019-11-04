@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IPixelShader : public IAsset
 		{
 		private:
-			std::string m_name;
-			PixelShader* m_asset;
+			std::string name_;
+			PixelShader* asset_;
 
 		public:
 			static PixelShader* parse(const std::string& name, ZoneMemory* mem, bool preferLocal = false);

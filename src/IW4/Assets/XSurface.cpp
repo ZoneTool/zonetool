@@ -88,19 +88,19 @@ namespace ZoneTool
 
 		void IXSurface::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data()).xsurface;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data()).xsurface;
 			}
 		}
 
 		void IXSurface::init(void* asset, ZoneMemory* mem)
 		{
-			this->m_asset = reinterpret_cast<XModelSurfs*>(asset);
-			this->m_name = this->m_asset->name;
+			this->asset_ = reinterpret_cast<XModelSurfs*>(asset);
+			this->name_ = this->asset_->name;
 		}
 
 		void IXSurface::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -113,7 +113,7 @@ namespace ZoneTool
 
 		std::string IXSurface::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IXSurface::type()
@@ -196,7 +196,7 @@ namespace ZoneTool
 
 		void IXSurface::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write<XModelSurfs>(data);
 
 			assert(sizeof XModelSurfs, 36);

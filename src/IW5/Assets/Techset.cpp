@@ -112,17 +112,17 @@ namespace ZoneTool
 
 		void ITechset::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
 				ZONETOOL_FATAL(
 "Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
 				// std::getchar();
 
 				this->m_parsed = false;
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).
 					techset;
 			}
 			this->m_parsed = true;
@@ -135,7 +135,7 @@ namespace ZoneTool
 
 		void ITechset::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			for (std::int32_t technique = 0; technique < 54; technique++)
 			{
@@ -168,7 +168,7 @@ namespace ZoneTool
 
 		std::string ITechset::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t ITechset::type()
@@ -178,7 +178,7 @@ namespace ZoneTool
 
 		void ITechset::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

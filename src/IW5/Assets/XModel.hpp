@@ -18,8 +18,8 @@ namespace ZoneTool
 		class IXModel : public IAsset
 		{
 		private:
-			std::string m_name;
-			XModel* m_asset;
+			std::string name_;
+			XModel* asset_;
 
 		public:
 			static XModel* parse_new(const std::string& name, ZoneMemory* mem, const std::string& filename, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);
@@ -29,7 +29,7 @@ namespace ZoneTool
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 
-			void* pointer() override { return m_asset; }
+			void* pointer() override { return asset_; }
 			std::string name() override;
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;

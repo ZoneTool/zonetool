@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IPhysPreset : public IAsset
 		{
 		private:
-			std::string m_name;
-			PhysPreset* m_asset;
+			std::string name_;
+			PhysPreset* asset_;
 
 		public:
 			IPhysPreset();

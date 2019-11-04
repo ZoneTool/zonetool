@@ -17,8 +17,8 @@ namespace ZoneTool
 		class IGameWorldSp : public IAsset
 		{
 		private:
-			std::string m_name;
-			GameWorldSp* m_asset;
+			std::string name_;
+			GameWorldSp* asset_;
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

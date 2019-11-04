@@ -105,36 +105,36 @@ namespace ZoneTool
 
 		void IGfxImage::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
-			this->isMapImage = (this->m_name.size() >= 6)
-				                   ? ((this->m_name.substr(0, 6) == "*light" || this->m_name.substr(0, 6) == "*refle" ||
-					                      this->m_name == "$outdoor")
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
+			this->isMapImage = (this->name_.size() >= 6)
+				                   ? ((this->name_.substr(0, 6) == "*light" || this->name_.substr(0, 6) == "*refle" ||
+					                      this->name_ == "$outdoor")
 					                      ? true
 					                      : false)
 				                   : false;
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data()).gfximage;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data()).gfximage;
 			}
 		}
 
 		void IGfxImage::init(void* asset, ZoneMemory* mem)
 		{
-			this->m_asset = reinterpret_cast<GfxImage*>(asset);
-			this->m_name = this->m_asset->name;
-			this->isMapImage = (this->m_name.size() >= 6)
-				                   ? ((this->m_name.substr(0, 6) == "*light" || this->m_name.substr(0, 6) == "*refle" ||
-					                      this->m_name == "$outdoor")
+			this->asset_ = reinterpret_cast<GfxImage*>(asset);
+			this->name_ = this->asset_->name;
+			this->isMapImage = (this->name_.size() >= 6)
+				                   ? ((this->name_.substr(0, 6) == "*light" || this->name_.substr(0, 6) == "*refle" ||
+					                      this->name_ == "$outdoor")
 					                      ? true
 					                      : false)
 				                   : false;
 
-			auto parsed = this->parse(this->m_name, mem);
+			auto parsed = this->parse(this->name_, mem);
 			if (parsed)
 			{
-				this->m_asset = parsed;
+				this->asset_ = parsed;
 			}
 		}
 
@@ -148,7 +148,7 @@ namespace ZoneTool
 
 		std::string IGfxImage::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IGfxImage::type()
@@ -160,7 +160,7 @@ namespace ZoneTool
 		{
 			IW5::IGfxImage::dump_iwi(this->name());
 			
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

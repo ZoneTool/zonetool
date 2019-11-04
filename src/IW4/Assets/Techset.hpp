@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ITechset : public IAsset
 		{
 		private:
-			std::string m_name;
-			MaterialTechniqueSet* m_asset;
+			std::string name_;
+			MaterialTechniqueSet* asset_;
 			bool m_parsed;
 			
 		public:
@@ -26,7 +26,7 @@ namespace ZoneTool
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
-			void* pointer() override { return m_asset; }
+			void* pointer() override { return asset_; }
 
 			std::string name() override;
 			std::int32_t type() override;

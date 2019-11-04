@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IAttachmentDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			AttachmentDef* m_asset;
+			std::string name_;
+			AttachmentDef* asset_;
 			bool m_parsed;
 
 			AttachmentDef* parse(const std::string& name, ZoneMemory* mem);

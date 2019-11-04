@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ISoundCurve : public IAsset
 		{
 		private:
-			std::string m_name;
-			SndCurve* m_asset;
+			std::string name_;
+			SndCurve* asset_;
 
 		public:
 			ISoundCurve();

@@ -15,12 +15,12 @@ namespace ZoneTool
 	{
 		void IFxEffectDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).fx;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).fx;
 			}
 		}
 
@@ -63,7 +63,7 @@ namespace ZoneTool
 
 		void IFxEffectDef::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			auto load_FxElemVisuals = [zone](FxElemDef* def, FxElemDefVisuals* vis)
 			{
@@ -153,7 +153,7 @@ namespace ZoneTool
 
 		std::string IFxEffectDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IFxEffectDef::type()
@@ -343,7 +343,7 @@ namespace ZoneTool
 
 		void IFxEffectDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

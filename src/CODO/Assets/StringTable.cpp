@@ -141,13 +141,13 @@ namespace ZoneTool::CODO
 
 	void IStringTable::init(const std::string& name, ZoneMemory* mem)
 	{
-		this->m_name = name;
-		this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).stringtable;
+		this->name_ = name;
+		this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).stringtable;
 
 		if (FileSystem::FileExists(name))
 		{
 			ZONETOOL_INFO("Parsing stringtable %s...", name.data());
-			this->m_asset = StringTable_Parse(name, mem);
+			this->asset_ = StringTable_Parse(name, mem);
 		}
 	}
 
@@ -161,7 +161,7 @@ namespace ZoneTool::CODO
 
 	std::string IStringTable::name()
 	{
-		return this->m_name;
+		return this->name_;
 	}
 
 	std::int32_t IStringTable::type()
@@ -171,7 +171,7 @@ namespace ZoneTool::CODO
 
 	void IStringTable::write(IZone* zone, ZoneBuffer* buf)
 	{
-		auto data = this->m_asset;
+		auto data = this->asset_;
 		auto dest = buf->write(data);
 
 		buf->push_stream(3);

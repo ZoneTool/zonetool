@@ -18,8 +18,8 @@ namespace ZoneTool
 		class IXAnimParts : public IAsset
 		{
 		private:
-			std::string m_name;
-			XAnimParts* m_asset;
+			std::string name_;
+			XAnimParts* asset_;
 
 		public:
 			static XAnimParts* parse_xae(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString);

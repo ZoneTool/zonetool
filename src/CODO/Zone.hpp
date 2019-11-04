@@ -46,7 +46,7 @@ namespace ZoneTool::CODO
 	{
 	private:
 		std::uintptr_t m_assetbase;
-		std::string m_name;
+		std::string name_;
 		ILinker* m_linker;
 		std::vector<std::shared_ptr<IAsset>> m_assets;
 		std::shared_ptr<ZoneMemory> m_zonemem;

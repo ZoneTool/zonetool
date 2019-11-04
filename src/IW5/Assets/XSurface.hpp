@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IXSurface : public IAsset
 		{
 		private:
-			std::string m_name;
-			ModelSurface* m_asset;
+			std::string name_;
+			ModelSurface* asset_;
 
 			void write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data, std::int16_t count);
 
@@ -32,7 +32,7 @@ namespace ZoneTool
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
 
-			void* pointer() override { return m_asset; }
+			void* pointer() override { return asset_; }
 			std::string name() override;
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;

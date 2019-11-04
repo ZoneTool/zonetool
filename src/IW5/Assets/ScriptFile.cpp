@@ -69,12 +69,12 @@ namespace ZoneTool
 
 		void IScriptFile::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->m_name.data(), 1).scriptfile;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data(), 1).scriptfile;
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace ZoneTool
 
 		std::string IScriptFile::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IScriptFile::type()
@@ -98,7 +98,7 @@ namespace ZoneTool
 
 		void IScriptFile::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write<ScriptFile>(data);
 
 			buf->push_stream(3);

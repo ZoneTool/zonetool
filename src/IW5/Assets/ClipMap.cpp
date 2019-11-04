@@ -298,13 +298,13 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = "maps/mp/" + currentzone + ".d3dbsp"; // name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->asset_ = this->parse(name, mem);
 			this->m_filename = name;
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), name.data(), 1).clipmap;
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data(), 1).clipmap;
 			}
 		}
 
@@ -318,7 +318,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			VMProtectBeginUltra("IW5::IClipMap::load_depending");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			if (data->staticModelList)
 			{
@@ -371,7 +371,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 			if (data->mapEnts)
 			{
-				zone->add_asset_of_type(map_ents, this->m_asset->mapEnts->name);
+				zone->add_asset_of_type(map_ents, this->asset_->mapEnts->name);
 			}
 
 #ifdef USE_VMPROTECT
@@ -381,7 +381,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 		std::string IClipMap::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IClipMap::type()
@@ -539,7 +539,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			VMProtectBeginUltra("IW5::IClipMap::write");
 #endif
 
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto offset = buf->get_zone_offset();
 			auto dest = buf->write<clipMap_t>(data);
 

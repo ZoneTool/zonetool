@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ITechset : public IAsset
 		{
 		private:
-			std::string m_name;
-			MaterialTechniqueSet* m_asset;
+			std::string name_;
+			MaterialTechniqueSet* asset_;
 			bool m_parsed;
 			
 		public:

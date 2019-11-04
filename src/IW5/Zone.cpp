@@ -140,9 +140,9 @@ namespace ZoneTool
 			auto startTime = GetTickCount64();
 
 			// make a folder in main, for the map images
-			std::filesystem::create_directories("main\\" + this->m_name + "\\images");
+			std::filesystem::create_directories("main\\" + this->name_ + "\\images");
 
-			ZONETOOL_INFO("Compiling fastfile \"%s\"...", this->m_name.data());
+			ZONETOOL_INFO("Compiling fastfile \"%s\"...", this->name_.data());
 
 			constexpr std::size_t num_streams = 9;
 			XZoneMemory<num_streams> mem;
@@ -261,10 +261,10 @@ namespace ZoneTool
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
 			// plutonium output paths
-			fastfile.save("zone\\pluto\\common\\" + this->m_name + ".ff");
-			fastfile.save("zone\\english\\" + this->m_name + ".ff");
+			fastfile.save("zone\\pluto\\common\\" + this->name_ + ".ff");
+			fastfile.save("zone\\english\\" + this->name_ + ".ff");
 
-			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->m_name.data());
+			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->name_.data());
 			ZONETOOL_INFO("Compiling took %u msec.", GetTickCount64() - startTime);
 
 			// this->m_linker->UnloadZones();
@@ -278,7 +278,7 @@ namespace ZoneTool
 		{
 			currentzone = name;
 
-			this->m_name = name;
+			this->name_ = name;
 			this->m_linker = linker;
 
 			this->m_zonemem = std::make_shared<ZoneMemory>(MAX_ZONE_SIZE);

@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ISound : public IAsset
 		{
 		private:
-			std::string m_name;
-			snd_alias_list_t* m_asset;
+			std::string name_;
+			snd_alias_list_t* asset_;
 			bool m_parsed;
 
 			static void write_soundfile(IZone* zone, ZoneBuffer* buf, SoundFile* dest);

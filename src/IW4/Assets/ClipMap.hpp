@@ -15,10 +15,10 @@ namespace ZoneTool
 		class IClipMap : public IAsset
 		{
 		private:
-			std::string m_name;
+			std::string name_;
 			std::string m_filename;
 
-			clipMap_t* m_asset;
+			clipMap_t* asset_;
 
 		public:
 			clipMap_t* parse(const std::string& name, ZoneMemory* mem);

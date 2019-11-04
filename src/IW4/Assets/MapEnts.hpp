@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IMapEnts : public IAsset
 		{
 		private:
-			std::string m_name;
-			MapEnts* m_asset;
+			std::string name_;
+			MapEnts* asset_;
 
 		public:
 			void ConvertEnts(MapEnts* ents, ZoneMemory* mem);

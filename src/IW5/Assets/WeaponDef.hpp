@@ -17,8 +17,8 @@ namespace ZoneTool
 		class IWeaponDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			WeaponCompleteDef* m_asset;
+			std::string name_;
+			WeaponCompleteDef* asset_;
 
 		public:
 			IWeaponDef();

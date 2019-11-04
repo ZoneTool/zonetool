@@ -49,12 +49,12 @@ namespace ZoneTool
 
 		void IAttachmentDef::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data(), 1).attachment;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).attachment;
 			}
 		}
 
@@ -64,7 +64,7 @@ namespace ZoneTool
 
 		void IAttachmentDef::load_depending(IZone* zone)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 
 			// if we didn't parse a custom asset and the asset is common: there is no point in writing it.
 			// make a reference to the original asset instead.
@@ -197,7 +197,7 @@ namespace ZoneTool
 
 		std::string IAttachmentDef::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IAttachmentDef::type()
@@ -207,7 +207,7 @@ namespace ZoneTool
 
 		void IAttachmentDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

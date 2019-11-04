@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ILoadedSound : public IAsset
 		{
 		private:
-			std::string m_name;
-			LoadedSound* m_asset;
+			std::string name_;
+			LoadedSound* asset_;
 
 		public:
 			ILoadedSound();

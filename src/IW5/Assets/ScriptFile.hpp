@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IScriptFile : public IAsset
 		{
 		private:
-			std::string m_name;
-			ScriptFile* m_asset;
+			std::string name_;
+			ScriptFile* asset_;
 
 			ScriptFile* parse(const std::string& name, ZoneMemory* mem);
 

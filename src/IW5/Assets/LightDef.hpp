@@ -15,8 +15,8 @@ namespace ZoneTool
 		class ILightDef : public IAsset
 		{
 		private:
-			std::string m_name;
-			GfxLightDef* m_asset;
+			std::string name_;
+			GfxLightDef* asset_;
 
 		public:
 			ILightDef();

@@ -100,12 +100,12 @@ namespace ZoneTool
 
 		void IPhysCollmap::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->m_name = name;
-			this->m_asset = this->parse(name, mem);
+			this->name_ = name;
+			this->asset_ = this->parse(name, mem);
 
-			if (!this->m_asset)
+			if (!this->asset_)
 			{
-				this->m_asset = DB_FindXAssetHeader(this->type(), this->name().data()).physcollmap;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).physcollmap;
 			}
 		}
 
@@ -119,7 +119,7 @@ namespace ZoneTool
 
 		std::string IPhysCollmap::name()
 		{
-			return this->m_name;
+			return this->name_;
 		}
 
 		std::int32_t IPhysCollmap::type()
@@ -171,7 +171,7 @@ namespace ZoneTool
 
 		void IPhysCollmap::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->m_asset;
+			auto data = this->asset_;
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);

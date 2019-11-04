@@ -15,8 +15,8 @@ namespace ZoneTool
 		class IComWorld : public IAsset
 		{
 		private:
-			std::string m_name;
-			ComWorld* m_asset;
+			std::string name_;
+			ComWorld* asset_;
 
 		public:
 			static ComWorld* parse(const std::string& name, ZoneMemory* mem);

@@ -105,6 +105,8 @@ namespace ZoneTool
 				}
 			}
 
+			asset->remappedTechniques = nullptr;
+			
 			reader.close();
 			
 			return asset;

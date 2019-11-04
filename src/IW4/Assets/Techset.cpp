@@ -35,7 +35,7 @@ namespace ZoneTool
 				{
 					dest_index -= 6;
 				}
-				else if (i >= (44 + 5))
+				else if (i >= (40 + 5))
 				{
 					dest_index -= 5;
 				}
@@ -168,8 +168,7 @@ namespace ZoneTool
 			START_LOG_STREAM;
 
 			dest->name = buf->write_str(this->name());
-
-			dest->remappedTechniques = nullptr;
+			dest->remappedTechniques = static_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(techset, this->name()));
 
 			for (std::int32_t technique = 0; technique < 48; technique++)
 			{
@@ -257,7 +256,7 @@ namespace ZoneTool
 				{
 					dest_index -= 6;
 				}
-				else if (i >= (44 + 5))
+				else if (i >= (40 + 5))
 				{
 					dest_index -= 5;
 				}
@@ -289,7 +288,7 @@ namespace ZoneTool
 				{
 					dest_index += 6;
 				}
-				else if (i >= 44)
+				else if (i >= 40)
 				{
 					dest_index += 5;
 				}
@@ -324,7 +323,7 @@ namespace ZoneTool
 				{
 					dest_index += 6;
 				}
-				else if (i >= 44)
+				else if (i >= 40)
 				{
 					dest_index += 5;
 				}

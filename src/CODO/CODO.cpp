@@ -105,6 +105,11 @@ namespace ZoneTool::CODO
         return false;
     }
 
+	bool Linker::supports_version(const zone_target_version version)
+	{
+		return false;
+	}
+
     void Linker::dump_zone(const std::string& name)
 	{
 		//is_dumping_complete = false;

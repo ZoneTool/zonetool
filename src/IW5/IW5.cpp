@@ -136,6 +136,11 @@ namespace ZoneTool
             return true;
         }
 
+		bool Linker::supports_version(const zone_target_version version)
+		{
+			return version == zone_target_version::iw5_release;
+		}
+
         void Linker::dump_zone(const std::string& name)
 		{
 			is_dumping_complete = false;

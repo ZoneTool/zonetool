@@ -73,7 +73,31 @@ namespace ZoneTool
 		xbox360,
 		ps3,
 	};
+	enum class zone_target_version
+	{
+		iw3_alpha_253,
+		iw3_alpha_290,
+		iw3_alpha_328,
+		iw4_alpha_482,
+		iw4_alpha_491,
+		iw4_release,
+		iw4_release_console,
+		iw5_release,
+		max,
+	};
 
+	static std::string zone_target_version_str[8] = 
+	{
+		"iw3_alpha_253",
+		"iw3_alpha_290",
+		"iw3_alpha_328",
+		"iw4_alpha_482",
+		"iw4_alpha_491",
+		"iw4_release",
+		"iw4_release_console",
+		"iw5_release",
+	};
+	
 	static void endian_convert(void* data, const std::size_t size)
 	{
 		if (size <= 0)

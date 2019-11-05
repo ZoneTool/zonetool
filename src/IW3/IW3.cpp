@@ -334,6 +334,12 @@ namespace ZoneTool
             return false;
         }
 
+		bool Linker::supports_version(const zone_target_version version)
+		{
+			return version == zone_target_version::iw3_alpha_253 || version == zone_target_version::iw3_alpha_290 || 
+				version == zone_target_version::iw3_alpha_328;
+		}
+
         void Linker::dump_zone(const std::string& name)
 		{
 			isDumping = true;

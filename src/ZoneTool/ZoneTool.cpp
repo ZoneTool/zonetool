@@ -160,6 +160,29 @@ namespace ZoneTool
 					ZONETOOL_ERROR("Invalid zone target \"%s\"!", row->fields_[1]);
 				}
 			}
+			//
+			else if (row->fields_[0] == "target_version"s)
+			{
+				auto found_version = false;
+				for (auto i = 0u; i < static_cast<std::size_t>(zone_target_version::max); i++)
+				{
+					if (zone_target_version_str[i] == row->fields_[1])
+					{
+						const auto target_version = static_cast<zone_target_version>(i);
+						if (!linker->supports_version(target_version))
+						{
+							ZONETOOL_FATAL("Current linker (%s) does not support target version %s.", linker->version(), row->fields_[1]);
+						}
+						
+						found_version = true;
+					}
+				}
+
+				if (!found_version)
+				{
+					ZONETOOL_FATAL("Invalid target version \"%s\".", row->fields_[1]);
+				}
+			}
 			// this allows us to reference assets instead of rewriting them
 			else if (row->fields_[0] == "reference"s)
 			{

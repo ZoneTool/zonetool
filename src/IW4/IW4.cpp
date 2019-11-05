@@ -645,6 +645,12 @@ char**>(0x00799278)[type]);
             return true;
         }
 
+		bool Linker::supports_version(const zone_target_version version)
+		{
+			return version == zone_target_version::iw4_release || version == zone_target_version::iw4_release_console || 
+				version == zone_target_version::iw4_alpha_482 || version == zone_target_version::iw4_alpha_491;
+		}
+
         void Linker::dump_zone(const std::string& name)
 		{
 			isDumpingComplete = false;

@@ -19,6 +19,7 @@ namespace ZoneTool
 		virtual std::shared_ptr<ZoneBuffer> alloc_buffer() = 0;
 		virtual std::shared_ptr<IZone> alloc_zone(const std::string& zone) = 0;
         virtual bool supports_building() = 0;
+		virtual bool supports_version(const zone_target_version version) = 0;
 
 		virtual void dump_zone(const std::string& name) = 0;
 		virtual void verify_zone(const std::string& name) = 0;

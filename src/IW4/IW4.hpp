@@ -34,7 +34,8 @@ namespace ZoneTool
 			std::int32_t type_to_int(std::string type) override;
 			std::string type_to_string(std::int32_t type) override;
             bool supports_building() override;
-
+			bool supports_version(const zone_target_version version) override;
+			
 			void dump_zone(const std::string& name) override;
 			void verify_zone(const std::string& name) override;
 			

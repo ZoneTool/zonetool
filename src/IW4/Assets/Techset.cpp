@@ -310,7 +310,7 @@ namespace ZoneTool
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
 			auto iw5_techset = new IW5::MaterialTechniqueSet;
-			memset(iw5_techset, 0xFF, sizeof IW5::MaterialTechniqueSet);
+			memset(iw5_techset, 0, sizeof IW5::MaterialTechniqueSet);
 
 			iw5_techset->name = asset->name;
 			iw5_techset->pad = asset->pad;

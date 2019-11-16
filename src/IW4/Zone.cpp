@@ -67,6 +67,7 @@ namespace ZoneTool
 			// declare asset interfaces
 			DECLARE_ASSET(xmodelsurfs, IXSurface);
 			DECLARE_ASSET(image, IGfxImage);
+			DECLARE_ASSET(localize, ILocalizeEntry);
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
@@ -286,9 +287,17 @@ namespace ZoneTool
 			}
 
 			// Save fastfile
-			ZoneBuffer fastfile(buf_compressed.size() + 21);
+			ZoneBuffer fastfile(buf_compressed.size() + ((target_ == zone_target::xbox360 || target_ == zone_target::ps3) ? 37 : 21));
 			fastfile.init_streams(1);
 			fastfile.write_stream(header, 21);
+
+			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
+			{
+				char trash[16] = {};
+				memset(trash, 0, sizeof trash);
+
+				fastfile.write_stream(trash, sizeof trash);
+			}
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 

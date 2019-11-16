@@ -12,6 +12,8 @@
 #define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS
 
+#define ZONETOOL_COMPILING
+
 // Windows Includes
 #include <windows.h>
 #include <Shellapi.h>

@@ -9,6 +9,12 @@
 #include "stdafx.hpp"
 #include <Dbghelp.h>
 
+// include zonetool linkers
+#include <IW3/IW3.hpp>
+#include <IW4/IW4.hpp>
+#include <IW5/IW5.hpp>
+#include <CODO/CODO.hpp>
+
 #pragma comment(lib, "Dbghelp")
 
 std::string currentzone;

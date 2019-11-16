@@ -8,6 +8,7 @@
 // ========================================================
 #include "stdafx.hpp"
 #include <unordered_map>
+#include "ZoneTool/ZoneTool.hpp"
 
 namespace ZoneTool
 {
@@ -84,6 +85,9 @@ namespace ZoneTool
 			LargeLocalInit_t LargeLocalInit = (LargeLocalInit_t)0x4A62A0;
 			Cmd_ExecuteSingleCommand_t Cmd_ExecuteSingleCommand = (Cmd_ExecuteSingleCommand_t)0x609540;
 			DWORD G_SetupWeaponDef = 0x4E1F30;
+			DWORD Scr_BeginLoadScripts = 0x4E1ED0;
+			DWORD Scr_BeginLoadScripts2 = 0x4541F0;
+			DWORD Scr_InitAllocNodes = 0x4B8740;
 
 			Sys_InitializeCriticalSections();
 			Sys_InitMainThread();
@@ -95,6 +99,17 @@ namespace ZoneTool
 			DB_InitThread();
 			Com_InitDvars();
 			R_RegisterDvars();
+
+			// gsc stuff
+			__asm call Scr_BeginLoadScripts;
+			__asm
+			{
+				push 0x201A45C;
+				call Scr_BeginLoadScripts2;
+				add esp, 4;
+			}
+			__asm call Scr_InitAllocNodes;
+			
 			LargeLocalInit();
 			FS_Init();
 
@@ -442,10 +457,83 @@ char**>(0x00799278)[type]);
 			std::exit(0);
 		}
 
+		void gsc_compile_error(int unk, const char* fmt, ...)
+		{
+			char error_message[4096] = {};
+			
+			va_list va;
+			va_start(va, fmt);
+			_vsnprintf(error_message, sizeof error_message, fmt, va);
+
+			ZONETOOL_ERROR("script compile error: %s", error_message);
+		}
+
+		void emit_opcode(int opcode, int a2, int a3)
+		{
+			ZONETOOL_INFO("compiling opcode %u", opcode);
+		}
+		
 		void Linker::startup()
 		{
 			if (this->is_used())
 			{
+				// for compiling GSC scripts
+				ZoneTool::register_command("compilescript", [](auto args)
+				{
+					//
+					if (args.size() < 2)
+					{
+						ZONETOOL_INFO("Usage: compilescript <scriptfile>\n");
+						return;
+					}
+
+					if (FileSystem::FileExists(args[1] + ".gsc"))
+					{
+						ZONETOOL_INFO("Compiling script \"%s\"...", args[1].data());
+						
+						auto fp = FileSystem::FileOpen(args[1] + ".gsc", "rb");
+						if (fp)
+						{
+							const auto file_size = FileSystem::FileSize(fp);
+							const auto bytes = FileSystem::ReadBytes(fp, file_size);
+							auto bytes_ptr = bytes.data();
+
+							// set bytes ptr
+							Memory(0x1CFEEE8).set(bytes_ptr);
+
+							// patch current thread
+							Memory(0x1CDE7FC).set(GetCurrentThreadId());
+
+							// load gsc
+							Function<void(const char*, int, int)>(0x427D00)(args[1].data(), 0, 0);
+							
+							FileSystem::FileClose(fp);
+
+							ZONETOOL_INFO("Successfully compiled script \"%s\"!", args[1].data());
+						}
+					}
+					else
+					{
+						ZONETOOL_ERROR("Cannot find script \"%s\".", args[1].data());
+					}
+				});
+
+				// dump emitted opcodes
+				Memory(0x613FD0).jump(emit_opcode);
+
+				// force compiling gsc
+				Memory(0x427DB4).set<std::uint8_t>(0xEB);
+				Memory(0x427D22).set<std::uint8_t>(0xEB);
+				
+				// 
+				Memory(0x427DED).nop(6);
+				
+				// do nothing with online sessions
+				Memory(0x441650).set<std::uint8_t>(0xC3);
+
+				// temp fix for GSC compiling
+				Memory(0x434260).jump(gsc_compile_error);
+				
 				// Realloc asset pools
 				ReallocateAssetPoolM(localize, 2);
 				ReallocateAssetPoolM(material, 2);

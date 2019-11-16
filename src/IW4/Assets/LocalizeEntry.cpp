@@ -26,6 +26,12 @@ namespace ZoneTool
 			this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).localize;
 		}
 
+		void ILocalizeEntry::init(void* asset, ZoneMemory* mem)
+		{
+			this->asset_ = reinterpret_cast<LocalizeEntry*>(asset);
+			this->name_ = this->asset_->name;
+		}
+
 		void ILocalizeEntry::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 		}

@@ -11,15 +11,16 @@
 // include zonetool utilities
 #include <ZoneUtils/ZoneUtils.hpp>
 
-// include zonetool linkers
-#include <IW3/IW3.hpp>
-#include <IW4/IW4.hpp>
-#include <IW5/IW5.hpp>
-#include <CODO/CODO.hpp>
-
 extern std::string currentzone;
+
+#ifdef ZONETOOL_COMPILING
+#define ZONETOOL_LIB __declspec(dllexport)
+#else
+#define ZONETOOL_LIB __declspec(dllimport)
+#endif
 
 namespace ZoneTool
 {
 	void startup();
+	void register_command(const std::string& name, std::function<void(std::vector<std::string>)> cb);
 }

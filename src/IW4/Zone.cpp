@@ -226,6 +226,15 @@ namespace ZoneTool
 
 				if (target_ != zone_target::pc)
 				{
+					if (*type_ptr >= 7 && target_ == zone_target::xbox360)
+					{
+						*type_ptr -= 2;
+					}
+					else if (*type_ptr >= 8 && target_ == zone_target::ps3)
+					{
+						*type_ptr -= 1;
+					}
+					
 					endian_convert(type_ptr);
 				}
 			}
@@ -293,10 +302,16 @@ namespace ZoneTool
 
 			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
 			{
-				char trash[16] = {};
-				memset(trash, 0, sizeof trash);
+				auto language = 1;
+				auto entry_count = 0;
 
-				fastfile.write_stream(trash, sizeof trash);
+				endian_convert(&language);
+				endian_convert(&entry_count);
+				
+				fastfile.write_stream(&language, 4);
+				fastfile.write_stream(&entry_count, 4);
+				fastfile.write_stream(&mem_ptr->size, 4);
+				fastfile.write_stream(&mem_ptr->size, 4);
 			}
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());

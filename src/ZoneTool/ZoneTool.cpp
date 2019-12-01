@@ -209,7 +209,7 @@ namespace ZoneTool
 				{
 					add_assets_using_iterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
 					add_assets_using_iterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone.get());
-					add_assets_using_iterator(fastfile, "xmodel", "XModel", ".xme5", true, zone.get());
+					add_assets_using_iterator(fastfile, "xmodel", "XModel", ".xme6", true, zone.get());
 				}
 				catch (std::exception& ex)
 				{

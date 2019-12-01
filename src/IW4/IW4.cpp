@@ -287,6 +287,7 @@ char**>(0x00799278)[type]);
 					DECLARE_ASSET(fx, IFxEffectDef);
 					DECLARE_ASSET(lightdef, ILightDef);
 					DECLARE_ASSET(weapon, IWeaponDef);
+					DECLARE_ASSET(addon_map_ents, IAddonMapEnts);
 				}
 			}
 		}

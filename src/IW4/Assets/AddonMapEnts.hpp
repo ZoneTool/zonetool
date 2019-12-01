@@ -10,21 +10,17 @@
 
 namespace ZoneTool
 {
-	namespace IW5
+	namespace IW4
 	{
-		class ITechset : public IAsset
+		class IAddonMapEnts : public IAsset
 		{
 		private:
 			std::string name_;
-			MaterialTechniqueSet* asset_;
-			bool m_parsed;
-			
+			AddonMapEnts* asset_;
+
 		public:
-			static MaterialTechnique* parse_technique(const std::string& name, ZoneMemory* mem,
-				std::uint32_t index);
-			static MaterialTechniqueSet* parse(const std::string& name, ZoneMemory* mem);
-			static char* parse_statebits(const std::string& techset, ZoneMemory* mem);
-			
+			AddonMapEnts* parse(std::string name, ZoneMemory* mem);
+
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;
@@ -33,10 +29,7 @@ namespace ZoneTool
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
-			static void dump_technique_data(MaterialTechniqueSet* asset, bool is_iw5 = true);
-			static void dump_statebits(const std::string& techset, char* statebits);
-			static void dump(MaterialTechniqueSet* asset);
-			static void dump_technique(MaterialTechnique* asset);
+			static void dump(AddonMapEnts* asset);
 		};
 	}
 }

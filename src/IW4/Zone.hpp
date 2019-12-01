@@ -40,6 +40,7 @@ extern std::string currentzone;
 #include "Assets/FxEffectDef.hpp"
 #include "Assets/LightDef.hpp"
 #include "Assets/StructuredDataDef.hpp"
+#include "Assets/AddonMapEnts.hpp"
 
 namespace ZoneTool
 {

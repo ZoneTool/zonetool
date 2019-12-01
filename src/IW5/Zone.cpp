@@ -245,12 +245,12 @@ namespace ZoneTool
 			// buf->save("debug\\" + this->name_ + ".zone");
 
 			// Compress buffer
-			auto buf_compressed = buf->compress_zstd();
+			auto buf_compressed = buf->compress_zlib();
 
 			// Generate FF header
 			auto header = this->m_zonemem->Alloc<XFileHeader>();
 			strcpy(header->header, "IWffu100");
-			header->version = 2000;
+			header->version = 1;
 			header->allowOnlineUpdate = 0;
 
 			// Save fastfile
@@ -260,9 +260,9 @@ namespace ZoneTool
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
-			// plutonium output paths
-			fastfile.save("zone\\pluto\\common\\" + this->name_ + ".ff");
-			fastfile.save("zone\\english\\" + this->name_ + ".ff");
+			// oxygen output paths
+			fastfile.save("oxygen\\zone\\" + this->name_ + ".ff");
+			// fastfile.save("zone\\english\\" + this->name_ + ".ff");
 
 			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->name_.data());
 			ZONETOOL_INFO("Compiling took %u msec.", GetTickCount64() - startTime);

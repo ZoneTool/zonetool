@@ -125,6 +125,7 @@ namespace ZoneTool
 			DECLARE_ASSET(fx, IFxEffectDef);
 			DECLARE_ASSET(lightdef, ILightDef);
 			DECLARE_ASSET(structureddatadef, IStructuredDataDef);
+			DECLARE_ASSET(addon_map_ents, IAddonMapEnts);
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();

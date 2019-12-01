@@ -21,11 +21,6 @@ namespace ZoneTool
 			WeaponCompleteDef* asset_;
 
 		public:
-			IWeaponDef();
-			~IWeaponDef();
-
-			WeaponDef* parse_weapondef(Json& data, WeaponCompleteDef* baseAsset, ZoneMemory* mem);
-
 			WeaponCompleteDef* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
@@ -39,10 +34,6 @@ namespace ZoneTool
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 			void write_WeaponDef(IZone* zone, ZoneBuffer* buf, WeaponCompleteDef* complete,
 			                     WeaponDef* data);
-
-			static Json dump_weapondef(WeaponDef* asset, const std::function<const char*(uint16_t)>& convertToString);
-			static Json dump_complete(WeaponCompleteDef* asset,
-			                          const std::function<const char*(uint16_t)>& convertToString);
 			static void dump(WeaponCompleteDef* asset,
 			                 const std::function<const char*(uint16_t)>& convertToString = SL_ConvertToString);
 		};

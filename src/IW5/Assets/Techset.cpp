@@ -353,9 +353,86 @@ namespace ZoneTool
 				FileSystem::FileClose(fp);
 			}
 		}
+
+		void ITechset::dump_technique_data(MaterialTechniqueSet* asset, bool is_iw5)
+		{
+			std::filesystem::create_directories("techsets/techniques");
+			
+			for (int i = 0; i < 54; i++)
+			{
+				if (!asset->techniques[i])
+				{
+					continue;
+				}
+
+				auto technique = asset->techniques[i];
+
+				std::vector<nlohmann::json> pass_array;
+				for (int p = 0; p < technique->hdr.numPasses; p++)
+				{
+					auto current_pass = &technique->pass[p];
+					nlohmann::json pass;
+
+					std::vector<nlohmann::json> arg_array;
+
+					for (int a = 0; a < current_pass->perObjArgCount + current_pass->perPrimArgCount + current_pass->stableArgCount; a++)
+					{
+						auto current_arg = &current_pass->argumentDef[a];
+						nlohmann::json arg;
+
+						arg["type"] = current_arg->type;
+						
+						if (current_arg->type == 1 || current_arg->type == 8)
+						{
+							arg["value"][0] = current_arg->u.literalConst[0];
+							arg["value"][1] = current_arg->u.literalConst[0];
+							arg["value"][2] = current_arg->u.literalConst[0];
+							arg["value"][3] = current_arg->u.literalConst[0];
+						}
+						else if (current_arg->type == 4 || current_arg->type == 6)
+						{
+							arg["firstRow"] = current_arg->u.codeConst.firstRow;
+							arg["rowCount"] = current_arg->u.codeConst.rowCount;
+							arg["index"] = current_arg->u.codeConst.index;
+						}
+						else
+						{
+							arg["value"] = current_arg->u.codeSampler;
+						}
+
+						arg_array.push_back(arg);
+					}
+					
+					pass["perObjArgCount"] = current_pass->perObjArgCount;
+					pass["perPrimArgCount"] = current_pass->perPrimArgCount;
+					pass["stableArgCount"] = current_pass->stableArgCount;
+					pass["pixelShader"] = current_pass->pixelShader ? current_pass->pixelShader->name : "";
+					pass["vertexShader"] = current_pass->vertexShader ? current_pass->vertexShader->name : "";
+					pass["vertexDecl"] = current_pass->vertexDecl ? current_pass->vertexDecl->name : "";
+					pass["args"] = arg_array;
+					
+					pass_array.push_back(pass);
+				}
+				
+				nlohmann::json json;
+				json["name"] = technique->hdr.name;
+				json["index"] = i;
+				json["flags"] = technique->hdr.unk;
+				json["numPasses"] = technique->hdr.numPasses;
+				json["pass"] = pass_array;
+				
+				auto meme = json.dump();
+				
+				auto fp = fopen(va("techsets/techniques/%s.%s.json", technique->hdr.name, is_iw5 ? "iw5" : "iw4").data(), "wb");
+				fwrite(meme.data(), meme.size(), 1, fp);
+				fclose(fp);
+			}
+		}
 		
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
+			// dump_technique_data(asset);
+			
 			auto path = "techsets\\"s + asset->name + ".techset";
 			
 			AssetDumper dumper;

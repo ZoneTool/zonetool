@@ -64,30 +64,6 @@ namespace ZoneTool
 				triggerReader.close();
 			}
 
-			//file = FileSystem::FileOpen(name + ".ents.triggers", "rb");
-
-			//ents->trigger.hullCount = freadint(file);
-			//ents->trigger.modelCount = freadint(file);
-			//ents->trigger.slabCount = freadint(file);
-
-			//// parse trigger data
-			//if (ents->trigger.hullCount)
-			//{
-			//	ents->trigger.hulls = mem->Alloc<TriggerHull>(ents->trigger.hullCount);
-			//	fread(ents->trigger.hulls, sizeof(TriggerHull), ents->trigger.hullCount, file);
-			//}
-			//if (ents->trigger.modelCount)
-			//{
-			//	ents->trigger.models = mem->Alloc<TriggerModel>(ents->trigger.modelCount);
-			//	fread(ents->trigger.models, sizeof(TriggerModel), ents->trigger.modelCount, file);
-			//}
-			//if (ents->trigger.slabCount)
-			//{
-			//	ents->trigger.slabs = mem->Alloc<TriggerSlab>(ents->trigger.slabCount);
-			//	fread(ents->trigger.slabs, sizeof(TriggerSlab), ents->trigger.slabCount, file);
-			//}
-			//FileSystem::FileClose(file);
-
 			// return mapents
 			return ents;
 		}

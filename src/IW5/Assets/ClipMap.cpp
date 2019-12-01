@@ -278,6 +278,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 			// copy info into pInfo
 			colmap->pInfo = &colmap->info;
+
 			/*colmap->pInfo = mem->Alloc<ClipInfo>();
 			memcpy(colmap->pInfo, &colmap->info, sizeof ClipInfo);*/
 

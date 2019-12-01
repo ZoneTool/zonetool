@@ -19,7 +19,7 @@ namespace ZoneTool
 			MapEnts* asset_;
 
 		public:
-			void ConvertEnts(MapEnts* ents, ZoneMemory* mem);
+			static void ConvertEnts(MapEnts* ents, ZoneMemory* mem);
 
 			MapEnts* parse(std::string name, ZoneMemory* mem);
 			IMapEnts();

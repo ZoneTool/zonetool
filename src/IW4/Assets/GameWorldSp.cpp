@@ -14,7 +14,7 @@ namespace ZoneTool
 	{
 		void IGameWorldSp::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp";
 			const auto mp_asset = IGameWorldMp::parse(name, mem);
 
 			if (!mp_asset)

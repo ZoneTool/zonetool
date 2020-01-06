@@ -299,7 +299,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 
 		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
 			this->m_filename = name;
 

@@ -69,7 +69,7 @@ namespace ZoneTool
 
 		void IFxWorld::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
 
 			if (!this->asset_)

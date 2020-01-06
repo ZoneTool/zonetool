@@ -16,12 +16,12 @@ namespace ZoneTool
 		AddonMapEnts* IAddonMapEnts::parse(std::string name, ZoneMemory* mem)
 		{
 			// check if we can open a filepointer
-			if (!FileSystem::FileExists(name + ".addon.ents"))
+			if (!FileSystem::FileExists(name))
 			{
 				return nullptr;
 			}
 
-			auto file = FileSystem::FileOpen(name + ".addon.ents", "rb");
+			auto file = FileSystem::FileOpen(name, "rb");
 
 			// let them know that we're parsing a custom mapents file
 			ZONETOOL_INFO("Parsing addon mapents \"%s\"...", name.c_str());
@@ -34,10 +34,9 @@ namespace ZoneTool
 
 			ents->entityString = mem->Alloc<char>(ents->numEntityChars + 1);
 			memset((char*)ents->entityString, 0, ents->numEntityChars);
-
 			fread((char*)ents->entityString, ents->numEntityChars, 1, file);
-			((char*)ents->entityString)[ents->numEntityChars] = '\0';
-
+			ents->numEntityChars++;
+			
 			// convert the mapents!
 			IMapEnts::ConvertEnts(reinterpret_cast<MapEnts*>(ents), mem);
 
@@ -47,7 +46,7 @@ namespace ZoneTool
 			AssetReader triggerReader(mem);
 			AssetReader stageReader(mem);
 
-			if (triggerReader.open(name + ".addon.ents.triggers"))
+			if (triggerReader.open(name + ".triggers"))
 			{
 				ents->trigger.modelCount = triggerReader.read_int();
 				ents->trigger.models = triggerReader.read_array<TriggerModel>();
@@ -67,7 +66,7 @@ namespace ZoneTool
 
 		void IAddonMapEnts::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".mapents"; // name;
 			this->asset_ = this->parse(name, mem);
 
 			if (!this->asset_)
@@ -114,13 +113,20 @@ namespace ZoneTool
 
 			IMapEnts::write_triggers(zone, buf, &dest->trigger);
 
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->entityString);
+				endian_convert(&dest->numEntityChars);
+			}
+
 			END_LOG_STREAM;
 			buf->pop_stream();
 		}
 
 		void IAddonMapEnts::dump(AddonMapEnts* asset)
 		{
-			auto file = FileSystem::FileOpen(asset->name + ".addon.ents"s, "wb");
+			auto file = FileSystem::FileOpen(asset->name, "wb");
 
 			if (file)
 			{
@@ -129,7 +135,7 @@ namespace ZoneTool
 			}
 
 			AssetDumper triggerDumper;
-			if (triggerDumper.open(asset->name + ".addon.ents.triggers"s))
+			if (triggerDumper.open(asset->name + ".triggers"s))
 			{
 				triggerDumper.dump_int(asset->trigger.modelCount);
 				triggerDumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);

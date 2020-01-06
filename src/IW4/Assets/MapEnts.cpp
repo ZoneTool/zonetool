@@ -323,6 +323,16 @@ namespace ZoneTool
 			{
 				dest->slabs = buf->write_s(3, dest->slabs, dest->slabCount);
 			}
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->models);
+				endian_convert(&dest->modelCount);
+				endian_convert(&dest->hulls);
+				endian_convert(&dest->hullCount);
+				endian_convert(&dest->slabs);
+				endian_convert(&dest->slabCount);
+			}
 		}
 
 		void IMapEnts::write(IZone* zone, ZoneBuffer* buf)

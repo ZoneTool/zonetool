@@ -63,12 +63,12 @@ namespace ZoneTool
 		void IGlassWorld::init(void* asset, ZoneMemory* mem)
 		{
 			this->asset_ = reinterpret_cast<GlassWorld*>(asset);
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 		}
 
 		void IGlassWorld::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
 
 			if (!this->asset_)

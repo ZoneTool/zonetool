@@ -30,12 +30,11 @@ namespace ZoneTool
 			auto ents = mem->Alloc<AddonMapEnts>();
 
 			ents->name = mem->StrDup(name);
-			ents->numEntityChars = FileSystem::FileSize(file);
+			ents->numEntityChars = FileSystem::FileSize(file) + 1;
 
-			ents->entityString = mem->Alloc<char>(ents->numEntityChars + 1);
+			ents->entityString = mem->Alloc<char>(ents->numEntityChars);
 			memset((char*)ents->entityString, 0, ents->numEntityChars);
-			fread((char*)ents->entityString, ents->numEntityChars, 1, file);
-			ents->numEntityChars++;
+			fread((char*)ents->entityString, ents->numEntityChars - 1, 1, file);
 			
 			// convert the mapents!
 			IMapEnts::ConvertEnts(reinterpret_cast<MapEnts*>(ents), mem);

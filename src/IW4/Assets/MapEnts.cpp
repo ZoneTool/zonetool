@@ -191,14 +191,11 @@ namespace ZoneTool
 			// replace mapents if needed
 			if (!newEntsString.empty())
 			{
-				ents->numEntityChars = newEntsString.size();
-				ents->entityString = mem->Alloc<char>(ents->numEntityChars + 1);
-				memcpy((void*)ents->entityString, &newEntsString[0], ents->numEntityChars);
+				ents->numEntityChars = newEntsString.size() + 1;
+				ents->entityString = mem->Alloc<char>(ents->numEntityChars);
+				memset((void*)ents->entityString, 0, ents->numEntityChars);
+				memcpy((void*)ents->entityString, &newEntsString[0], ents->numEntityChars - 1);
 			}
-
-			//auto fp_ = fopen("output.d3dbsp.ents", "wb");
-			//fwrite(ents->entityString, ents->numEntityChars, 1, fp_);
-			//fclose(fp_);
 		}
 
 		/*legacy zonetool code, refactor me!*/
@@ -281,7 +278,7 @@ namespace ZoneTool
 
 		void IMapEnts::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/mp/" + currentzone + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
 
 			if (!this->asset_)

@@ -52,8 +52,6 @@ namespace ZoneTool
 			auto data = this->asset_;
 			auto dest = buf->write(data);
 
-			Font_s;
-
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
@@ -76,8 +74,35 @@ namespace ZoneTool
 			if (data->glyphs)
 			{
 				buf->align(3);
-				buf->write(data->glyphs, data->glyphCount);
+				auto dest_glyphs = buf->write(data->glyphs, data->glyphCount);
 				ZoneBuffer::ClearPointer(&dest->glyphs);
+
+				for (auto i = 0u; i < data->glyphCount; i++)
+				{
+					if (zone->get_target() != zone_target::pc)
+					{
+						endian_convert(&dest_glyphs[i].letter);
+						endian_convert(&dest_glyphs[i].pixelHeight);
+						endian_convert(&dest_glyphs[i].pixelWidth);
+						endian_convert(&dest_glyphs[i].dx);
+						endian_convert(&dest_glyphs[i].s0);
+						endian_convert(&dest_glyphs[i].s1);
+						endian_convert(&dest_glyphs[i].t0);
+						endian_convert(&dest_glyphs[i].t1);
+						endian_convert(&dest_glyphs[i].x0);
+						endian_convert(&dest_glyphs[i].y0);
+					}
+				}
+			}
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->fontName);
+				endian_convert(&dest->material);
+				endian_convert(&dest->glowMaterial);
+				endian_convert(&dest->glyphCount);
+				endian_convert(&dest->glyphs);
+				endian_convert(&dest->pixelHeight);
 			}
 
 			END_LOG_STREAM;

@@ -194,6 +194,12 @@ namespace ZoneTool
 						{
 							destStrings[i].string = buf->write_str(data->strings[i].string);
 						}
+
+						if (zone->get_target() != zone_target::pc)
+						{
+							endian_convert(&destStrings[i].string);
+							endian_convert(&destStrings[i].hash);
+						}
 					}
 				}
 
@@ -202,6 +208,14 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->strings);
+				endian_convert(&dest->rows);
+				endian_convert(&dest->columns);
+			}
 		}
 
 		void IStringTable::dump(StringTable* asset)

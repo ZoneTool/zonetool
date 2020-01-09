@@ -163,6 +163,8 @@ namespace ZoneTool
 			auto data = this->asset_;
 			auto dest = buf->write(data);
 
+			// sizeof GfxImage;
+			
 			buf->push_stream(3);
 			START_LOG_STREAM;
 

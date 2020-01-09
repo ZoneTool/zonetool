@@ -116,7 +116,7 @@ namespace ZoneTool
 
 				auto glassdata = data->g_glassData;
 				auto destdata = buf->write(glassdata);
-
+				
 				if (glassdata->glassPieces)
 				{
 					buf->align(3);
@@ -138,12 +138,36 @@ namespace ZoneTool
 							buf->write(glassdata->glassNames[i].pieceIndices, glassdata->glassNames[i].pieceCount);
 							ZoneBuffer::ClearPointer(&glassdata->glassNames[i].pieceIndices);
 						}
+
+						if (zone->get_target() != zone_target::pc)
+						{
+							endian_convert(&namedest[i].name);
+							endian_convert(&namedest[i].nameStr);
+							endian_convert(&namedest[i].pieceCount);
+							endian_convert(&namedest[i].pieceIndices);
+						}
 					}
 
 					ZoneBuffer::ClearPointer(&destdata->glassNames);
 				}
 
 				ZoneBuffer::ClearPointer(&dest->g_glassData);
+
+				if (zone->get_target() != zone_target::pc)
+				{
+					endian_convert(&destdata->glassPieces);
+					endian_convert(&destdata->pieceCount);
+					endian_convert(&destdata->damageToWeaken);
+					endian_convert(&destdata->damageToDestroy);
+					endian_convert(&destdata->glassNameCount);
+					endian_convert(&destdata->glassNames);
+				}
+			}
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->g_glassData);
 			}
 
 			END_LOG_STREAM;

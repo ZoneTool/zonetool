@@ -93,6 +93,14 @@ namespace ZoneTool
 					image, data->attenuation.image->name));
 			}
 
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->attenuation.image);
+				endian_convert(&dest->attenuation.samplerState);
+				endian_convert(&dest->lmapLookupStart);
+			}
+
 			END_LOG_STREAM;
 			buf->pop_stream();
 		}

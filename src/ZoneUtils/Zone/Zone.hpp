@@ -34,13 +34,22 @@ namespace ZoneTool
 		{
 			return target_;
 		}
+		virtual zone_target_version get_target_version()
+		{
+			return target_version_;
+		}
 		virtual void set_target(const zone_target target)
 		{
 			target_ = target;
 		}
+		virtual void set_target_version(const zone_target_version version)
+		{
+			target_version_ = version;
+		}
 
 	protected:
 		zone_target target_ = zone_target::pc;
+		zone_target_version target_version_ = zone_target_version::iw4_release;
 		
 	};
 }

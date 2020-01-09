@@ -48,7 +48,7 @@ namespace ZoneTool
 		{
 			auto data = this->asset_;
 			auto dest = buf->write(data);
-
+			
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
@@ -56,6 +56,18 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+			
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->filename);
+				endian_convert(&dest->knotCount);
+
+				for (auto i = 0u; i < 16; i++)
+				{
+					endian_convert(&dest->knots[i][0]);
+					endian_convert(&dest->knots[i][1]);
+				}
+			}
 		}
 
 		void ISoundCurve::dump(SndCurve* asset)

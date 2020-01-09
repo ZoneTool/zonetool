@@ -397,6 +397,8 @@ namespace ZoneTool
 
 		void IMaterial::write(IZone* zone, ZoneBuffer* buf)
 		{
+			sizeof Material;
+			
 			auto dest = buf->at<Material>();
 			auto data = this->asset_;
 

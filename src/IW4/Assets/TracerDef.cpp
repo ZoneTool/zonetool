@@ -61,6 +61,26 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->material);
+				endian_convert(&dest->drawInterval);
+				endian_convert(&dest->speed);
+				endian_convert(&dest->beamLength);
+				endian_convert(&dest->beamWidth);
+				endian_convert(&dest->screwRadius);
+				endian_convert(&dest->screwDist);
+
+				for (auto i = 0u; i < 5; i++)
+				{
+					for (auto j = 0u; j < 5; j++)
+					{
+						endian_convert(&dest->colors[i][j]);
+					}
+				}
+			}
 		}
 
 		void ITracerDef::dump(TracerDef* asset)

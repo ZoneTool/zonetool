@@ -60,12 +60,9 @@ namespace ZoneTool
 			auto data = this->asset_;
 			auto dest = buf->write(data);
 
-			Font_s;
-
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			// TODO
 			dest->name = buf->write_str(this->name());
 
 			if (data->material)

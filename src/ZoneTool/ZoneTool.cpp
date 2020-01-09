@@ -116,6 +116,15 @@ namespace ZoneTool
 
 		// set default zone target to PC
 		zone->set_target(zone_target::pc);
+
+		if (linker->version() == "IW4"s)
+		{
+			zone->set_target_version(zone_target_version::iw4_release);
+		}
+		else if (linker->version() == "IW5"s)
+		{
+			zone->set_target_version(zone_target_version::iw5_release);
+		}
 		
 		auto path = "zone_source\\" + fastfile + ".csv";
 		const auto parser = CsvParser_new(path.data(), ",", false);
@@ -179,7 +188,8 @@ namespace ZoneTool
 						{
 							ZONETOOL_FATAL("Current linker (%s) does not support target version %s.", linker->version(), row->fields_[1]);
 						}
-						
+
+						zone->set_target_version(target_version);
 						found_version = true;
 					}
 				}

@@ -109,7 +109,7 @@ namespace ZoneTool
 
 		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
-			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + ".d3dbsp"; // name;
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
 			this->m_filename = name;
 
@@ -197,7 +197,7 @@ namespace ZoneTool
 
 		std::int32_t IClipMap::type()
 		{
-			return col_map_mp;
+			return col_map_sp;
 		}
 
 		void IClipMap::write(IZone* zone, ZoneBuffer* buf)

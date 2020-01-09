@@ -163,6 +163,8 @@ namespace ZoneTool
 
 		void ILoadedSound::write(IZone* zone, ZoneBuffer* buf)
 		{
+			sizeof LoadedSound;
+			
 			auto data = this->asset_;
 			auto dest = buf->write(data);
 

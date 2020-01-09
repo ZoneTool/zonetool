@@ -31,8 +31,7 @@ namespace ZoneTool
 			{
 				if (m_assets[idx]->type() == type && m_assets[idx]->name() == name)
 				{
-					auto ptr = reinterpret_cast<void*>((3 << 28) | ((this->m_assetbase + (8 * idx) + 4) & 0x0FFFFFFF) +
-						1);
+					auto ptr = reinterpret_cast<void*>((3 << ((target_ == zone_target::pc) ? 28 : 29)) | ((this->m_assetbase + (8 * idx) + 4) & 0x0FFFFFFF) + 1);
 					return ptr;
 				}
 			}
@@ -145,6 +144,9 @@ namespace ZoneTool
 
 		void Zone::build(ZoneBuffer* buf)
 		{
+			// init streams properly
+			buf->init_streams(target_ == zone_target::pc ? 8 : 6);
+			
 			const auto start_time = GetTickCount64();
 
 			// make a folder in main, for the map images
@@ -161,7 +163,8 @@ namespace ZoneTool
 			auto zone = buf->at<XZoneMemory<num_streams>>();
 
 			// write zone header
-			auto mem_ptr = buf->write(&mem);
+			auto mem_ptr = buf->at<XZoneMemory<num_streams>>();
+			buf->write_stream(&mem, 4, target_ == zone_target::pc ? 10 : 8);
 			
 			std::uintptr_t pad = 0xFFFFFFFF;
 			std::uintptr_t zero = 0;
@@ -292,7 +295,15 @@ namespace ZoneTool
 
 			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
 			{
-				header->version = 269;
+				if (target_version_ == zone_target_version::iw4_alpha_482)
+				{
+					header->version = 253;
+				}
+				else
+				{
+					header->version = 269;
+				}
+				
 				endian_convert(&header->version);
 			}
 

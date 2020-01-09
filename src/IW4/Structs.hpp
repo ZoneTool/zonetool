@@ -1683,7 +1683,9 @@ namespace ZoneTool
 		{
 			char* stageName;
 			float offset[3];
-			int flags;
+			unsigned __int16 triggerIndex;
+			char sunPrimaryLightIndex;
+			char pad;
 		};
 
 		struct MapEnts

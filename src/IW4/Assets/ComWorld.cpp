@@ -91,21 +91,53 @@ namespace ZoneTool
 			auto dest = buf->write(data);
 
 			buf->push_stream(3);
-
+			
 			dest->name = buf->write_str(this->name());
 
 			if (data->primaryLights)
 			{
 				buf->align(3);
 				auto destlight = buf->write(data->primaryLights, data->primaryLightCount);
-
+				
 				for (std::uint32_t i = 0; i < data->primaryLightCount; i++)
 				{
 					if (data->primaryLights[i].defName)
 					{
 						destlight[i].defName = buf->write_str(data->primaryLights[i].defName);
 					}
+
+					if (zone->get_target() != zone_target::pc)
+					{
+						endian_convert(&destlight[i].defName);
+						endian_convert(&destlight[i].type);
+						endian_convert(&destlight[i].canUseShadowMap);
+						endian_convert(&destlight[i].exponent);
+						endian_convert(&destlight[i].unused);
+						endian_convert(&destlight[i].color[0]);
+						endian_convert(&destlight[i].color[1]);
+						endian_convert(&destlight[i].color[2]);
+						endian_convert(&destlight[i].dir[0]);
+						endian_convert(&destlight[i].dir[1]);
+						endian_convert(&destlight[i].dir[2]);
+						endian_convert(&destlight[i].origin[0]);
+						endian_convert(&destlight[i].origin[1]);
+						endian_convert(&destlight[i].origin[2]);
+						endian_convert(&destlight[i].radius);
+						endian_convert(&destlight[i].cosHalfFovOuter);
+						endian_convert(&destlight[i].cosHalfFovInner);
+						endian_convert(&destlight[i].cosHalfFovExpanded);
+						endian_convert(&destlight[i].rotationLimit);
+						endian_convert(&destlight[i].translationLimit);
+					}
 				}
+			}
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->primaryLights);
+				endian_convert(&dest->primaryLightCount);
+				endian_convert(&dest->isInUse);
 			}
 
 			buf->pop_stream();

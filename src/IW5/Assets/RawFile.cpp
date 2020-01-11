@@ -9,7 +9,7 @@
 #include "stdafx.hpp"
 #include <zlib.h>
 
-#define ZONETOOL_BRANDING		"Compiled using ZoneTool by RektInator, localhost & X3RX35."
+#define ZONETOOL_BRANDING "Compiled using ZoneTool by RektInator."
 
 namespace ZoneTool
 {

@@ -23,10 +23,6 @@ namespace ZoneTool
 			GfxImage* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IGfxImage();
-			~IGfxImage();
-
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void init(void* asset, ZoneMemory* mem) override;
 

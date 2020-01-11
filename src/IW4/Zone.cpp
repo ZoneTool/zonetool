@@ -31,7 +31,7 @@ namespace ZoneTool
 			{
 				if (m_assets[idx]->type() == type && m_assets[idx]->name() == name)
 				{
-					auto ptr = reinterpret_cast<void*>((3 << ((target_ == zone_target::pc) ? 28 : 29)) | ((this->m_assetbase + (8 * idx) + 4) & 0x0FFFFFFF) + 1);
+					auto ptr = reinterpret_cast<void*>((3 << 28) | ((this->m_assetbase + (8 * idx) + 4) & 0x0FFFFFFF) + 1);
 					return ptr;
 				}
 			}
@@ -146,6 +146,17 @@ namespace ZoneTool
 		{
 			// init streams properly
 			buf->init_streams(target_ == zone_target::pc ? 8 : 6);
+			
+			if (target_ != zone_target::pc)
+			{
+				auto pak_version = 269;
+				if (target_version_ == zone_target_version::iw4_alpha_482)
+				{
+					pak_version = 253;
+				}
+				
+				buf->alloc_image_pak(pak_version);
+			}
 			
 			const auto start_time = GetTickCount64();
 
@@ -266,13 +277,17 @@ namespace ZoneTool
 			zone->externalsize = 0;
 
 			// Update stream data
-			for (int i = 0; i < num_streams; i++)
+			for (int i = 0; i < (target_ != zone_target::pc ? 6 : 8); i++)
 			{
 				zone->streams[i] = buf->stream_offset(i);
 			}
 
+			auto streamed_files = buf->stream_files();
+			
 			if (target_ != zone_target::pc)
 			{
+				mem_ptr->streams[5] = 1352;
+				
 				endian_convert(&mem_ptr->size);
 				endian_convert(&mem_ptr->externalsize);
 				for (auto& stream : mem_ptr->streams)
@@ -295,42 +310,72 @@ namespace ZoneTool
 
 			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
 			{
+				auto pak_version = 269;
 				if (target_version_ == zone_target_version::iw4_alpha_482)
 				{
-					header->version = 253;
+					pak_version = 253;
 				}
-				else
-				{
-					header->version = 269;
-				}
-				
+
+				header->version = pak_version;
 				endian_convert(&header->version);
 			}
 
+			// fix entry count
+			if (streamed_files.size())
+			{
+				XAssetStreamFile meme = {};
+				memset(&meme, 0, sizeof XAssetStreamFile);
+
+				const auto needed_entries = 4 - (streamed_files.size() % 4);
+				for (auto i = 0u; i < needed_entries; i++)
+				{
+					streamed_files.push_back(meme);
+				}
+			}
+			
 			// Save fastfile
-			ZoneBuffer fastfile(buf_compressed.size() + ((target_ == zone_target::xbox360 || target_ == zone_target::ps3) ? 37 : 21));
+			ZoneBuffer fastfile(buf_compressed.size() + ((target_ == zone_target::xbox360 || target_ == zone_target::ps3) ? 37 : 21) + (streamed_files.size() * 12));
 			fastfile.init_streams(1);
 			fastfile.write_stream(header, 21);
 
 			if (target_ == zone_target::xbox360 || target_ == zone_target::ps3)
-			{
+			{				
 				auto language = 1;
-				auto entry_count = 0;
-
+				auto entry_count = streamed_files.size();
+				
 				endian_convert(&language);
 				endian_convert(&entry_count);
 				
 				fastfile.write_stream(&language, 4);
 				fastfile.write_stream(&entry_count, 4);
+
+				// write streamed files
+				for (auto& stream_file : streamed_files)
+				{
+					auto file = fastfile.at<XAssetStreamFile>();
+					fastfile.write_stream(&stream_file, sizeof XAssetStreamFile, 1);
+
+					endian_convert(&file->fileIndex);
+					endian_convert(&file->offset);
+					endian_convert(&file->offsetEnd);
+				}
+				
 				fastfile.write_stream(&mem_ptr->size, 4);
 				fastfile.write_stream(&mem_ptr->size, 4);
 			}
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
-			// rekto
-			// fastfile.save("zone\\pluto\\common\\" + this->name_ + ".ff");
-			fastfile.save("zone\\english\\" + this->name_ + ".ff");
+			// buf->save_image_pak("imagefile5.pakm");
+
+			if (target_version_ == zone_target_version::iw4_alpha_482)
+			{
+				fastfile.save("zone\\english\\" + this->name_ + ".ffm");
+			}
+			else
+			{
+				fastfile.save("zone\\english\\" + this->name_ + ".ff");
+			}
 
 			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->name_.data());
 			ZONETOOL_INFO("Compiling took %u msec.", GetTickCount64() - start_time);

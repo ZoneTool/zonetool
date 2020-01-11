@@ -13,14 +13,6 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		IGfxImage::IGfxImage()
-		{
-		}
-
-		IGfxImage::~IGfxImage()
-		{
-		}
-
 		std::string IGfxImage::clean_name(const std::string& name)
 		{
 			auto newName = name;
@@ -158,44 +150,123 @@ namespace ZoneTool
 		
 		void IGfxImage::write(IZone* zone, ZoneBuffer* buf)
 		{
-			IW5::IGfxImage::dump_iwi(this->name());
-			
-			auto data = this->asset_;
-			auto dest = buf->write(data);
-
-			// sizeof GfxImage;
-			
-			buf->push_stream(3);
-			START_LOG_STREAM;
-
-			dest->name = buf->write_str(this->name());
-
-			// set loaded to false
-			dest->loaded = false;
-
-			buf->push_stream(0);
-			if (data->texture)
+			if (zone->get_target() == zone_target::pc)
 			{
-				buf->align(3);
+				IW5::IGfxImage::dump_iwi(this->name());
 
-				auto desttext = buf->at<GfxImageLoadDef>();
-				buf->write_stream(data->texture, sizeof GfxImageLoadDef - sizeof std::uintptr_t);
+				auto data = this->asset_;
+				auto dest = buf->write(data);
 
-				if (isMapImage && desttext->dataSize)
+				buf->push_stream(3);
+				START_LOG_STREAM;
+
+				dest->name = buf->write_str(this->name());
+
+				// set loaded to false
+				dest->loaded = false;
+
+				buf->push_stream(0);
+				if (data->texture)
 				{
-					buf->write_stream(&data->texture->texture, data->texture->dataSize);
+					buf->align(3);
+
+					auto desttext = buf->at<GfxImageLoadDef>();
+					buf->write_stream(data->texture, sizeof GfxImageLoadDef - sizeof std::uintptr_t);
+
+					if (isMapImage && desttext->dataSize)
+					{
+						buf->write_stream(&data->texture->texture, data->texture->dataSize);
+					}
+					else
+					{
+						desttext->dataSize = 0;
+					}
+
+					ZoneBuffer::ClearPointer(&dest->texture);
+				}
+				buf->pop_stream();
+
+				END_LOG_STREAM;
+				buf->pop_stream();
+			}
+			else
+			{
+				alpha::GfxImage alpha_image = {};
+
+				// transform iwi
+				if (!FileSystem::FileExists(va("images/%s.iwi", this->name().data())))
+				{
+					ZONETOOL_FATAL("Image %s is missing!", this->name().data());
+				}
+
+				std::vector<std::uint8_t> pixels;
+				auto fp = FileSystem::FileOpen(va("images/%s.iwi", this->name().data()), "rb");
+				if (fp)
+				{
+					auto file_size = FileSystem::FileSize(fp);
+					auto img_data = FileSystem::ReadBytes(fp, file_size);
+
+					auto iwi_header = (GfxImageFileHeader*)img_data.data();
+					
+					auto pixel_data = img_data.data() + 32;
+					auto pixel_data_size = img_data.size() - 32;
+
+					pixels.resize(pixel_data_size);
+					memcpy(&pixels[0], pixel_data, pixel_data_size);
+					
+					// add image to imagepak
+					// buf->add_image(pixels);
+
+					// dunno
+					alpha_image.cached = false;
+					alpha_image.format = 0x1A200154; // iwi_header->format;
+					alpha_image.width = iwi_header->dimensions[0];
+					alpha_image.height = iwi_header->dimensions[1];
+					alpha_image.depth = iwi_header->dimensions[2];
+					alpha_image.levelCount = 1;
+					alpha_image.mapType = 3;
+					alpha_image.category = 3;
+					alpha_image.cardMemory.platform[0] = pixels.size();
 				}
 				else
 				{
-					desttext->dataSize = 0;
+					ZONETOOL_FATAL("Cannot open image %s!", this->name().data());
 				}
+				
 
-				ZoneBuffer::ClearPointer(&dest->texture);
+				auto data = &alpha_image;
+				auto dest = buf->write(data);
+
+				buf->push_stream(3);
+
+				dest->name = buf->write_str(this->name());
+
+				buf->push_stream(1);
+				if (pixels.size())
+				{
+					buf->align(4095);
+					buf->write(pixels.data(), pixels.size());
+					ZoneBuffer::ClearPointer(&dest->pixels);
+				}
+				else
+				{
+					dest->pixels = nullptr;
+				}
+				buf->pop_stream();
+				
+				buf->pop_stream();
+
+				if (zone->get_target() != zone_target::pc)
+				{
+					endian_convert(&dest->name);
+					endian_convert(&dest->format);
+					endian_convert(&dest->width);
+					endian_convert(&dest->height);
+					endian_convert(&dest->depth);
+					endian_convert(&dest->pixels);
+					endian_convert(&dest->cardMemory.platform[0]);
+				}
 			}
-			buf->pop_stream();
-
-			END_LOG_STREAM;
-			buf->pop_stream();
 		}
 
 		// Legacy cancer code

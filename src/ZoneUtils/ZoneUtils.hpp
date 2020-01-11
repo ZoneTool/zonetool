@@ -47,6 +47,13 @@ namespace ZoneTool
 		std::uint32_t streams[num_streams];
 	};
 
+	struct XAssetStreamFile
+	{
+		unsigned int fileIndex;
+		unsigned int offset;
+		unsigned int offsetEnd;
+	};
+
 	struct XZoneInfo
 	{
 		const char* zone;
@@ -122,7 +129,7 @@ namespace ZoneTool
 	}
 	template <typename T> static void endian_convert(T* data)
 	{
-		return endian_convert(data, sizeof T);
+		return endian_convert((void*)data, sizeof T);
 	}
 #pragma push(pop)
 }
@@ -131,6 +138,7 @@ namespace ZoneTool
 #include "CSV.hpp"
 #include "Zone/ZoneMemory.hpp"
 #include "Zone/ZoneBuffer.hpp"
+#include "Utils/PakFile.hpp"
 #include "Zone/Zone.hpp"
 #include "IAsset.hpp"
 #include "Utils/FileReader.hpp"

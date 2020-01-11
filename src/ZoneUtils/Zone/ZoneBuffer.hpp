@@ -84,6 +84,7 @@ namespace ZoneTool
 		std::uint8_t iv[16];
 	};
 
+	class PakFile;
 	class ZoneBuffer
 	{
 	protected:
@@ -137,13 +138,26 @@ namespace ZoneTool
 
 		std::unordered_map<std::uintptr_t, std::uintptr_t> m_zonepointers;
 
+		std::shared_ptr<PakFile> image_pak_;
+		std::vector<XAssetStreamFile> stream_files_;
+		
 	public:
 		ZoneBuffer();
 		~ZoneBuffer();
 
+		PakFile* image_pak();
+		
 		ZoneBuffer(std::vector<std::uint8_t> data);
 		ZoneBuffer(std::size_t size);
 
+		void add_image(const std::vector<std::uint8_t>& pixels);
+		void alloc_image_pak(const std::uint32_t version);
+
+		std::vector<XAssetStreamFile> stream_files()
+		{
+			return stream_files_;
+		}
+		
 		std::uintptr_t get_stream_pos()
 		{
 			return this->m_zonestreams[this->m_stream];
@@ -332,7 +346,11 @@ namespace ZoneTool
 		}
 
 		void save(const std::string& filename);
+		void save_image_pak(const std::string& filename);
 
+		static std::vector<std::uint8_t> compress_zlib(const std::uint8_t* data, const std::size_t size);
+		static std::vector<std::uint8_t> compress_zlib(const std::vector<std::uint8_t>& data);
+		
 		std::vector<std::uint8_t> compress_zstd();
 		std::vector<std::uint8_t> compress_zlib();
 		void encrypt();

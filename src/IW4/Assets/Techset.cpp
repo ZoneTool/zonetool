@@ -261,7 +261,7 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
+				// ZONETOOL_FATAL("Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
 
 				this->m_parsed = false;
 				this->asset_ = DB_FindXAssetHeader(this->type(), &this->name()[0]).techset;
@@ -278,27 +278,30 @@ namespace ZoneTool
 
 		void ITechset::load_depending(IZone* zone)
 		{
-			auto data = this->asset_;
-
-			for (std::int32_t technique = 0; technique < 48; technique++)
+			if (zone->get_target() == zone_target::pc)
 			{
-				if (data->techniques[technique])
-				{
-					for (std::int32_t pass = 0; pass < data->techniques[technique]->hdr.numPasses; pass++)
-					{
-						auto& techniquePass = data->techniques[technique]->pass[pass];
+				auto data = this->asset_;
 
-						if (techniquePass.vertexDecl)
+				for (std::int32_t technique = 0; technique < 48; technique++)
+				{
+					if (data->techniques[technique])
+					{
+						for (std::int32_t pass = 0; pass < data->techniques[technique]->hdr.numPasses; pass++)
 						{
-							zone->add_asset_of_type(vertexdecl, techniquePass.vertexDecl->name);
-						}
-						if (techniquePass.vertexShader)
-						{
-							zone->add_asset_of_type(vertexshader, techniquePass.vertexShader->name);
-						}
-						if (techniquePass.pixelShader)
-						{
-							zone->add_asset_of_type(pixelshader, techniquePass.pixelShader->name);
+							auto& techniquePass = data->techniques[technique]->pass[pass];
+
+							if (techniquePass.vertexDecl)
+							{
+								zone->add_asset_of_type(vertexdecl, techniquePass.vertexDecl->name);
+							}
+							if (techniquePass.vertexShader)
+							{
+								zone->add_asset_of_type(vertexshader, techniquePass.vertexShader->name);
+							}
+							if (techniquePass.pixelShader)
+							{
+								zone->add_asset_of_type(pixelshader, techniquePass.pixelShader->name);
+							}
 						}
 					}
 				}
@@ -317,86 +320,104 @@ namespace ZoneTool
 
 		void ITechset::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
-
-			buf->push_stream(3);
-			START_LOG_STREAM;
-
-			dest->name = buf->write_str(this->name());
-			dest->remappedTechniques = static_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(techset, this->name()));
-
-			for (std::int32_t technique = 0; technique < 48; technique++)
+			if (zone->get_target() == zone_target::pc)
 			{
-				if (!data->techniques[technique])
+				auto data = this->asset_;
+				auto dest = buf->write(data);
+
+				buf->push_stream(3);
+				START_LOG_STREAM;
+
+				dest->name = buf->write_str(this->name());
+				dest->remappedTechniques = static_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(techset, this->name()));
+
+				for (std::int32_t technique = 0; technique < 48; technique++)
 				{
-					continue;
-				}
-
-				buf->align(3);
-
-				auto techniqueHeader = buf->write(&data->techniques[technique]->hdr);
-				auto techniquePasses = buf->write(data->techniques[technique]->pass, techniqueHeader->numPasses);
-
-				for (std::int32_t pass = 0; pass < techniqueHeader->numPasses; pass++)
-				{
-					if (techniquePasses[pass].vertexDecl)
+					if (!data->techniques[technique])
 					{
-						techniquePasses[pass].vertexDecl =
-							reinterpret_cast<VertexDecl*>(zone->get_asset_pointer(
-								vertexdecl, techniquePasses[pass].vertexDecl->name));
+						continue;
 					}
 
-					if (techniquePasses[pass].vertexShader)
-					{
-						techniquePasses[pass].vertexShader =
-							reinterpret_cast<VertexShader*>(zone->get_asset_pointer(
-								vertexshader, techniquePasses[pass].vertexShader->name));
-					}
+					buf->align(3);
 
-					if (techniquePasses[pass].pixelShader)
-					{
-						techniquePasses[pass].pixelShader =
-							reinterpret_cast<PixelShader*>(zone->get_asset_pointer(
-								pixelshader, techniquePasses[pass].pixelShader->name));
-					}
+					auto techniqueHeader = buf->write(&data->techniques[technique]->hdr);
+					auto techniquePasses = buf->write(data->techniques[technique]->pass, techniqueHeader->numPasses);
 
-					if (techniquePasses[pass].argumentDef)
+					for (std::int32_t pass = 0; pass < techniqueHeader->numPasses; pass++)
 					{
-						buf->align(3);
-						auto destArgs = buf->write(techniquePasses[pass].argumentDef,
-						                           techniquePasses[pass].perPrimArgCount +
-						                           techniquePasses[pass].perObjArgCount +
-						                           techniquePasses[pass].stableArgCount);
-
-						for (auto arg = 0; arg <
-						     techniquePasses[pass].perPrimArgCount +
-						     techniquePasses[pass].perObjArgCount +
-						     techniquePasses[pass].stableArgCount; arg++)
+						if (techniquePasses[pass].vertexDecl)
 						{
-							auto curArg = &techniquePasses[pass].argumentDef[arg];
-
-							if (curArg->type == 1 || curArg->type == 7)
-							{
-								if (destArgs[arg].u.literalConst)
-								{
-									destArgs[arg].u.literalConst = buf->write_s(3, destArgs[arg].u.literalConst, 4);
-								}
-							}
+							techniquePasses[pass].vertexDecl =
+								reinterpret_cast<VertexDecl*>(zone->get_asset_pointer(
+									vertexdecl, techniquePasses[pass].vertexDecl->name));
 						}
 
-						ZoneBuffer::ClearPointer(&techniquePasses[pass].argumentDef);
+						if (techniquePasses[pass].vertexShader)
+						{
+							techniquePasses[pass].vertexShader =
+								reinterpret_cast<VertexShader*>(zone->get_asset_pointer(
+									vertexshader, techniquePasses[pass].vertexShader->name));
+						}
+
+						if (techniquePasses[pass].pixelShader)
+						{
+							techniquePasses[pass].pixelShader =
+								reinterpret_cast<PixelShader*>(zone->get_asset_pointer(
+									pixelshader, techniquePasses[pass].pixelShader->name));
+						}
+
+						if (techniquePasses[pass].argumentDef)
+						{
+							buf->align(3);
+							auto destArgs = buf->write(techniquePasses[pass].argumentDef,
+								techniquePasses[pass].perPrimArgCount +
+								techniquePasses[pass].perObjArgCount +
+								techniquePasses[pass].stableArgCount);
+
+							for (auto arg = 0; arg <
+								techniquePasses[pass].perPrimArgCount +
+								techniquePasses[pass].perObjArgCount +
+								techniquePasses[pass].stableArgCount; arg++)
+							{
+								auto curArg = &techniquePasses[pass].argumentDef[arg];
+
+								if (curArg->type == 1 || curArg->type == 7)
+								{
+									if (destArgs[arg].u.literalConst)
+									{
+										destArgs[arg].u.literalConst = buf->write_s(3, destArgs[arg].u.literalConst, 4);
+									}
+								}
+							}
+
+							ZoneBuffer::ClearPointer(&techniquePasses[pass].argumentDef);
+						}
 					}
+
+					buf->write_str(techniqueHeader->name);
+
+					ZoneBuffer::ClearPointer(&techniqueHeader->name);
+					ZoneBuffer::ClearPointer(&dest->techniques[technique]);
 				}
 
-				buf->write_str(techniqueHeader->name);
-				
-				ZoneBuffer::ClearPointer(&techniqueHeader->name);
-				ZoneBuffer::ClearPointer(&dest->techniques[technique]);
+				END_LOG_STREAM;
+				buf->pop_stream();
 			}
+			else
+			{
+				alpha::MaterialTechniqueSet alpha_techset = {};
 
-			END_LOG_STREAM;
-			buf->pop_stream();
+				auto data = &alpha_techset;
+				auto dest = buf->write(data);
+
+				buf->push_stream(3);
+				START_LOG_STREAM;
+
+				dest->name = buf->write_str(va(",%s", this->name().data()).data());
+
+				END_LOG_STREAM;
+				buf->pop_stream();
+			}
 		}
 
 		char* ITechset::parse_statebits(const std::string& techset, ZoneMemory* mem)

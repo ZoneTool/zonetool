@@ -3202,7 +3202,7 @@ namespace ZoneTool
 		struct clipMap_t
 		{
 			const char* name; // 4
-			bool isInUse; // 4
+			int isInUse; // 4
 			int numCPlanes; // +8
 			cplane_s* cPlanes; // sizeof 20, +12
 			int numStaticModels; // +16

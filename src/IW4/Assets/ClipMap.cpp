@@ -549,6 +549,63 @@ namespace ZoneTool
 			END_LOG_STREAM;
 			buf->pop_stream();
 
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->isInUse);
+				endian_convert(&dest->numCPlanes);
+				endian_convert(&dest->cPlanes);
+				endian_convert(&dest->numStaticModels);
+				endian_convert(&dest->staticModelList);
+				endian_convert(&dest->numMaterials);
+				endian_convert(&dest->materials);
+				endian_convert(&dest->numCBrushSides);
+				endian_convert(&dest->cBrushSides);
+				endian_convert(&dest->numCBrushEdges);
+				endian_convert(&dest->cBrushEdges);
+				endian_convert(&dest->numCNodes);
+				endian_convert(&dest->cNodes);
+				endian_convert(&dest->numCLeaf);
+				endian_convert(&dest->cLeaf);
+				endian_convert(&dest->numCLeafBrushNodes);
+				endian_convert(&dest->cLeafBrushNodes);
+				endian_convert(&dest->numLeafBrushes);
+				endian_convert(&dest->leafBrushes);
+				endian_convert(&dest->numLeafSurfaces);
+				endian_convert(&dest->leafSurfaces);
+				endian_convert(&dest->numVerts);
+				endian_convert(&dest->verts);
+				endian_convert(&dest->numTriIndices);
+				endian_convert(&dest->triIndices);
+				endian_convert(&dest->triEdgeIsWalkable);
+				endian_convert(&dest->numCollisionBorders);
+				endian_convert(&dest->collisionBorders);
+				endian_convert(&dest->numCollisionPartitions);
+				endian_convert(&dest->collisionPartitions);
+				endian_convert(&dest->numCollisionAABBTrees);
+				endian_convert(&dest->collisionAABBTrees);
+				endian_convert(&dest->numCModels);
+				endian_convert(&dest->cModels);
+				endian_convert(&dest->numBrushes);
+				endian_convert(&dest->brushes);
+				endian_convert(&dest->brushBounds);
+				endian_convert(&dest->brushContents);
+				endian_convert(&dest->mapEnts);
+				endian_convert(&dest->smodelNodeCount);
+				endian_convert(&dest->smodelNodes);
+				endian_convert(&dest->dynEntCount[0]);
+				endian_convert(&dest->dynEntCount[1]);
+				endian_convert(&dest->dynEntDefList[0]);
+				endian_convert(&dest->dynEntDefList[1]);
+				endian_convert(&dest->dynEntPoseList[0]);
+				endian_convert(&dest->dynEntPoseList[1]);
+				endian_convert(&dest->dynEntClientList[0]);
+				endian_convert(&dest->dynEntClientList[1]);
+				endian_convert(&dest->dynEntCollList[0]);
+				endian_convert(&dest->dynEntCollList[1]);
+				endian_convert(&dest->checksum);
+			}
+			
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
 #endif

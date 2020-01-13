@@ -205,8 +205,11 @@ namespace ZoneTool
 #ifdef USE_VMPROTECT
 			VMProtectBeginUltra("IW4::IClipMap::write");
 #endif
-
+			
 			auto data = this->asset_;
+
+			memset(&data->collisionBorders, 0, 100);
+			
 			auto offset = buf->get_zone_offset();
 			auto dest = buf->write<clipMap_t>(data);
 
@@ -217,7 +220,19 @@ namespace ZoneTool
 
 			if (data->cPlanes)
 			{
-				dest->cPlanes = buf->write_s(3, data->cPlanes, data->numCPlanes);
+				cplane_s* destCplanes = nullptr;
+				dest->cPlanes = buf->write_s(3, data->cPlanes, data->numCPlanes, sizeof cplane_s, &destCplanes);
+
+				if (dest->cPlanes == reinterpret_cast<cplane_s*>(-1) && zone->get_target() != zone_target::pc)
+				{
+					for (auto i = 0; i < data->numCPlanes; i++)
+					{
+						endian_convert(&destCplanes[i].normal[0]);
+						endian_convert(&destCplanes[i].normal[1]);
+						endian_convert(&destCplanes[i].normal[2]);
+						endian_convert(&destCplanes[i].dist);
+					}
+				}
 			}
 
 			if (data->staticModelList)
@@ -231,6 +246,27 @@ namespace ZoneTool
 					{
 						static_model[i].xmodel = reinterpret_cast<XModel*>(zone->get_asset_pointer(
 							xmodel, data->staticModelList[i].xmodel->name));
+					}
+
+					if (zone->get_target() != zone_target::pc)
+					{
+						endian_convert(&static_model[i].origin[0]);
+						endian_convert(&static_model[i].origin[1]);
+						endian_convert(&static_model[i].origin[2]);
+						endian_convert(&static_model[i].absmin[0]);
+						endian_convert(&static_model[i].absmin[1]);
+						endian_convert(&static_model[i].absmin[2]);
+						endian_convert(&static_model[i].absmax[0]);
+						endian_convert(&static_model[i].absmax[1]);
+						endian_convert(&static_model[i].absmax[2]);
+						for (auto a = 0; a < 3; a++)
+						{
+							for (auto b = 0; b < 3; b++)
+							{
+								endian_convert(&static_model[i].invScaledAxis[a][b]);
+							}
+						}
+						endian_convert(&static_model[i].xmodel);
 					}
 				}
 
@@ -250,6 +286,13 @@ namespace ZoneTool
 						{
 							dmaterial[i].material = buf->write_str(data->materials[i].material);
 						}
+
+						if (zone->get_target() != zone_target::pc)
+						{
+							endian_convert(&dmaterial[i].material);
+							endian_convert(&dmaterial[i].surfaceFlags);
+							endian_convert(&dmaterial[i].contentFlags);
+						}
 					}
 				}
 			}
@@ -266,7 +309,14 @@ namespace ZoneTool
 					{
 						if (data->cBrushSides[i].plane)
 						{
+							// should use zone pointer, no need to convert
 							brush_side[i].plane = buf->write_s(3, data->cBrushSides[i].plane);
+						}
+
+						if (zone->get_target() != zone_target::pc)
+						{
+							endian_convert(&brush_side[i].plane);
+							endian_convert(&brush_side[i].materialNum);
 						}
 					}
 				}
@@ -288,6 +338,13 @@ namespace ZoneTool
 					{
 						node[i].plane = buf->write_s(3, data->cNodes[i].plane);
 					}
+
+					if (zone->get_target() != zone_target::pc)
+					{
+						endian_convert(&node[i].plane);
+						endian_convert(&node[i].children[0]);
+						endian_convert(&node[i].children[1]);
+					}
 				}
 
 				ZoneBuffer::ClearPointer(&dest->cNodes);
@@ -296,13 +353,40 @@ namespace ZoneTool
 			if (data->cLeaf)
 			{
 				buf->align(3);
-				buf->write(data->cLeaf, data->numCLeaf);
+				auto destLeaf = buf->write(data->cLeaf, data->numCLeaf);
 				ZoneBuffer::ClearPointer(&dest->cLeaf);
+
+				if (zone->get_target() != zone_target::pc)
+				{
+					for (auto i = 0; i < data->numCLeaf; i++)
+					{
+						endian_convert(&destLeaf[i].firstCollAabbIndex);
+						endian_convert(&destLeaf[i].collAabbCount);
+						endian_convert(&destLeaf[i].brushContents);
+						endian_convert(&destLeaf[i].terrainContents);
+						endian_convert(&destLeaf[i].mins[0]);
+						endian_convert(&destLeaf[i].mins[1]);
+						endian_convert(&destLeaf[i].mins[2]);
+						endian_convert(&destLeaf[i].maxs[0]);
+						endian_convert(&destLeaf[i].maxs[1]);
+						endian_convert(&destLeaf[i].maxs[2]);
+						endian_convert(&destLeaf[i].leafBrushNode);
+					}
+				}
 			}
 
 			if (data->leafBrushes)
 			{
-				dest->leafBrushes = buf->write_s(1, data->leafBrushes, data->numLeafBrushes);
+				short* destLeafBrushes = nullptr;
+				dest->leafBrushes = buf->write_s(1, data->leafBrushes, data->numLeafBrushes, sizeof (short), &destLeafBrushes);
+
+				if (zone->get_target() != zone_target::pc)
+				{
+					for (auto i = 0; i < data->numLeafBrushes; i++)
+					{
+						endian_convert(&destLeafBrushes[i]);
+					}
+				}
 			}
 
 			if (data->cLeafBrushNodes)
@@ -317,8 +401,33 @@ namespace ZoneTool
 					{
 						if (data->cLeafBrushNodes[i].leafBrushCount > 0 && data->cLeafBrushNodes[i].data.leaf.brushes)
 						{
+							unsigned short* destLeafBrushes = nullptr;
 							leaf_brush_node[i].data.leaf.brushes = buf->write_s(
-								1, data->cLeafBrushNodes[i].data.leaf.brushes, data->cLeafBrushNodes[i].leafBrushCount);
+								1, data->cLeafBrushNodes[i].data.leaf.brushes, data->cLeafBrushNodes[i].leafBrushCount, sizeof (unsigned short), &destLeafBrushes);
+
+							if (zone->get_target() != zone_target::pc && leaf_brush_node[i].data.leaf.brushes == reinterpret_cast<unsigned short*>(-1))
+							{
+								for (auto a = 0; a < data->cLeafBrushNodes[i].leafBrushCount; a++)
+								{
+									endian_convert(&destLeafBrushes[a]);
+								}
+							}
+						}
+
+						if (zone->get_target() != zone_target::pc)
+						{
+							endian_convert(&leaf_brush_node[i].leafBrushCount);
+							endian_convert(&leaf_brush_node[i].contents);
+
+							if (!data->cLeafBrushNodes[i].data.leaf.brushes)
+							{
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[0]);
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[1]);
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[2]);
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[3]);
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[4]);
+								endian_convert(&leaf_brush_node[i].data.children.childOffset[5]);
+							}
 						}
 					}
 				}
@@ -327,15 +436,27 @@ namespace ZoneTool
 			if (data->verts)
 			{
 				buf->align(3);
-				buf->write(data->verts, data->numVerts);
+				auto destVerts = buf->write(data->verts, data->numVerts);
 				ZoneBuffer::ClearPointer(&dest->verts);
+
+				for (auto a = 0; a < data->numVerts; a++)
+				{
+					endian_convert(&destVerts[a].data[0]);
+					endian_convert(&destVerts[a].data[1]);
+					endian_convert(&destVerts[a].data[2]);
+				}
 			}
 
 			if (data->triIndices)
 			{
 				buf->align(1);
-				buf->write(data->triIndices, data->numTriIndices * 3);
+				auto destTriIndices = buf->write(data->triIndices, data->numTriIndices * 3);
 				ZoneBuffer::ClearPointer(&dest->triIndices);
+
+				for (auto a = 0; a < data->numTriIndices * 3; a++)
+				{
+					endian_convert(&destTriIndices[a]);
+				}
 			}
 
 			if (data->triEdgeIsWalkable)

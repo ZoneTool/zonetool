@@ -336,6 +336,7 @@ namespace ZoneTool
 				{
 					if (data->cNodes[i].plane)
 					{
+						// should use zone pointer, no need to convert
 						node[i].plane = buf->write_s(3, data->cNodes[i].plane);
 					}
 
@@ -427,6 +428,10 @@ namespace ZoneTool
 								endian_convert(&leaf_brush_node[i].data.children.childOffset[3]);
 								endian_convert(&leaf_brush_node[i].data.children.childOffset[4]);
 								endian_convert(&leaf_brush_node[i].data.children.childOffset[5]);
+							}
+							else
+							{
+								endian_convert(&leaf_brush_node[i].data.leaf.brushes);
 							}
 						}
 					}

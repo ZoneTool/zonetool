@@ -2331,32 +2331,33 @@ namespace ZoneTool
 			GfxAabbTree* aabbtree;
 		};
 
+#pragma pack(push, 4)
+		struct GfxPortal;
 		struct GfxPortalWritable
 		{
 			bool isQueued;
 			bool isAncestor;
 			char recursionDepth;
 			char hullPointCount;
-			//float(*hullPoints)[2];
+			float(*hullPoints)[2];
+			GfxPortal* queuedParent;
 		};
 
 		struct DpvsPlane
 		{
 			float coeffs[4];
-			char side[3];
 		};
 
-		struct GfxPortal // Needs to be investigated
+		struct GfxPortal
 		{
-			GfxPortalWritable writable; // 4
-			DpvsPlane plane; // 20
-			int unknown1;
-			float (*vertices)[3];
-			short unknown2;
+			GfxPortalWritable writable;
+			DpvsPlane plane;
+			float(*vertices)[3];
+			unsigned __int16 cellIndex;
 			char vertexCount;
-			//char unknown2[2];
 			float hullAxis[2][3];
 		};
+#pragma pack(pop)
 
 #pragma pack(push, 4)
 		struct GfxCell

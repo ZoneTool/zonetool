@@ -249,13 +249,35 @@ namespace ZoneTool
 						
 						alpha_image.cached = false;
 						alpha_image.cardMemory.platform[0] = pixels.size();
-						alpha_image.format = 0x1A200154;
+						if (this->name().starts_with("*refle"))
+						{
+							alpha_image.format = 0x18280186;
+							alpha_image.mapType = 5;
+							alpha_image.semantic = 1;
+							alpha_image.category = 1;
+						}
+						else if (this->name().starts_with("*light"))
+						{
+							alpha_image.format = 0x2800017A;
+							alpha_image.mapType = 3;
+							alpha_image.semantic = 1;
+							alpha_image.category = 2;
+						}
+						else if (this->name() == "$outdoor")
+						{
+							alpha_image.format = 0x28000102;
+							alpha_image.mapType = 3;
+							alpha_image.semantic = 1;
+							alpha_image.category = 1;
+						}
+						else
+						{
+							ZONETOOL_FATAL("you goofed");
+						}
 						alpha_image.width = this->asset_->width;
 						alpha_image.height = this->asset_->height;
 						alpha_image.depth = this->asset_->depth;
 						alpha_image.levelCount = 1;
-						alpha_image.mapType = 3;
-						alpha_image.category = 3;
 					}
 					
 				}

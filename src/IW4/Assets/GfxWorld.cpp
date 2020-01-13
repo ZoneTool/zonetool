@@ -81,11 +81,6 @@ namespace ZoneTool
 #endif
 
 			auto data = this->asset_;
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				return;
-			}
 			
 			// Skies
 			if (data->skyCount)
@@ -140,8 +135,12 @@ namespace ZoneTool
 				zone->add_asset_of_type(image, data->worldDraw.outdoorImage->name);
 			}
 
+			if (zone->get_target() != zone_target::pc)
+			{
+				return;
+			}
+			
 			// MaterialMemory
-
 			if (data->materialMemory)
 			{
 				for (int i = 0; i < data->materialMemoryCount; i++)
@@ -152,7 +151,7 @@ namespace ZoneTool
 					}
 				}
 			}
-
+			
 			// Sunflare_t
 			if (data->sun.spriteMaterial)
 			{
@@ -843,7 +842,27 @@ namespace ZoneTool
 				memcpy(&alpha_world->lightGrid, &this->asset_->lightGrid, sizeof GfxWorld);
 				memcpy(&alpha_world->dpvs.litOpaqueSurfsBegin, &this->asset_->dpvs.litOpaqueSurfsBegin, 100);
 				memcpy(&alpha_world->dpvsDyn, &this->asset_->dpvsDyn, 70);
-				
+
+
+
+				//// DEBUGGING PURPOSES: CHECK WHATS BROKEN!
+				//alpha::GfxWorldDraw tempDraw = {};
+				//memcpy(&tempDraw, &alpha_world->draw, sizeof alpha::GfxWorldDraw);
+
+				//// clear gfx world
+				// memset(&alpha_world->dpvsPlanes, 0, sizeof alpha::GfxWorld);
+				//alpha_world->aabbTreeCounts = nullptr;
+				//alpha_world->aabbTrees = nullptr;
+				alpha_world->cells = nullptr;
+
+				//// restore draw data
+				//memcpy(&alpha_world->draw, &tempDraw, sizeof alpha::GfxWorldDraw);
+
+				// these need to be fixed
+				alpha_world->draw.reflectionProbeTextures = 0;
+				alpha_world->draw.lightmapPrimaryTextures = 0;
+				alpha_world->draw.lightmapSecondaryTextures = 0;
+								
 				auto data = &alpha_world[0];
 				auto dest = buf->write(data);
 
@@ -1009,22 +1028,34 @@ namespace ZoneTool
 						{
 							buf->align(3);
 							auto gfx_portal = buf->write(data->cells[i].portals, data->cells[i].portalCount);
-
+							
 							for (std::int32_t i2 = 0; i2 < data->cells[i].portalCount; i2++)
 							{
+								gfx_portal[i2].writable.queuedParent = nullptr;
+								gfx_portal[i2].writable.hullPointCount = 0;
+								gfx_portal[i2].writable.hullPoints = nullptr;
+								
 								if (data->cells[i].portals[i2].vertices)
 								{
 									buf->align(3);
-									buf->write(data->cells[i].portals[i2].vertices, data->cells[i].portals[i2].vertexCount);
+									auto destVertices = buf->write(data->cells[i].portals[i2].vertices, data->cells[i].portals[i2].vertexCount);
 									ZoneBuffer::ClearPointer(&gfx_portal[i2].vertices);
+
+									for (auto i3 = 0; i3 < data->cells[i].portals[i2].vertexCount; i3++)
+									{
+										endian_convert(&destVertices[i3][0]);
+										endian_convert(&destVertices[i3][1]);
+										endian_convert(&destVertices[i3][2]);
+									}
 								}
 
+								endian_convert(&gfx_portal[i2].vertices);
 								endian_convert(&gfx_portal[i2].plane.coeffs[0]);
 								endian_convert(&gfx_portal[i2].plane.coeffs[1]);
 								endian_convert(&gfx_portal[i2].plane.coeffs[2]);
 								endian_convert(&gfx_portal[i2].plane.coeffs[3]);
-								endian_convert(&gfx_portal[i2].unknown1);
-								endian_convert(&gfx_portal[i2].unknown2);
+								endian_convert(&gfx_portal[i2].cellIndex);
+
 								for (auto a = 0; a < 2; a++)
 								{
 									for (auto b = 0; b < 3; b++)
@@ -1043,7 +1074,7 @@ namespace ZoneTool
 							buf->write(data->cells[i].reflectionProbes, data->cells[i].reflectionProbeCount);
 							ZoneBuffer::ClearPointer(&gfx_cell[i].reflectionProbes);
 						}
-
+						
 						ZoneBuffer::ClearPointer(&dest->cells);
 
 						endian_convert(&gfx_cell[i].bounds.halfSize[0]);
@@ -1060,16 +1091,14 @@ namespace ZoneTool
 				if (data->draw.reflectionProbes)
 				{
 					buf->align(3);
-					auto reflectionProbes = buf->write(data->draw.reflectionProbes,
-						data->draw.reflectionProbeCount);
+					auto reflectionProbes = buf->write(data->draw.reflectionProbes, data->draw.reflectionProbeCount);
 
 					for (std::uint64_t i = 0; i < data->draw.reflectionProbeCount; i++)
 					{
 						if (reflectionProbes[i])
 						{
-							reflectionProbes[i] = nullptr;
-							/*reflectionProbes[i] = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(
-								image, data->draw.reflectionProbes[i]->name));*/
+							reflectionProbes[i] = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(
+								image, reinterpret_cast<GfxImage*>(data->draw.reflectionProbes[i])->name));
 						}
 
 						endian_convert(&reflectionProbes[i]);
@@ -1081,8 +1110,15 @@ namespace ZoneTool
 				if (data->draw.reflectionProbeOrigins)
 				{
 					buf->align(3);
-					buf->write(data->draw.reflectionProbeOrigins, data->draw.reflectionProbeCount);
+					auto destReflectionProbes = buf->write(data->draw.reflectionProbeOrigins, data->draw.reflectionProbeCount);
 					ZoneBuffer::ClearPointer(&dest->draw.reflectionProbeOrigins);
+
+					for (auto i = 0; i < data->draw.reflectionProbeCount; i++)
+					{
+						endian_convert(&destReflectionProbes[i].offset[0]);
+						endian_convert(&destReflectionProbes[i].offset[1]);
+						endian_convert(&destReflectionProbes[i].offset[2]);
+					}
 				}
 
 				buf->push_stream(2);
@@ -1139,20 +1175,35 @@ namespace ZoneTool
 				if (data->draw.lightmapOverridePrimary)
 				{
 					dest->draw.lightmapOverridePrimary = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(
-						image, data->draw.lightmapOverridePrimary->name));
+						image, reinterpret_cast<GfxImage*>(data->draw.lightmapOverridePrimary)->name));
 				}
 
 				if (data->draw.lightmapOverrideSecondary)
 				{
 					dest->draw.lightmapOverrideSecondary = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(
-						image, data->draw.lightmapOverrideSecondary->name));
+						image, reinterpret_cast<GfxImage*>(data->draw.lightmapOverrideSecondary)->name));
 				}
 
 				if (data->draw.vd.vertices)
 				{
 					buf->align(3);
-					buf->write_p(data->draw.vd.vertices, data->draw.vertexCount);
+					auto destVertices = buf->write_p(data->draw.vd.vertices, data->draw.vertexCount);
 					ZoneBuffer::ClearPointer(&dest->draw.vd.vertices);
+
+					for (auto i = 0u; i < data->draw.vertexCount; i++)
+					{
+						endian_convert(&destVertices[i].xyz[0]);
+						endian_convert(&destVertices[i].xyz[1]);
+						endian_convert(&destVertices[i].xyz[2]);
+						endian_convert(&destVertices[i].binormalSign);
+						endian_convert(&destVertices[i].color.packed);
+						endian_convert(&destVertices[i].texCoord[0]);
+						endian_convert(&destVertices[i].texCoord[1]);
+						endian_convert(&destVertices[i].lmapCoord[0]);
+						endian_convert(&destVertices[i].lmapCoord[1]);
+						endian_convert(&destVertices[i].normal.packed);
+						endian_convert(&destVertices[i].tangent.packed);
+					}
 				}
 
 				if (data->draw.vld.data)
@@ -1165,18 +1216,28 @@ namespace ZoneTool
 				if (data->draw.indices)
 				{
 					buf->align(1);
-					buf->write_p(data->draw.indices, data->draw.indexCount);
+					auto destIndices = buf->write_p(data->draw.indices, data->draw.indexCount);
 					ZoneBuffer::ClearPointer(&dest->draw.indices);
+
+					for (auto i = 0; i < data->draw.indexCount; i++)
+					{
+						endian_convert(&destIndices[i]);
+					}
 				}
 
 				if (data->lightGrid.rowDataStart)
 				{
 					buf->align(1);
-					buf->write_p(data->lightGrid.rowDataStart,
+					auto destRowData = buf->write_p(data->lightGrid.rowDataStart,
 						data->lightGrid.maxs[data->lightGrid.rowAxis] - data->lightGrid.mins[data
 						->lightGrid.rowAxis] +
 						1);
 					ZoneBuffer::ClearPointer(&dest->lightGrid.rowDataStart);
+
+					for (auto i = 0u; i < data->lightGrid.maxs[data->lightGrid.rowAxis] - data->lightGrid.mins[data->lightGrid.rowAxis] + 1; i++)
+					{
+						endian_convert(&destRowData[i]);
+					}
 				}
 
 				if (data->lightGrid.rawRowData)
@@ -1189,8 +1250,13 @@ namespace ZoneTool
 				if (data->lightGrid.entries)
 				{
 					buf->align(3);
-					buf->write(data->lightGrid.entries, data->lightGrid.entryCount);
+					auto destEntries = buf->write(data->lightGrid.entries, data->lightGrid.entryCount);
 					ZoneBuffer::ClearPointer(&dest->lightGrid.entries);
+
+					for (auto i = 0u; i < data->lightGrid.entryCount; i++)
+					{
+						endian_convert(&destEntries[i].colorsIndex);
+					}
 				}
 
 				if (data->lightGrid.colors)
@@ -1237,7 +1303,7 @@ namespace ZoneTool
 
 				if (data->outdoorImage)
 				{
-					dest->outdoorImage = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(image, ((GfxImage*)data->outdoorImage)->name)
+					dest->outdoorImage = reinterpret_cast<alpha::GfxImage*>(zone->get_asset_pointer(image, reinterpret_cast<GfxImage*>(data->outdoorImage)->name)
 						);
 				}
 
@@ -1245,16 +1311,26 @@ namespace ZoneTool
 				if (data->cellCasterBits)
 				{
 					buf->align(3);
-					buf->write(data->cellCasterBits,
+					auto destCellCasterBits = buf->write(data->cellCasterBits,
 						data->dpvsPlanes.cellCount * ((data->dpvsPlanes.cellCount + 31) >> 5));
 					ZoneBuffer::ClearPointer(&dest->cellCasterBits);
+
+					for (auto i = 0; i < data->dpvsPlanes.cellCount * ((data->dpvsPlanes.cellCount + 31) >> 5); i++)
+					{
+						endian_convert(&destCellCasterBits[i]);
+					}
 				}
 
 				if (data->cellHasSunLitSurfsBits)
 				{
 					buf->align(3);
-					buf->write(data->cellHasSunLitSurfsBits, (data->dpvsPlanes.cellCount + 31) >> 5);
+					auto destCellHasSunLitSurfsBits = buf->write(data->cellHasSunLitSurfsBits, (data->dpvsPlanes.cellCount + 31) >> 5);
 					ZoneBuffer::ClearPointer(&dest->cellHasSunLitSurfsBits);
+
+					for (auto i = 0; i < (data->dpvsPlanes.cellCount + 31) >> 5; i++)
+					{
+						endian_convert(&destCellHasSunLitSurfsBits[i]);
+					}
 				}
 
 				if (data->sceneDynModel)
@@ -1364,7 +1440,7 @@ namespace ZoneTool
 									auto destAxis = buf->write(data->lightRegion[i].hulls[i2].axis,
 										data->lightRegion[i].hulls[i2].axisCount);
 
-									for (auto i3 = 0; i3 < data->lightRegion[i].hulls[i2].axisCount; i3++)
+									for (auto i3 = 0u; i3 < data->lightRegion[i].hulls[i2].axisCount; i3++)
 									{
 										endian_convert(&destAxis[i3].dir[0]);
 										endian_convert(&destAxis[i3].dir[1]);

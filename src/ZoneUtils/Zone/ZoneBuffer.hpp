@@ -328,6 +328,7 @@ namespace ZoneTool
 		std::size_t size();
 
 		void align(std::uint32_t alignment);
+		void inc_stream(const std::uint32_t stream, const std::size_t size);
 		void push_stream(std::uint32_t stream);
 		void pop_stream();
 

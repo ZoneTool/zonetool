@@ -14,6 +14,7 @@
 #include <IW4/IW4.hpp>
 #include <IW5/IW5.hpp>
 #include <CODO/CODO.hpp>
+#include "Utils/Swizzle.hpp"
 
 #pragma comment(lib, "Dbghelp")
 
@@ -584,6 +585,7 @@ namespace ZoneTool
 		// Startup complete, show branding
 		branding(current_linker);
 
+		// handle startup commands
 		CreateThread(nullptr, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(handle_params), nullptr, 0, nullptr);
 
 #ifdef USE_VMPROTECT

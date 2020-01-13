@@ -2785,7 +2785,16 @@ namespace ZoneTool
 			int sunPrimaryLightIndex; // 4 // = 32
 			int primaryLightCount; // 4
 			int primaryLightEnvCount; // 4
-			char unknown1[12]; // 16 // = 56 // Sortkeys. Don't know which ones though
+			union
+			{
+				struct
+				{
+					unsigned int sortKeyEffectDecal;
+					unsigned int sortKeyEffectAuto;
+					unsigned int sortKeyDistortion;
+				};
+				char unknown1[12]; // 16 // = 56 // Sortkeys. Don't know which ones though
+			};
 			GfxWorldDpvsPlanes dpvsPlanes; // 16
 			GfxCellTreeCount* aabbTreeCounts; // Size: 4 * dpvsPlanes.cellCount // 4
 			GfxCellTree* aabbTree; // 4
@@ -2829,6 +2838,141 @@ namespace ZoneTool
 		};
 #pragma pack(pop)
 
+		namespace alpha
+		{
+			struct D3DResource
+			{
+				unsigned int Common;
+				unsigned int ReferenceCount;
+				unsigned int Fence;
+				unsigned int ReadFence;
+				unsigned int Identifier;
+				unsigned int BaseFlush;
+			};
+			
+			struct D3DIndexBuffer : D3DResource
+			{
+				unsigned int Address;
+				unsigned int Size;
+			};
+
+			union GPUVERTEX_FETCH_CONSTANT
+			{
+				unsigned int dword[2];
+			};
+			
+			struct D3DVertexBuffer : D3DResource
+			{
+				GPUVERTEX_FETCH_CONSTANT Format;
+			};
+			
+			struct GfxWorldVertexData
+			{
+				GfxWorldVertex* vertices;
+				D3DVertexBuffer worldVb;
+			};
+
+			struct GfxWorldVertexLayerData
+			{
+				char* data;
+				D3DVertexBuffer layerVb;
+			};
+			
+			struct GfxWorldDraw
+			{
+				unsigned int reflectionProbeCount;
+				GfxImage** reflectionProbes;
+				GfxReflectionProbe* reflectionProbeOrigins;
+				GfxTexture* reflectionProbeTextures;
+				int lightmapCount;
+				GfxLightmapArray* lightmaps;
+				GfxTexture* lightmapPrimaryTextures;
+				GfxTexture* lightmapSecondaryTextures;
+				GfxImage* lightmapOverridePrimary;
+				GfxImage* lightmapOverrideSecondary;
+				unsigned int vertexCount;
+				GfxWorldVertexData vd;
+				unsigned int vertexLayerDataSize;
+				GfxWorldVertexLayerData vld;
+				unsigned int indexCount;
+				unsigned __int16* indices;
+				D3DIndexBuffer indexBuffer;
+			};
+
+			struct GfxWorldDpvsStatic
+			{
+				unsigned int smodelCount;
+				unsigned int staticSurfaceCount;
+				unsigned int litOpaqueSurfsBegin;
+				unsigned int litOpaqueSurfsEnd;
+				unsigned int litTransSurfsBegin;
+				unsigned int litTransSurfsEnd;
+				unsigned int shadowCasterSurfsBegin;
+				unsigned int shadowCasterSurfsEnd;
+				unsigned int emissiveSurfsBegin;
+				unsigned int emissiveSurfsEnd;
+				unsigned int smodelVisDataCount;
+				unsigned int surfaceVisDataCount;
+				char* smodelVisData[3];
+				char* surfaceVisData[3];
+				unsigned __int16* sortedSurfIndex;
+				GfxStaticModelInst* smodelInsts;
+				GfxSurface* surfaces;
+				GfxCullGroup* surfacesBounds;
+				GfxStaticModelDrawInst* smodelDrawInsts;
+				GfxDrawSurf* surfaceMaterials;
+				unsigned int* surfaceCastsSunShadow;
+				volatile int usageCount;
+			};
+			
+			struct __declspec(align(4)) GfxWorld
+			{
+				const char* name;
+				const char* baseName;
+				int planeCount;
+				int nodeCount;
+				unsigned int surfaceCount;
+				int skyCount;
+				GfxSky* skies;
+				unsigned int lastSunPrimaryLightIndex;
+				unsigned int primaryLightCount;
+				unsigned int sortKeyLitDecal;
+				unsigned int sortKeyEffectDecal;
+				unsigned int sortKeyEffectAuto;
+				unsigned int sortKeyDistortion;
+				GfxWorldDpvsPlanes dpvsPlanes;
+				GfxCellTreeCount* aabbTreeCounts;
+				GfxCellTree* aabbTrees;
+				GfxCell* cells;
+				GfxWorldDraw draw;
+				GfxLightGrid lightGrid;
+				int modelCount;
+				GfxBrushModel* models;
+				Bounds bounds;
+				unsigned int checksum;
+				int materialMemoryCount;
+				MaterialMemory* materialMemory;
+				sunflare_t sun;
+				float outdoorLookupMatrix[4][4];
+				GfxImage* outdoorImage;
+				unsigned int* cellCasterBits;
+				unsigned int* cellHasSunLitSurfsBits;
+				GfxSceneDynModel* sceneDynModel;
+				GfxSceneDynBrush* sceneDynBrush;
+				unsigned int* primaryLightEntityShadowVis;
+				unsigned int* primaryLightDynEntShadowVis[2];
+				char* nonSunPrimaryLightForModelDynEnt;
+				GfxShadowGeometry* shadowGeom;
+				GfxLightRegion* lightRegion;
+				GfxWorldDpvsStatic dpvs;
+				GfxWorldDpvsDynamic dpvsDyn;
+				unsigned int mapVtxChecksum;
+				unsigned int heroOnlyLightCount;
+				GfxHeroLight* heroOnlyLights;
+				char fogTypesAllowed;
+			};
+		}
+		
 #pragma pack(push, 4)
 		struct cStaticModel_s
 		{

@@ -9,6 +9,7 @@
 #include "stdafx.hpp"
 #include "IW5/Assets/GfxImage.hpp"
 
+
 namespace ZoneTool
 {
 	namespace IW4
@@ -194,39 +195,69 @@ namespace ZoneTool
 				alpha::GfxImage alpha_image = {};
 
 				// transform iwi
-				if (!FileSystem::FileExists(va("images/%s.iwi", this->name().data())))
+				if (!FileSystem::FileExists(va("images/%s.iwi", this->name().data())) && !this->isMapImage)
 				{
 					ZONETOOL_FATAL("Image %s is missing!", this->name().data());
 				}
 
 				std::vector<std::uint8_t> pixels;
 				auto fp = FileSystem::FileOpen(va("images/%s.iwi", this->name().data()), "rb");
-				if (fp)
+				if (fp || this->isMapImage)
 				{
-					auto file_size = FileSystem::FileSize(fp);
-					auto img_data = FileSystem::ReadBytes(fp, file_size);
+					if (!this->isMapImage)
+					{
+						auto file_size = FileSystem::FileSize(fp);
+						auto img_data = FileSystem::ReadBytes(fp, file_size);
 
-					auto iwi_header = (GfxImageFileHeader*)img_data.data();
+						auto iwi_header = (GfxImageFileHeader*)img_data.data();
+
+						sizeof GfxImageFileHeader;
+
+						auto pixel_data = img_data.data() + 32;
+						auto pixel_data_size = img_data.size() - 32;
+
+						pixels.resize(pixel_data_size);
+						memcpy(&pixels[0], pixel_data, pixel_data_size);
+
+						// add image to imagepak
+
+
+						// zone images
+						alpha_image.cached = false;
+						alpha_image.cardMemory.platform[0] = pixels.size();
+
+						// pakfile images
+						//alpha_image.cached = true;
+						//alpha_image.cardMemory.platform[0] = 0;
+						//alpha_image.streams[0].width = iwi_header->dimensions[0];
+						//alpha_image.streams[0].height = iwi_header->dimensions[1];
+						//alpha_image.streams[0].pixelSize = 1;
+						//buf->add_image(pixels);
+
+						alpha_image.format = 0x1A200154;
+						alpha_image.width = iwi_header->dimensions[0];
+						alpha_image.height = iwi_header->dimensions[1];
+						alpha_image.depth = iwi_header->dimensions[2];
+						alpha_image.levelCount = 1;
+						alpha_image.mapType = 3;
+						alpha_image.category = 3;
+					}
+					else
+					{
+						pixels.resize(this->asset_->texture->dataSize);
+						memcpy(&pixels[0], &this->asset_->texture->texture, pixels.size());
+						
+						alpha_image.cached = false;
+						alpha_image.cardMemory.platform[0] = pixels.size();
+						alpha_image.format = 0x1A200154;
+						alpha_image.width = this->asset_->width;
+						alpha_image.height = this->asset_->height;
+						alpha_image.depth = this->asset_->depth;
+						alpha_image.levelCount = 1;
+						alpha_image.mapType = 3;
+						alpha_image.category = 3;
+					}
 					
-					auto pixel_data = img_data.data() + 32;
-					auto pixel_data_size = img_data.size() - 32;
-
-					pixels.resize(pixel_data_size);
-					memcpy(&pixels[0], pixel_data, pixel_data_size);
-					
-					// add image to imagepak
-					// buf->add_image(pixels);
-
-					// dunno
-					alpha_image.cached = false;
-					alpha_image.format = 0x1A200154; // iwi_header->format;
-					alpha_image.width = iwi_header->dimensions[0];
-					alpha_image.height = iwi_header->dimensions[1];
-					alpha_image.depth = iwi_header->dimensions[2];
-					alpha_image.levelCount = 1;
-					alpha_image.mapType = 3;
-					alpha_image.category = 3;
-					alpha_image.cardMemory.platform[0] = pixels.size();
 				}
 				else
 				{
@@ -242,7 +273,7 @@ namespace ZoneTool
 				dest->name = buf->write_str(this->name());
 
 				buf->push_stream(1);
-				if (pixels.size())
+				if (data->cardMemory.platform[0])
 				{
 					buf->align(4095);
 					buf->write(pixels.data(), pixels.size());
@@ -256,15 +287,18 @@ namespace ZoneTool
 				
 				buf->pop_stream();
 
-				if (zone->get_target() != zone_target::pc)
+				endian_convert(&dest->name);
+				endian_convert(&dest->format);
+				endian_convert(&dest->width);
+				endian_convert(&dest->height);
+				endian_convert(&dest->depth);
+				endian_convert(&dest->pixels);
+				endian_convert(&dest->cardMemory.platform[0]);
+				for (auto i = 0; i < 4; i++)
 				{
-					endian_convert(&dest->name);
-					endian_convert(&dest->format);
-					endian_convert(&dest->width);
-					endian_convert(&dest->height);
-					endian_convert(&dest->depth);
-					endian_convert(&dest->pixels);
-					endian_convert(&dest->cardMemory.platform[0]);
+					endian_convert(&dest->streams[i].width);
+					endian_convert(&dest->streams[i].height);
+					endian_convert(&dest->streams[i].pixelSize);
 				}
 			}
 		}

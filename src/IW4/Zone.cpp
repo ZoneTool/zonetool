@@ -145,7 +145,7 @@ namespace ZoneTool
 		void Zone::build(ZoneBuffer* buf)
 		{
 			// init streams properly
-			buf->init_streams(target_ == zone_target::pc ? 8 : 6);
+			buf->init_streams(/*target_ == zone_target::pc ? 8 : 6*/8);							// use 8 because it always uses a shiftsize of 28, even though console is missing 1-2 streams.
 			
 			if (target_ != zone_target::pc)
 			{
@@ -175,7 +175,7 @@ namespace ZoneTool
 
 			// write zone header
 			auto mem_ptr = buf->at<XZoneMemory<num_streams>>();
-			buf->write_stream(&mem, 4, target_ == zone_target::pc ? 10 : 8);
+			buf->write_stream(&mem, 4, target_ == zone_target::pc ? 10 : 8);			// write correct amount of streams, skip last 2 streams for console
 			
 			std::uintptr_t pad = 0xFFFFFFFF;
 			std::uintptr_t zero = 0;
@@ -286,7 +286,7 @@ namespace ZoneTool
 			
 			if (target_ != zone_target::pc)
 			{
-				mem_ptr->streams[5] = 1352;
+				// mem_ptr->streams[5] = 1352;
 				
 				endian_convert(&mem_ptr->size);
 				endian_convert(&mem_ptr->externalsize);
@@ -366,11 +366,10 @@ namespace ZoneTool
 
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
-			// buf->save_image_pak("imagefile5.pakm");
-
 			if (target_version_ == zone_target_version::iw4_alpha_482)
 			{
 				fastfile.save("zone\\english\\" + this->name_ + ".ffm");
+				buf->save_image_pak("imagefile5.pakm");
 			}
 			else
 			{

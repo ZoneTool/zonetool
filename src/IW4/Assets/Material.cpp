@@ -588,6 +588,9 @@ namespace ZoneTool
 				endian_convert(&dest->textureTable);
 				endian_convert(&dest->constantTable);
 				endian_convert(&dest->stateBitsTable);
+
+				// alloc callback memory for textures
+				buf->inc_stream(5, dest->textureCount * 4);
 			}
 		}
 

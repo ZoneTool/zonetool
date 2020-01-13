@@ -225,7 +225,7 @@ namespace ZoneTool
 			((char*)ents->entityString)[ents->numEntityChars] = '\0';
 
 			// convert the mapents!
-			this->ConvertEnts(ents, mem);
+			// this->ConvertEnts(ents, mem);
 
 			// close filepointer
 			FileSystem::FileClose(file);
@@ -363,6 +363,17 @@ namespace ZoneTool
 						buf->write_str(data->stageNames[i].stageName);
 						ZoneBuffer::ClearPointer(&stage[i].stageName);
 					}
+					
+					if (zone->get_target() != zone_target::pc)
+					{
+						endian_convert(&stage[i].stageName);
+						endian_convert(&stage[i].triggerIndex);
+						endian_convert(&stage[i].offset[0]);
+						endian_convert(&stage[i].offset[1]);
+						endian_convert(&stage[i].offset[2]);
+						// endian_convert(&stage[i].sunPrimaryLightIndex);
+						// endian_convert(&dest->stageNames);
+					}
 				}
 
 				ZoneBuffer::ClearPointer(&dest->stageNames);
@@ -370,6 +381,15 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->entityString);
+				endian_convert(&dest->numEntityChars);
+				endian_convert(&dest->stageCount);
+				endian_convert(&dest->stageNames);
+			}
 		}
 
 		void IMapEnts::dump(MapEnts* asset)

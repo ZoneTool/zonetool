@@ -75,7 +75,7 @@ namespace ZoneTool
 		}
 
 		void IFxWorld::write(IZone* zone, ZoneBuffer* buf)
-		{
+		{			
 			auto data = this->asset_;
 			auto dest = buf->write(data);
 
@@ -199,6 +199,37 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+
+			if (zone->get_target() != zone_target::pc)
+			{
+				endian_convert(&dest->name);
+				endian_convert(&dest->glassSys.time);
+				endian_convert(&dest->glassSys.defCount);
+				endian_convert(&dest->glassSys.pieceLimit);
+				endian_convert(&dest->glassSys.pieceWordCount);
+				endian_convert(&dest->glassSys.initPieceCount);
+				endian_convert(&dest->glassSys.cellCount);
+				endian_convert(&dest->glassSys.activePieceCount);
+				endian_convert(&dest->glassSys.firstFreePiece);
+				endian_convert(&dest->glassSys.geoDataLimit);
+				endian_convert(&dest->glassSys.geoDataCount);
+				endian_convert(&dest->glassSys.initGeoDataCount);
+				endian_convert(&dest->glassSys.defs);
+				endian_convert(&dest->glassSys.piecePlaces);
+				endian_convert(&dest->glassSys.pieceStates);
+				endian_convert(&dest->glassSys.pieceDynamics);
+				endian_convert(&dest->glassSys.geoData);
+				endian_convert(&dest->glassSys.isInUse);
+				endian_convert(&dest->glassSys.cellBits);
+				endian_convert(&dest->glassSys.visData);
+				endian_convert(&dest->glassSys.linkOrg);
+				endian_convert(&dest->glassSys.halfThickness);
+				endian_convert(&dest->glassSys.lightingHandles);
+				endian_convert(&dest->glassSys.initPieceStates);
+				endian_convert(&dest->glassSys.initGeoData);
+				endian_convert(&dest->glassSys.effectChanceAccum);
+				endian_convert(&dest->glassSys.lastPieceDeletionTime);
+			}
 		}
 
 		void IFxWorld::dump(FxWorld* asset)

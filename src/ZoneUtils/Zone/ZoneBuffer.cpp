@@ -190,6 +190,11 @@ namespace ZoneTool
 		}
 	}
 
+	void ZoneBuffer::inc_stream(const std::uint32_t stream, const std::size_t size)
+	{
+		m_zonestreams[stream] += size;
+	}
+
 	void ZoneBuffer::push_stream(std::uint32_t stream)
 	{
 		m_streamstack.push(m_stream);

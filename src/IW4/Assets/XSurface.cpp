@@ -15,7 +15,7 @@ namespace ZoneTool
 		XModelSurfs* IXSurface::parse(const std::string& name, ZoneMemory* mem)
 		{
 			AssetReader read(mem);
-
+			
 			if (!read.open("XSurface\\" + name + ".xse"))
 			{
 				return nullptr;
@@ -121,18 +121,17 @@ namespace ZoneTool
 			return xmodelsurfs;
 		}
 
-		void IXSurface::write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data, XSurface* dest,
-		                                std::uint16_t count)
+		template <typename T> void write_xsurfaces(IZone* zone, ZoneBuffer* buf, T* data, T* dest, std::uint16_t count, bool is_console)
 		{
-			assert(sizeof XSurface, 64);
-			assert(sizeof Face, 6);
-			assert(sizeof XRigidVertList, 12);
-			assert(sizeof XSurfaceCollisionTree, 40);
-			assert(sizeof XSurfaceCollisionLeaf, 2);
-			assert(sizeof XSurfaceCollisionAabb, 12);
-			assert(sizeof XSurfaceCollisionNode, 16);
-			assert(sizeof GfxPackedVertex, 32);
-			assert(sizeof XSurfaceVertexInfo, 12);
+			//assert(sizeof XSurface, 64);
+			//assert(sizeof Face, 6);
+			//assert(sizeof XRigidVertList, 12);
+			//assert(sizeof XSurfaceCollisionTree, 40);
+			//assert(sizeof XSurfaceCollisionLeaf, 2);
+			//assert(sizeof XSurfaceCollisionAabb, 12);
+			//assert(sizeof XSurfaceCollisionNode, 16);
+			//assert(sizeof GfxPackedVertex, 32);
+			//assert(sizeof XSurfaceVertexInfo, 12);
 
 			for (std::int16_t surf = 0; surf < count; surf++)
 			{
@@ -145,12 +144,20 @@ namespace ZoneTool
 						                                                surf].vertexInfo.vertCount[3] * 7));
 				}
 
-				buf->push_stream(6);
+				if (!is_console)
+				{
+					buf->push_stream(6);
+				}
+				
 				if (data[surf].verticies)
 				{
 					dest[surf].verticies = buf->write_s(15, data[surf].verticies, data[surf].vertCount);
 				}
-				buf->pop_stream();
+				
+				if (!is_console)
+				{
+					buf->pop_stream();
+				}
 
 				if (data[surf].rigidVertLists)
 				{
@@ -185,37 +192,92 @@ namespace ZoneTool
 					}
 				}
 
-				buf->push_stream(7);
+				if (!is_console)
+				{
+					buf->push_stream(7);
+				}
+				
 				if (data[surf].triIndices)
 				{
-					dest[surf].triIndices = buf->write_s(15, data[surf].triIndices, data[surf].triCount);
+					Face* dest_tris = nullptr;
+					dest[surf].triIndices = buf->write_s(15, data[surf].triIndices, data[surf].triCount, sizeof(unsigned __int16), &dest_tris);
+
+					if (is_console)
+					{
+						for (auto a = 0u; a < data[surf].triCount; a++)
+						{
+							endian_convert(&dest_tris[a].v1);
+							endian_convert(&dest_tris[a].v2);
+							endian_convert(&dest_tris[a].v3);
+						}
+					}
 				}
-				buf->pop_stream();
+
+				if (!is_console)
+				{
+					buf->pop_stream();
+				}
 			}
 		}
 
 		void IXSurface::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write<XModelSurfs>(data);
-
-			assert(sizeof XModelSurfs, 36);
-
-			buf->push_stream(3);
-			START_LOG_STREAM;
-
-			dest->name = buf->write_str(this->name());
-
-			if (data->surfs)
+			if (zone->get_target() == zone_target::pc)
 			{
-				buf->align(3);
-				auto destsurfaces = buf->write(data->surfs, data->numsurfs);
-				this->write_xsurfices(zone, buf, data->surfs, destsurfaces, data->numsurfs);
-				ZoneBuffer::ClearPointer(&dest->surfs);
-			}
+				auto data = this->asset_;
+				auto dest = buf->write<XModelSurfs>(data);
 
-			END_LOG_STREAM;
-			buf->pop_stream();
+				assert(sizeof XModelSurfs, 36);
+
+				buf->push_stream(3);
+				START_LOG_STREAM;
+
+				dest->name = buf->write_str(this->name());
+
+				if (data->surfs)
+				{
+					buf->align(3);
+					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
+					write_xsurfaces<XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, false);
+					ZoneBuffer::ClearPointer(&dest->surfs);
+				}
+
+				END_LOG_STREAM;
+				buf->pop_stream();
+			}
+			else
+			{
+				alpha::XModelSurfs alpha_surfs = {};
+				auto data = &alpha_surfs;
+				auto dest = buf->write(data);
+
+				assert(sizeof alpha::XModelSurfs, 32);
+
+				buf->push_stream(3);
+				START_LOG_STREAM;
+
+				dest->name = buf->write_str(this->name());
+
+				if (data->surfs)
+				{
+					buf->align(3);
+					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
+					write_xsurfaces <alpha::XSurface > (zone, buf, data->surfs, destsurfaces, data->numsurfs, true);
+					ZoneBuffer::ClearPointer(&dest->surfs);
+				}
+
+				END_LOG_STREAM;
+				buf->pop_stream();
+
+				endian_convert(&dest->name);
+				endian_convert(&dest->surfs);
+				endian_convert(&dest->numsurfs);
+				for (auto a = 0; a < 5; a++)
+				{
+					endian_convert(&dest->partBits[a]);
+				}
+			}
+			
 		}
 
 		void IXSurface::dump(XModelSurfs* asset)

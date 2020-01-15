@@ -614,6 +614,79 @@ namespace ZoneTool
 			int partBits[6];
 		};
 
+		namespace alpha
+		{
+			struct D3DResource
+			{
+				unsigned int Common;
+				unsigned int ReferenceCount;
+				unsigned int Fence;
+				unsigned int ReadFence;
+				unsigned int Identifier;
+				unsigned int BaseFlush;
+			};
+
+			struct D3DIndexBuffer : D3DResource
+			{
+				unsigned int Address;
+				unsigned int Size;
+			};
+
+			union GPUVERTEX_FETCH_CONSTANT
+			{
+				unsigned int dword[2];
+			};
+
+			struct D3DVertexBuffer : D3DResource
+			{
+				GPUVERTEX_FETCH_CONSTANT Format;
+			};
+			
+			struct XSurface
+			{
+				char tileMode;
+				char deformed;
+				unsigned __int16 vertCount;
+				unsigned __int16 triCount;
+				Face* triIndices;
+				XSurfaceVertexInfo vertexInfo;
+				GfxPackedVertex* verticies;
+				D3DVertexBuffer vb0;
+				unsigned int vertListCount;
+				XRigidVertList* rigidVertLists;
+				D3DIndexBuffer indexBuffer;
+				int partBits[5];
+			};
+
+#pragma pack(push, 4)
+			struct XModelSurfs
+			{
+				const char* name;
+				XSurface* surfs;
+				unsigned __int16 numsurfs;
+				int partBits[5];
+			};
+#pragma pack(pop)
+
+			struct XModelLodInfo
+			{
+				float dist;
+				unsigned __int16 numsurfs;
+				unsigned __int16 surfIndex;
+				XModelSurfs* modelSurfs;
+				int partBits[5];
+				XSurface* surfs;
+			};
+
+			struct XModelCollSurf_s
+			{
+				Bounds bounds;
+				int boneIdx;
+				int contents;
+				int surfFlags;
+			};
+		}
+
 		struct XModelSurfs
 		{
 			const char* name;
@@ -2840,33 +2913,7 @@ namespace ZoneTool
 #pragma pack(pop)
 
 		namespace alpha
-		{
-			struct D3DResource
-			{
-				unsigned int Common;
-				unsigned int ReferenceCount;
-				unsigned int Fence;
-				unsigned int ReadFence;
-				unsigned int Identifier;
-				unsigned int BaseFlush;
-			};
-			
-			struct D3DIndexBuffer : D3DResource
-			{
-				unsigned int Address;
-				unsigned int Size;
-			};
-
-			union GPUVERTEX_FETCH_CONSTANT
-			{
-				unsigned int dword[2];
-			};
-			
-			struct D3DVertexBuffer : D3DResource
-			{
-				GPUVERTEX_FETCH_CONSTANT Format;
-			};
-			
+		{			
 			struct GfxWorldVertexData
 			{
 				GfxWorldVertex* vertices;

@@ -18,9 +18,6 @@ namespace ZoneTool
 			std::string name_;
 			XModelSurfs* asset_;
 
-			void write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data, XSurface* dest,
-			                     std::uint16_t count);
-
 		public:
 			XModelSurfs* parse(const std::string& name, ZoneMemory* mem);
 

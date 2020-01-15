@@ -202,7 +202,7 @@ namespace ZoneTool
 					Face* dest_tris = nullptr;
 					dest[surf].triIndices = buf->write_s(15, data[surf].triIndices, data[surf].triCount, sizeof(unsigned __int16), &dest_tris);
 
-					if (is_console)
+					if (is_console && dest[surf].triIndices == reinterpret_cast<Face*>(-1))
 					{
 						for (auto a = 0u; a < data[surf].triCount; a++)
 						{

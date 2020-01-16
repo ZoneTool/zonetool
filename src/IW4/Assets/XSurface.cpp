@@ -205,14 +205,61 @@ namespace ZoneTool
 								{
 									if (entry->nodes)
 									{
-										entry->nodes = buf->write_s(15, entry->nodes, entry->nodeCount);
+										XSurfaceCollisionNode* destnode = nullptr;
+										entry->nodes = buf->write_s(15, entry->nodes, entry->nodeCount, sizeof (XSurfaceCollisionNode), &destnode);
+
+										if (entry->nodes == reinterpret_cast<XSurfaceCollisionNode*>(-1) && is_console)
+										{
+											for (auto a = 0u; a < entry->leafCount; a++)
+											{
+												for (auto b = 0; b < 3; b++)
+												{
+													endian_convert(&destnode[a].aabb.mins[b]);
+													endian_convert(&destnode[a].aabb.maxs[b]);
+												}
+
+												endian_convert(&destnode[a].childBeginIndex);
+												endian_convert(&destnode[a].childCount);
+											}
+										}
 									}
 
 									if (entry->leafs)
 									{
-										entry->leafs = buf->write_s(1, entry->leafs, entry->leafCount);
+										XSurfaceCollisionLeaf* destleaf = nullptr;
+										entry->leafs = buf->write_s(1, entry->leafs, entry->leafCount, sizeof (XSurfaceCollisionLeaf), &destleaf);
+
+										if (entry->leafs == reinterpret_cast<XSurfaceCollisionLeaf *>(-1) && is_console)
+										{
+											for (auto a = 0u; a < entry->leafCount; a++)
+											{
+												endian_convert(&destleaf[a].triangleBeginIndex);
+											}
+										}
+									}
+
+									if (is_console)
+									{
+										for (auto a = 0; a < 3; a++)
+										{
+											endian_convert(&entry->trans[a]);
+											endian_convert(&entry->scale[a]);
+										}
+										endian_convert(&entry->nodeCount);
+										endian_convert(&entry->nodes);
+										endian_convert(&entry->leafCount);
+										endian_convert(&entry->leafs);
 									}
 								}
+							}
+
+							if (is_console)
+							{
+								endian_convert(&ct[k].boneOffset);
+								endian_convert(&ct[k].vertCount);
+								endian_convert(&ct[k].triOffset);
+								endian_convert(&ct[k].triCount);
+								endian_convert(&ct[k].collisionTree);
 							}
 						}
 					}

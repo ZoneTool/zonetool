@@ -123,25 +123,35 @@ namespace ZoneTool
 
 		template <typename T> void write_xsurfaces(IZone* zone, ZoneBuffer* buf, T* data, T* dest, std::uint16_t count, bool is_console)
 		{
-			//assert(sizeof XSurface, 64);
-			//assert(sizeof Face, 6);
-			//assert(sizeof XRigidVertList, 12);
-			//assert(sizeof XSurfaceCollisionTree, 40);
-			//assert(sizeof XSurfaceCollisionLeaf, 2);
-			//assert(sizeof XSurfaceCollisionAabb, 12);
-			//assert(sizeof XSurfaceCollisionNode, 16);
-			//assert(sizeof GfxPackedVertex, 32);
-			//assert(sizeof XSurfaceVertexInfo, 12);
+			assert(sizeof XSurface, 64);
+			assert(sizeof Face, 6);
+			assert(sizeof XRigidVertList, 12);
+			assert(sizeof XSurfaceCollisionTree, 40);
+			assert(sizeof XSurfaceCollisionLeaf, 2);
+			assert(sizeof XSurfaceCollisionAabb, 12);
+			assert(sizeof XSurfaceCollisionNode, 16);
+			assert(sizeof GfxPackedVertex, 32);
+			assert(sizeof XSurfaceVertexInfo, 12);
 
-			for (std::int16_t surf = 0; surf < count; surf++)
+			for (auto surf = 0u; surf < count; surf++)
 			{
 				if (data[surf].vertexInfo.vertsBlend)
 				{
-					dest[surf].vertexInfo.vertsBlend = buf->write_s(1, data[surf].vertexInfo.vertsBlend,
-					                                                data[surf].vertexInfo.vertCount[0] +
-					                                                (data[surf].vertexInfo.vertCount[1] * 3) + (data[
-						                                                surf].vertexInfo.vertCount[2] * 5) + (data[
-						                                                surf].vertexInfo.vertCount[3] * 7));
+					unsigned __int16* destverts = nullptr;
+					const auto vertcount = data[surf].vertexInfo.vertCount[0] +
+						(data[surf].vertexInfo.vertCount[1] * 3) + 
+						(data[surf].vertexInfo.vertCount[2] * 5) + 
+						(data[surf].vertexInfo.vertCount[3] * 7);
+					
+					dest[surf].vertexInfo.vertsBlend = buf->write_s(1, data[surf].vertexInfo.vertsBlend, count, sizeof (unsigned __int16), &destverts);
+
+					if (is_console && dest[surf].vertexInfo.vertsBlend == reinterpret_cast<unsigned __int16*>(-1))
+					{
+						for (auto a = 0u; a < vertcount; a++)
+						{
+							endian_convert(&destverts[a]);
+						}
+					}
 				}
 
 				if (!is_console)
@@ -151,7 +161,23 @@ namespace ZoneTool
 				
 				if (data[surf].verticies)
 				{
-					dest[surf].verticies = buf->write_s(15, data[surf].verticies, data[surf].vertCount);
+					GfxPackedVertex* destverticies = nullptr;
+					dest[surf].verticies = buf->write_s(15, data[surf].verticies, data[surf].vertCount, sizeof GfxPackedVertex, &destverticies);
+
+					if (is_console && dest[surf].verticies == reinterpret_cast<GfxPackedVertex*>(-1))
+					{
+						for (auto a = 0; a < data[surf].vertCount; a++)
+						{
+							endian_convert(&destverticies[a].xyz[0]);
+							endian_convert(&destverticies[a].xyz[1]);
+							endian_convert(&destverticies[a].xyz[2]);
+							endian_convert(&destverticies[a].binormalSign);
+							// packed data probably consists of single bytes?
+							//endian_convert(&destverticies[a].texCoord.packed);
+							//endian_convert(&destverticies[a].normal.packed);
+							//endian_convert(&destverticies[a].tangent.packed);
+						}
+					}
 				}
 				
 				if (!is_console)
@@ -217,6 +243,24 @@ namespace ZoneTool
 				{
 					buf->pop_stream();
 				}
+
+				if (is_console)
+				{
+					endian_convert(&dest[surf].vertCount);
+					endian_convert(&dest[surf].triCount);
+					endian_convert(&dest[surf].triIndices);
+					endian_convert(&dest[surf].vertexInfo.vertCount[0]);
+					endian_convert(&dest[surf].vertexInfo.vertCount[1]);
+					endian_convert(&dest[surf].vertexInfo.vertCount[2]);
+					endian_convert(&dest[surf].vertexInfo.vertCount[3]);
+					endian_convert(&dest[surf].verticies);
+					endian_convert(&dest[surf].vertListCount);
+					endian_convert(&dest[surf].rigidVertLists);
+					for (auto a = 0; a < 5; a++)
+					{
+						endian_convert(&dest[surf].partBits[a]);
+					}
+				}
 			}
 		}
 
@@ -262,7 +306,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
-					write_xsurfaces <alpha::XSurface > (zone, buf, data->surfs, destsurfaces, data->numsurfs, true);
+					write_xsurfaces<alpha::XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, true);
 					ZoneBuffer::ClearPointer(&dest->surfs);
 				}
 

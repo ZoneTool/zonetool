@@ -338,7 +338,32 @@ namespace ZoneTool
 			}
 			else
 			{
+				std::vector<alpha::XSurface> surfs;
+				surfs.resize(this->asset_->numsurfs);
+
+				for (auto i = 0u; i < this->asset_->numsurfs; i++)
+				{
+					// 
+					surfs[i].tileMode = this->asset_->surfs[i].tileMode;
+					surfs[i].deformed = this->asset_->surfs[i].deformed;
+					surfs[i].vertCount = this->asset_->surfs[i].vertCount;
+					surfs[i].triCount = this->asset_->surfs[i].triCount;
+					surfs[i].triIndices = this->asset_->surfs[i].triIndices;
+					surfs[i].verticies = this->asset_->surfs[i].verticies;
+					surfs[i].vertListCount = this->asset_->surfs[i].vertListCount;
+					surfs[i].rigidVertLists = this->asset_->surfs[i].rigidVertLists;
+					memcpy(&surfs[i].vertexInfo, &this->asset_->surfs[i].vertexInfo, sizeof XSurfaceVertexInfo);
+					memcpy(surfs[i].partBits, this->asset_->surfs[i].partBits, sizeof(int) * 5);
+					
+					// memset console shit to 0
+					memset(&surfs[i].vb0, 0, sizeof alpha::D3DVertexBuffer);
+					memset(&surfs[i].indexBuffer, 0, sizeof alpha::D3DIndexBuffer);
+				}
+				
 				alpha::XModelSurfs alpha_surfs = {};
+				memcpy(&alpha_surfs, this->asset_, sizeof alpha::XModelSurfs);
+				alpha_surfs.surfs = surfs.data();
+				
 				auto data = &alpha_surfs;
 				auto dest = buf->write(data);
 

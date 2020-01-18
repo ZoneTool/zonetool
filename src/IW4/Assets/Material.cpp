@@ -459,7 +459,7 @@ namespace ZoneTool
 				alpha::Material alpha_material = {};
 
 				// transform data
-				memcpy(&alpha_material.info, this->asset_, sizeof alpha::MaterialInfo);
+				memcpy(&alpha_material, this->asset_, 16);
 				memcpy(&alpha_material.textureCount, &this->asset_->numMaps, 5);
 				memcpy(&alpha_material.techniqueSet, &this->asset_->techniqueSet, 16);
 				alpha_material.subMaterials = nullptr;
@@ -515,7 +515,7 @@ namespace ZoneTool
 				
 				buf->push_stream(3);
 
-				dest->info.name = buf->write_str(this->name());
+				dest->name = buf->write_str(this->name());
 
 				if (data->techniqueSet)
 				{
@@ -581,9 +581,9 @@ namespace ZoneTool
 				
 				buf->pop_stream();
 
-				endian_convert(&dest->info.name);
-				endian_convert(&dest->info.surfaceTypeBits);
-				endian_convert(&dest->info.drawSurf.packed);
+				endian_convert(&dest->name);
+				endian_convert(&dest->surfaceTypeBits);
+				endian_convert(&dest->drawSurf.packed);
 				endian_convert(&dest->techniqueSet);
 				endian_convert(&dest->textureTable);
 				endian_convert(&dest->constantTable);

@@ -107,21 +107,93 @@ namespace ZoneTool
 			return xmodel;
 		}
 
-		void IXModel::write(IZone* zone, ZoneBuffer* buf)
+		void endian_convert_xmodel(alpha::XModel* data)
 		{
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW4::IXModel::write");
-#endif
+			endian_convert(&data->name);
+			endian_convert(&data->numBones);
+			endian_convert(&data->numRootBones);
+			endian_convert(&data->numSurfaces);
+			endian_convert(&data->scale);
 
-			auto data = this->asset_;
-			auto dest = buf->write<XModel>(data);
+			for (auto a = 0; a < 5; a ++)
+			{
+				endian_convert(&data->noScalePartBits[a]);
+			}
+
+			endian_convert(&data->boneNames);
+			endian_convert(&data->parentList);
+			endian_convert(&data->tagAngles);
+			endian_convert(&data->tagPositions);
+			endian_convert(&data->partClassification);
+			endian_convert(&data->animMatrix);
+			endian_convert(&data->materials);
+
+			for (auto a = 0; a < 4; a++)
+			{
+				endian_convert(&data->lods[a].dist);
+				endian_convert(&data->lods[a].numSurfacesInLod);
+				endian_convert(&data->lods[a].surfIndex);
+				endian_convert(&data->lods[a].surfaces);
+
+				for (auto b = 0; b < 5; b++)
+				{
+					endian_convert(&data->lods[a].partBits[b]);
+				}
+
+				endian_convert(&data->lods[a].surfs);
+			}
+			
+			endian_convert(&data->maxLoadedLod);
+			endian_convert(&data->numLods);
+			endian_convert(&data->collLod);
+			endian_convert(&data->flags);
+			endian_convert(&data->colSurf);
+			endian_convert(&data->numColSurfs);
+			endian_convert(&data->contents);
+			endian_convert(&data->boneInfo);
+			endian_convert(&data->radius);
+			endian_convert(&data->bounds.halfSize[0]);
+			endian_convert(&data->bounds.halfSize[1]);
+			endian_convert(&data->bounds.halfSize[2]);
+			endian_convert(&data->bounds.midPoint[0]);
+			endian_convert(&data->bounds.midPoint[1]);
+			endian_convert(&data->bounds.midPoint[2]);
+			endian_convert(&data->invHighMipRadius);
+			endian_convert(&data->memUsage);
+			endian_convert(&data->physPreset);
+			endian_convert(&data->physCollmap);
+		}
+		
+		void write_colsurf(IZone* zone, ZoneBuffer* buf, XModel* data, XModelCollSurf_s* dest)
+		{
+			for (int i = 0; i < data->numColSurfs; i++)
+			{
+				dest[i].tris = buf->write_s(3, data->colSurf[i].tris, data->colSurf[i].numCollTris);
+			}
+		}
+
+		void write_lod_pc(IZone* zone, ZoneBuffer* buf, XModel* data, XModel* dest, std::size_t index)
+		{
+			dest->lods[index].surfaces = reinterpret_cast<XModelSurfs*>(zone->get_asset_pointer(
+				xmodelsurfs, data->lods[index].surfaces->name));
+		}
+
+		void write_lod_console(IZone* zone, ZoneBuffer* buf, alpha::XModel* data, alpha::XModel* dest, std::size_t index)
+		{
+			
+		}
+		
+		template <typename T> void write_model(IZone* zone, ZoneBuffer* buf, const std::string& name, T* data, bool is_console)
+		{
+			auto dest = buf->write(data);
 
 			assert(sizeof XModel, 304);
+			assert(sizeof alpha::XModel, 268);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
-			dest->name = buf->write_str(this->name());
+			dest->name = buf->write_str(name);
 
 			if (data->boneNames)
 			{
@@ -172,7 +244,7 @@ namespace ZoneTool
 				auto destMaterials = buf->write(data->materials, data->numSurfaces);
 				for (int i = 0; i < data->numSurfaces; i++)
 				{
-					destMaterials[i] = reinterpret_cast<Material*>(zone->get_asset_pointer(
+					((Material**)destMaterials)[i] = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, data->materials[i]->name));
 				}
 
@@ -182,26 +254,15 @@ namespace ZoneTool
 			for (int i = 0; i < 4; i++)
 			{
 				if (!data->lods[i].surfaces) continue;
-				dest->lods[i].surfaces = reinterpret_cast<XModelSurfs*>(zone->get_asset_pointer(
-					xmodelsurfs, data->lods[i].surfaces->name));
 
-				//if (data->lods[i].surfaces && dependingSurfaces[i])
-				//{
-				//	buf->push_stream(0);
-				//	buf->align(3);
-				//	dependingSurfaces[i]->write(zone, buf);
-				//	buf->pop_stream();
-
-				//	//ZoneBuffer::ClearPointer(&dest->lods[i].surfaces);
-				//	//delete[] dependingSurfaces[i];
-
-				//	dest->lods[i].numSurfacesInLod = data->lods[i].surfaces->xSurficiesCount;
-				//	dest->lods[i].surfaces = (ModelSurface*)-1;
-				//}
-				//else
-				//{
-				//	dest->lods[i].surfaces = nullptr;
-				//}
+				if (zone->get_target() == zone_target::pc)
+				{
+					write_lod_pc(zone, buf, (XModel*)data, (XModel*)dest, i);
+				}
+				else
+				{
+					write_lod_console(zone, buf, (alpha::XModel*)data, (alpha::XModel*)dest, i);
+				}
 			}
 
 			if (data->colSurf)
@@ -209,9 +270,9 @@ namespace ZoneTool
 				buf->align(3);
 				auto destSurf = buf->write(data->colSurf, data->numColSurfs);
 
-				for (int i = 0; i < data->numColSurfs; i++)
+				if (!is_console)
 				{
-					destSurf[i].tris = buf->write_s(3, data->colSurf[i].tris, data->colSurf[i].numCollTris);
+					write_colsurf(zone, buf, (XModel*)data, (XModelCollSurf_s*)destSurf);
 				}
 
 				ZoneBuffer::ClearPointer(&dest->colSurf);
@@ -238,6 +299,28 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
+
+			if (zone->get_target() == zone_target::pc)
+			{
+				endian_convert_xmodel(reinterpret_cast<alpha::XModel*>(dest));
+			}
+		}
+		
+		void IXModel::write(IZone* zone, ZoneBuffer* buf)
+		{
+#ifdef USE_VMPROTECT
+			VMProtectBeginUltra("IW4::IXModel::write");
+#endif
+
+			if (zone->get_target() == zone_target::pc)
+			{
+				auto data = this->asset_;
+				write_model<XModel>(zone, buf, this->name(), data, false);
+			}
+			else
+			{
+				write_model<alpha::XModel>(zone, buf, this->name(), nullptr, true);
+			}
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();

@@ -423,8 +423,8 @@ namespace ZoneTool
 				GfxDrawSurfFields fields;
 				unsigned __int64 packed;
 			};
-
-			struct __declspec(align(8)) MaterialInfo
+			
+			struct __declspec(align(8)) Material
 			{
 				const char* name;
 				char gameFlags;
@@ -433,11 +433,6 @@ namespace ZoneTool
 				char textureAtlasColumnCount;
 				GfxDrawSurf drawSurf;
 				unsigned int surfaceTypeBits;
-			};
-			
-			struct __declspec(align(8)) Material
-			{
-				MaterialInfo info;
 				char stateBitsEntry[33];
 				char textureCount;
 				char constantCount;
@@ -671,9 +666,9 @@ namespace ZoneTool
 			struct XModelLodInfo
 			{
 				float dist;
-				unsigned __int16 numsurfs;
+				unsigned __int16 numSurfacesInLod;
 				unsigned __int16 surfIndex;
-				XModelSurfs* modelSurfs;
+				XModelSurfs* surfaces;
 				int partBits[5];
 				XSurface* surfs;
 			};
@@ -762,6 +757,43 @@ namespace ZoneTool
 			PhysPreset* physPreset;
 			PhysCollmap* physCollmap;
 		}; // total size 304
+
+		namespace alpha
+		{
+#pragma pack(push, 4)
+			struct XModel
+			{
+				const char* name;
+				char numBones;
+				char numRootBones;
+				char numSurfaces;
+				float scale;
+				unsigned int noScalePartBits[5];
+				__int16* boneNames;
+				unsigned char* parentList;
+				XModelAngle* tagAngles;
+				XModelTagPos* tagPositions;
+				char* partClassification;
+				DObjAnimMat* animMatrix;
+				Material** materials;
+				XModelLodInfo lods[4];
+				char maxLoadedLod;
+				char numLods;
+				char collLod;
+				char flags;
+				XModelCollSurf_s* colSurf;
+				int numColSurfs;
+				int contents;
+				XBoneInfo* boneInfo;
+				float radius;
+				Bounds bounds;
+				unsigned __int16* invHighMipRadius;
+				int memUsage;
+				PhysPreset* physPreset;
+				PhysCollmap* physCollmap;
+			};
+#pragma pack(pop)
+		}
 
 		enum weapFireType_t : int
 		{

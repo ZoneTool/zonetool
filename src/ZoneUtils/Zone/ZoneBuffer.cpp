@@ -257,31 +257,86 @@ namespace ZoneTool
 		this->image_pak()->save(filename);
 	}
 
-	std::vector<std::uint8_t> ZoneBuffer::compress_zlib(const std::uint8_t* data, const std::size_t data_size)
+	std::vector<std::uint8_t> ZoneBuffer::compress_zlib(const std::uint8_t* data, const std::size_t data_size, bool compress_blocks)
 	{
 		auto compressBound = [](unsigned long sourceLen)
 		{
 			return static_cast<unsigned long>((ceil(sourceLen * 1.001)) + 12);
 		};
 
-		// calculate buffer size needed for current zone
-		auto size = compressBound(data_size);
+		if (compress_blocks == false)
+		{
+			// calculate buffer size needed for current zone
+			auto size = compressBound(data_size);
 
-		// alloc array for compressed data
-		std::vector<std::uint8_t> compressed;
-		compressed.resize(size);
+			// alloc array for compressed data
+			std::vector<std::uint8_t> compressed;
+			compressed.resize(size);
 
-		// compress buffer
-		auto status = compress2(compressed.data(), &size, data, data_size, ZLIB_BEST_COMPRESSION);
-		compressed.resize(size);
+			// compress buffer
+			auto status = compress2(compressed.data(), &size, data, data_size, ZLIB_BEST_COMPRESSION);
+			compressed.resize(size);
 
-		// return compressed buffer
-		return compressed;
+			// return compressed buffer
+			return compressed;
+		}
+		else
+		{
+			// data should be 0x10000 byte aligned
+			const auto block_size = 0x10000;
+			auto bound_size = compressBound(block_size);
+			auto num_blocks = data_size / block_size;
+
+			std::vector<std::vector<std::uint8_t>> blocks;
+			blocks.resize(num_blocks);
+
+			auto data_ptr = data;
+			for (auto& block : blocks)
+			{
+				// allocate for compressed data
+				block.resize(bound_size);
+
+				// compress block buffer
+				unsigned long size;
+				auto status = compress2(block.data(), &size, data_ptr, block_size, ZLIB_BEST_COMPRESSION);
+				if (size >= block_size)
+				{
+					// discard compressed data and just store uncompressed data
+					block.resize(block_size + 2);
+
+					// 0 block size is uncompressed
+					block[0] = 0;
+					block[1] = 0;
+					memcpy(block.data() + 2, data_ptr, block_size);
+				}
+				else
+				{
+					block.resize(size);
+
+					// overwrite zlib header with block size
+					size -= 2;
+					block[0] = (size & 0xff00) >> 8;
+					block[1] = size & 0xff;
+				}
+
+				// go to next block
+				data_ptr += block_size;
+			}
+
+			std::vector<uint8_t> compressed;
+			for (auto& block : blocks)
+			{
+				compressed.insert(compressed.end(), block.begin(), block.end());
+			}
+
+
+			return compressed;
+		}
 	}
 
-	std::vector<std::uint8_t> ZoneBuffer::compress_zlib(const std::vector<std::uint8_t>& data)
+	std::vector<std::uint8_t> ZoneBuffer::compress_zlib(const std::vector<std::uint8_t>& data, bool compress_blocks)
 	{
-		return ZoneBuffer::compress_zlib(data.data(), data.size());
+		return ZoneBuffer::compress_zlib(data.data(), data.size(), compress_blocks);
 	}
 
 	std::vector<std::uint8_t> ZoneBuffer::compress_zstd()
@@ -307,9 +362,9 @@ namespace ZoneTool
 		return compressed;
 	}
 
-	std::vector<std::uint8_t> ZoneBuffer::compress_zlib()
+	std::vector<std::uint8_t> ZoneBuffer::compress_zlib(bool compress_blocks)
 	{
-		return ZoneBuffer::compress_zlib(this->m_buf.data(), this->m_pos);
+		return ZoneBuffer::compress_zlib(this->m_buf.data(), this->m_pos, compress_blocks);
 	}
 
 	void GenerateKeys(XZoneKey* key)

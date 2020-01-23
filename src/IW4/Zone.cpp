@@ -175,7 +175,8 @@ namespace ZoneTool
 
 			// write zone header
 			auto mem_ptr = buf->at<XZoneMemory<num_streams>>();
-			buf->write_stream(&mem, 4, target_ == zone_target::pc ? 10 : 8);			// write correct amount of streams, skip last 2 streams for console
+
+			buf->write_stream(&mem, 4, target_ == zone_target::pc ? 10 : target_ == zone_target::ps3 ? 9 : 8);			// write correct amount of streams, skip last 2 streams for console
 			
 			std::uintptr_t pad = 0xFFFFFFFF;
 			std::uintptr_t zero = 0;
@@ -273,11 +274,11 @@ namespace ZoneTool
 			buf->pop_stream();
 
 			// update zone header
-			zone->size = buf->size() - header_size;
+			zone->size = buf->size() - (target_ == zone_target::pc ? 0x28 : target_ == zone_target::ps3 ? 0x24 : 0x20);
 			zone->externalsize = 0;
 
 			// Update stream data
-			for (int i = 0; i < (target_ != zone_target::pc ? 6 : 8); i++)
+			for (int i = 0; i < (target_ == zone_target::pc ? 8 : target_ == zone_target::ps3 ? 7 : 6); i++)
 			{
 				zone->streams[i] = buf->stream_offset(i);
 			}
@@ -296,11 +297,18 @@ namespace ZoneTool
 				}
 			}
 
+			if (this->get_target() == zone_target::ps3)
+			{
+				auto zoneSize = ((buf->size() + (0x10000 - 1)) & ~(0x10000 - 1));
+				std::vector<uint8_t> pad(zoneSize - buf->size(), 0);
+				buf->write(pad.data(), zoneSize - buf->size());
+			}
+
 			// Dump zone to disk (DEBUGGING PURPOSES)
 			buf->save("debug\\" + this->name_ + ".zone");
 
 			// Compress buffer
-			auto buf_compressed = buf->compress_zlib();
+			auto buf_compressed = buf->compress_zlib(this->get_target() == zone_target::ps3 ? true : false);
 
 			// Generate FF header
 			auto header = this->m_zonemem->Alloc<XFileHeader>();

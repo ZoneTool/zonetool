@@ -23,19 +23,24 @@ namespace ZoneTool
 		endian_convert(dest_version);
 	}
 
-	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::vector<std::uint8_t>& pixels) const
+	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::uint8_t* pixels, const std::size_t size) const
 	{
 		// get start position
 		auto start_location = this->buffer_->size();
 
 		// write image data
-		auto compressed = ZoneBuffer::compress_zlib(pixels);
+		auto compressed = ZoneBuffer::compress_zlib(pixels, size);
 		this->buffer_->write_stream(compressed.data(), compressed.size(), 1);
 
 		// get end position
 		auto end_location = this->buffer_->size();
 
 		return { start_location, end_location };
+	}
+
+	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::vector<std::uint8_t>& pixels) const
+	{
+		return add_entry(pixels.data(), pixels.size());
 	}
 
 	void PakFile::save(const std::string& filename)

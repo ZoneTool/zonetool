@@ -60,34 +60,6 @@ protected:
 
 };
 
-template <std::uint32_t Offset> class compressed_file : public file
-{
-public:
-	compressed_file(const std::string& filename)
-	{
-		auto fp = fopen(filename.data(), "rb");
-		if (fp)
-		{
-			std::vector<std::uint8_t> compressed_buffer;
-
-			const auto filesize = std::filesystem::file_size(filename);
-			compressed_buffer.resize(filesize);
-			fread(&compressed_buffer[0], 1, filesize, fp);
-			fclose(fp);
-
-			buffer_.resize(filesize);
-			uLongf buffer_len = buffer_.size();
-			uncompress(buffer_.data(), &buffer_len, &compressed_buffer[Offset], compressed_buffer.size() - Offset);
-
-			compressed_buffer.clear();
-		}
-	}
-
-private:
-
-};
-using compressed_pak = compressed_file<0xC>;
-
 void endian_convert_entries(ZoneTool::XAssetStreamFile* entries, std::uint32_t count)
 {
 	for (auto i = 0u; i < count; i++)
@@ -98,7 +70,7 @@ void endian_convert_entries(ZoneTool::XAssetStreamFile* entries, std::uint32_t c
 	}
 }
 
-void handle_entries(file& ff, std::vector<compressed_pak*>& paks, ZoneTool::PakFile& img5)
+void handle_entries(file& ff, std::vector<file*>& paks, ZoneTool::PakFile& img5)
 {
 	auto count = *ff.get<std::uint32_t>(0x19);						// get count
 	ZoneTool::endian_convert(&count);								// endian convert count
@@ -125,7 +97,7 @@ void handle_entries(file& ff, std::vector<compressed_pak*>& paks, ZoneTool::PakF
 		auto image_data = cur_pak->get<std::uint8_t>(entries[i].offset);
 
 		// store image in new imgpak
-		auto new_image_data = img5.add_entry(image_data, entries[i].offsetEnd - entries[i].offset);
+		auto new_image_data = img5.add_entry(image_data, entries[i].offsetEnd - entries[i].offset, true);
 
 		// replace existing image data
 		entries[i].offset = new_image_data.first;
@@ -139,12 +111,12 @@ void handle_entries(file& ff, std::vector<compressed_pak*>& paks, ZoneTool::PakF
 
 int main(int argc, char** argv)
 {
-	compressed_pak img1("imagefile1.pakm");
-	compressed_pak img2("imagefile2.pakm");
-	compressed_pak img3("imagefile3.pakm");
-	compressed_pak img4("imagefile4.pakm");
+	file img1("imagefile1.pakm");
+	file img2("imagefile2.pakm");
+	file img3("imagefile3.pakm");
+	file img4("imagefile4.pakm");
 
-	std::vector<compressed_pak*> paks = { &img1, &img2, &img3, &img4 };
+	std::vector<file*> paks = { &img1, &img2, &img3, &img4 };
 
 	file ff("mp_shipment.ff");
 	file loadscreen("mp_shipment_load.ff");

@@ -261,7 +261,8 @@ namespace ZoneTool
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
 			// oxygen output paths
-			fastfile.save("oxygen\\zone\\" + this->name_ + ".ff");
+			fastfile.save("C:\\Users\\RektInator\\AppData\\Local\\Plutonium\\storage\\iw5\\zone\\" + this->name_ + ".ff");
+			// fastfile.save("oxygen\\zone\\" + this->name_ + ".ff");
 			// fastfile.save("zone\\english\\" + this->name_ + ".ff");
 
 			ZONETOOL_INFO("Successfully compiled fastfile \"%s\"!", this->name_.data());

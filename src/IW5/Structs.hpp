@@ -3253,6 +3253,7 @@ namespace ZoneTool
 
 		typedef BYTE _BYTE;
 
+#pragma pack(push, 4)
 		struct StateTimers
 		{
 			int iFireDelay;
@@ -3382,7 +3383,6 @@ namespace ZoneTool
 				};
 				snd_alias_list_t* sounds[48];
 			};
-			
 			snd_alias_list_t** bounceSound;
 			snd_alias_list_t** rollingSound;
 			FxEffectDef* viewShellEjectEffect;
@@ -3709,6 +3709,7 @@ namespace ZoneTool
 			unsigned __int16 stowTag;
 			XModel* stowOffsetModel;
 		};
+#pragma pack(pop)
 
 		struct AnimOverrideEntry
 		{

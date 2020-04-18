@@ -446,6 +446,14 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(bool, doNotAllowAttachmentsToOverrideSpread);
 			WEAPON_READ_ASSET(xmodel, xmodel, stowOffsetModel);
 
+			// parse stowtag
+			if (!data["showTag"].is_null())
+			{
+				auto stowTag = data["showTag"].get<std::string>();
+				weapon->stowTag = SL_AllocString(stowTag);
+			}
+
+
 			weapon->accuracyGraphName[0] = nullptr;
 			weapon->accuracyGraphName[1] = nullptr;
 			weapon->accuracyGraphKnots = nullptr;
@@ -827,6 +835,8 @@ namespace ZoneTool
 			WEAPON_SCRIPTSTRING_ARRAY(notetrackSoundMapValues, 24);
 			WEAPON_SCRIPTSTRING_ARRAY(notetrackRumbleMapKeys, 16);
 			WEAPON_SCRIPTSTRING_ARRAY(notetrackRumbleMapValues, 16);
+
+			data->stowTag = buf->write_scriptstring(SL_ConvertToString(data->stowTag));
 
 			weapon->weapDef = data;
 			this->asset_ = weapon;
@@ -2102,7 +2112,7 @@ namespace ZoneTool
 			WEAPON_DUMP_FIELD(missileConeSoundCrossfadeEnabled);
 			WEAPON_DUMP_FIELD(offhandHoldIsCancelable);
 			WEAPON_DUMP_FIELD(doNotAllowAttachmentsToOverrideSpread);
-			WEAPON_DUMP_FIELD(stowTag);
+			data["stowTag"] = convertToString(asset->stowTag);
 			WEAPON_DUMP_ASSET(stowOffsetModel);
 
 			return data;

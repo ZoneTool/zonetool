@@ -203,6 +203,7 @@ namespace ZoneTool
 					DUMPCASE(sound, ISound, snd_alias_list_t);
 					DUMPCASE(stringtable, IStringTable, StringTable);
 					DUMPCASE(rawfile, IRawFile, RawFile);
+					DUMPCASE(scriptfile, IScriptFile, ScriptFile);
 					DUMPCASE(weapon, IWeaponDef, WeaponCompleteDef);
 					DUMPCASE(image, IGfxImage, GfxImage);
 					DUMPCASE(phys_collmap, IPhysCollmap, PhysCollmap);

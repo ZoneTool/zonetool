@@ -161,8 +161,8 @@ namespace ZoneTool
 				// Weapons
 				addEntry(ENUM_WEAPONS, 1, "iw5_ak74u");
 				addEntry(ENUM_WEAPONS2, 1, "iw5_ak74u");
-				addEntry(ENUM_WEAPONS, 2, "iw5_cheytac");
-				addEntry(ENUM_WEAPONS2, 2, "iw5_cheytac");
+				//addEntry(ENUM_WEAPONS, 2, "iw5_cheytac");
+				//addEntry(ENUM_WEAPONS2, 2, "iw5_cheytac");
 
 				// Gametypes
 				// addEntry(ENUM_GAMETYPES, 1, "oneflag");
@@ -170,13 +170,13 @@ namespace ZoneTool
 				// addEntry(ENUM_GAMETYPES, 3, "gtnw");
 
 				// Custom camos
-				addEntry(ENUM_CAMOS, 1, "plutonium");
+				//addEntry(ENUM_CAMOS, 1, "plutonium");
 
 				// Reticles
-				addEntry(ENUM_RETICLES, 1, "ret7");
-				addEntry(ENUM_RETICLES, 2, "ret8");
-				addEntry(ENUM_RETICLES, 3, "ret9");
-				addEntry(ENUM_RETICLES, 4, "ret10");
+				//addEntry(ENUM_RETICLES, 1, "ret7");
+				//addEntry(ENUM_RETICLES, 2, "ret8");
+				//addEntry(ENUM_RETICLES, 3, "ret9");
+				//addEntry(ENUM_RETICLES, 4, "ret10");
 
 				// Attachments
 				// 
@@ -188,17 +188,17 @@ namespace ZoneTool
 				// Weapons
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
 				addEntry((enumType_s)6, 1, "iw5_ak74u");
-				addEntry((enumType_s)0, 2, "iw5_cheytac");
-				addEntry((enumType_s)6, 2, "iw5_cheytac");
+				//addEntry((enumType_s)0, 2, "iw5_cheytac");
+				//addEntry((enumType_s)6, 2, "iw5_cheytac");
 
-				// Custom camos
-				addEntry((enumType_s)2, 1, "plutonium");
+				//// Custom camos
+				//addEntry((enumType_s)2, 1, "plutonium");
 
-				// Reticles
-				addEntry((enumType_s)5, 1, "ret7");
-				addEntry((enumType_s)5, 2, "ret8");
-				addEntry((enumType_s)5, 3, "ret9");
-				addEntry((enumType_s)5, 4, "ret10");
+				//// Reticles
+				//addEntry((enumType_s)5, 1, "ret7");
+				//addEntry((enumType_s)5, 2, "ret8");
+				//addEntry((enumType_s)5, 3, "ret9");
+				//addEntry((enumType_s)5, 4, "ret10");
 
 				// Gametypes
 				// addEntry((enum_type)9, 1, "oneflag");
@@ -209,7 +209,7 @@ namespace ZoneTool
 			}
 
 			// Increment version
-			data->defs->version += 1;
+			// data->defs->version += 1;
 
 			// Patch enums
 			for (int i = 0; i < ENUM_COUNT; i++)

@@ -42,6 +42,72 @@ namespace ZoneTool
 		} \
 	}
 
+		void parse_overlay(ADSOverlay* weapon, Json& data)
+		{
+			WEAPON_READ_ASSET(material, material, shader);
+			WEAPON_READ_ASSET(material, material, shaderLowRes);
+			WEAPON_READ_ASSET(material, material, shaderEMP);
+			WEAPON_READ_ASSET(material, material, shaderEMPLowRes);
+			WEAPON_READ_FIELD(int, reticle);
+			WEAPON_READ_FIELD(float, width);
+			WEAPON_READ_FIELD(float, height);
+			WEAPON_READ_FIELD(float, widthSplitscreen);
+			WEAPON_READ_FIELD(float, heightSplitscreen);
+		}
+
+		void parse_statetimers(StateTimers* weapon, Json& data)
+		{
+			WEAPON_READ_FIELD(int,  iFireDelay);
+			WEAPON_READ_FIELD(int,  iMeleeDelay);
+			WEAPON_READ_FIELD(int,  meleeChargeDelay);
+			WEAPON_READ_FIELD(int,  iDetonateDelay);
+			WEAPON_READ_FIELD(int,  iRechamberTime);
+			WEAPON_READ_FIELD(int,  rechamberTimeOneHanded);
+			WEAPON_READ_FIELD(int,  iRechamberBoltTime);
+			WEAPON_READ_FIELD(int,  iHoldFireTime);
+			WEAPON_READ_FIELD(int,  iDetonateTime);
+			WEAPON_READ_FIELD(int,  iMeleeTime);
+			WEAPON_READ_FIELD(int,  meleeChargeTime);
+			WEAPON_READ_FIELD(int,  iReloadTime);
+			WEAPON_READ_FIELD(int,  reloadShowRocketTime);
+			WEAPON_READ_FIELD(int,  iReloadEmptyTime);
+			WEAPON_READ_FIELD(int,  iReloadAddTime);
+			WEAPON_READ_FIELD(int,  iReloadStartTime);
+			WEAPON_READ_FIELD(int,  iReloadStartAddTime);
+			WEAPON_READ_FIELD(int,  iReloadEndTime);
+			WEAPON_READ_FIELD(int,  iDropTime);
+			WEAPON_READ_FIELD(int,  iRaiseTime);
+			WEAPON_READ_FIELD(int,  iAltDropTime);
+			WEAPON_READ_FIELD(int,  quickDropTime);
+			WEAPON_READ_FIELD(int,  quickRaiseTime);
+			WEAPON_READ_FIELD(int,  iBreachRaiseTime);
+			WEAPON_READ_FIELD(int,  iEmptyRaiseTime);
+			WEAPON_READ_FIELD(int,  iEmptyDropTime);
+			WEAPON_READ_FIELD(int, sprintInTime);
+			WEAPON_READ_FIELD(int, sprintLoopTime);
+			WEAPON_READ_FIELD(int, sprintOutTime);
+			WEAPON_READ_FIELD(int,  stunnedTimeBegin);
+			WEAPON_READ_FIELD(int,  stunnedTimeLoop);
+			WEAPON_READ_FIELD(int,  stunnedTimeEnd);
+			WEAPON_READ_FIELD(int,  nightVisionWearTime);
+			WEAPON_READ_FIELD(int,  nightVisionWearTimeFadeOutEnd);
+			WEAPON_READ_FIELD(int,  nightVisionWearTimePowerUp);
+			WEAPON_READ_FIELD(int,  nightVisionRemoveTime);
+			WEAPON_READ_FIELD(int,  nightVisionRemoveTimePowerDown);
+			WEAPON_READ_FIELD(int,  nightVisionRemoveTimeFadeInStart);
+			WEAPON_READ_FIELD(int,  fuseTime);
+			WEAPON_READ_FIELD(int,  aiFuseTime);
+			WEAPON_READ_FIELD(int,  blastFrontTime);
+			WEAPON_READ_FIELD(int,  blastRightTime);
+			WEAPON_READ_FIELD(int,  blastBackTime);
+			WEAPON_READ_FIELD(int,  blastLeftTime);
+			WEAPON_READ_FIELD(int, raiseInterruptableTime);
+			WEAPON_READ_FIELD(int, firstRaiseInterruptableTime);
+			WEAPON_READ_FIELD(int, reloadInterruptableTime);
+			WEAPON_READ_FIELD(int, reloadEmptyInterruptableTime);
+			WEAPON_READ_FIELD(int, fireInterruptableTime);
+		}
+
 		WeaponDef* parse_weapondef(Json& data, WeaponCompleteDef* baseAsset,
 			ZoneMemory* mem)
 		{
@@ -75,16 +141,16 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(int, iReticleSideSize);
 			WEAPON_READ_FIELD(int, iReticleMinOfs);
 			WEAPON_READ_FIELD(int, activeReticleType);
-			WEAPON_READ_FIELD(float, vStandMove[3]);
-			WEAPON_READ_FIELD(float, vStandRot[3]);
-			WEAPON_READ_FIELD(float, strafeMove[3]);
-			WEAPON_READ_FIELD(float, strafeRot[3]);
-			WEAPON_READ_FIELD(float, vDuckedOfs[3]);
-			WEAPON_READ_FIELD(float, vDuckedMove[3]);
-			WEAPON_READ_FIELD(float, vDuckedRot[3]);
-			WEAPON_READ_FIELD(float, vProneOfs[3]);
-			WEAPON_READ_FIELD(float, vProneMove[3]);
-			WEAPON_READ_FIELD(float, vProneRot[3]);
+			WEAPON_READ_FIELD_ARR(float, vStandMove, 3);
+			WEAPON_READ_FIELD_ARR(float, vStandRot, 3);
+			WEAPON_READ_FIELD_ARR(float, strafeMove, 3);
+			WEAPON_READ_FIELD_ARR(float, strafeRot, 3);
+			WEAPON_READ_FIELD_ARR(float, vDuckedOfs, 3);
+			WEAPON_READ_FIELD_ARR(float, vDuckedMove, 3);
+			WEAPON_READ_FIELD_ARR(float, vDuckedRot, 3);
+			WEAPON_READ_FIELD_ARR(float, vProneOfs, 3);
+			WEAPON_READ_FIELD_ARR(float, vProneMove, 3);
+			WEAPON_READ_FIELD_ARR(float, vProneRot, 3);
 			WEAPON_READ_FIELD(float, fPosMoveRate);
 			WEAPON_READ_FIELD(float, fPosProneMoveRate);
 			WEAPON_READ_FIELD(float, fStandMoveMinSpeed);
@@ -120,8 +186,8 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(int, playerDamage);
 			WEAPON_READ_FIELD(int, iMeleeDamage);
 			WEAPON_READ_FIELD(int, iDamageType);
-			// StateTimers stateTimers);
-			// StateTimers akimboStateTimers);
+			parse_statetimers(&weapon->stateTimers, data["stateTimers"]);
+			parse_statetimers(&weapon->akimboStateTimers, data["akimboStateTimers"]);
 			WEAPON_READ_FIELD(float, autoAimRange);
 			WEAPON_READ_FIELD(float, aimAssistRange);
 			WEAPON_READ_FIELD(float, aimAssistRangeAds);
@@ -132,7 +198,7 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(float, sprintDurationScale);
 			WEAPON_READ_FIELD(float, fAdsZoomInFrac);
 			WEAPON_READ_FIELD(float, fAdsZoomOutFrac);
-			// ADSOverlay overlay);
+			parse_overlay(&weapon->overlay, data["overlay"]);
 			WEAPON_READ_FIELD(int, overlayInterface);
 			WEAPON_READ_FIELD(float, fAdsBobFactor);
 			WEAPON_READ_FIELD(float, fAdsViewBobMult);
@@ -254,7 +320,7 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(float, fHipViewScatterMax);
 			WEAPON_READ_FIELD(float, fightDist);
 			WEAPON_READ_FIELD(float, maxDist);
-			WEAPON_READ_STRING(accuracyGraphName[2]);
+			// WEAPON_READ_STRING(accuracyGraphName[2]);
 			WEAPON_READ_FIELD(short, accuracyGraphKnotCount);
 			WEAPON_READ_FIELD(short, originalAccuracyGraphKnotCount);
 			WEAPON_READ_FIELD(int, iPositionReloadTransTime);
@@ -379,6 +445,16 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(bool, offhandHoldIsCancelable);
 			WEAPON_READ_FIELD(bool, doNotAllowAttachmentsToOverrideSpread);
 			WEAPON_READ_ASSET(xmodel, xmodel, stowOffsetModel);
+
+			weapon->accuracyGraphName[0] = nullptr;
+			weapon->accuracyGraphName[1] = nullptr;
+			weapon->accuracyGraphKnots = nullptr;
+			weapon->originalAccuracyGraphKnots = nullptr;
+			weapon->accuracyGraphKnotCount = 0;
+			weapon->originalAccuracyGraphKnotCount = 0;
+			weapon->parallelBounce = nullptr;
+			weapon->perpendicularBounce = nullptr;
+			// weapon->locationDamageMultipliers = nullptr;
 
 			weapon->gunXModel = mem->Alloc<XModel*>(16);
 			weapon->worldModel = mem->Alloc<XModel*>(16);
@@ -781,7 +857,7 @@ namespace ZoneTool
 
 			for (auto i = 0u; i < 48; i++)
 			{
-				// WEAPON_SUBASSET(sounds[i], sound, snd_alias_list_t);
+				 WEAPON_SUBASSET(sounds[i], sound, snd_alias_list_t);
 			}
 
 			if (data->bounceSound)
@@ -790,7 +866,7 @@ namespace ZoneTool
 				{
 					if (data->bounceSound[i])
 					{
-						// zone->add_asset_of_type(sound, data->bounceSound[i]->name);
+						 zone->add_asset_of_type(sound, data->bounceSound[i]->name);
 					}
 				}
 			}
@@ -801,16 +877,16 @@ namespace ZoneTool
 				{
 					if (data->rollingSound[i])
 					{
-						// zone->add_asset_of_type(sound, data->rollingSound[i]->name);
+						 zone->add_asset_of_type(sound, data->rollingSound[i]->name);
 					}
 				}
 			}
 
-			//WEAPON_SUBASSET(viewShellEjectEffect, fx, FxEffectDef);
-			//WEAPON_SUBASSET(worldShellEjectEffect, fx, FxEffectDef);
-			//WEAPON_SUBASSET(viewLastShotEjectEffect, fx, FxEffectDef);
-			//WEAPON_SUBASSET(worldLastShotEjectEffect, fx, FxEffectDef);
-			/*WEAPON_SUBASSET(reticleCenter, material, Material);
+			WEAPON_SUBASSET(viewShellEjectEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(worldShellEjectEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(viewLastShotEjectEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(worldLastShotEjectEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(reticleCenter, material, Material);
 			WEAPON_SUBASSET(reticleSide, material, Material);
 
 			WEAPON_SUBASSET(worldClipModel, xmodel, XModel);
@@ -825,13 +901,13 @@ namespace ZoneTool
 			WEAPON_SUBASSET(overlay.shader, material, Material);
 			WEAPON_SUBASSET(overlay.shaderLowRes, material, Material);
 			WEAPON_SUBASSET(overlay.shaderEMP, material, Material);
-			WEAPON_SUBASSET(overlay.shaderEMPLowRes, material, Material);*/
+			WEAPON_SUBASSET(overlay.shaderEMPLowRes, material, Material);
 
-			// WEAPON_SUBASSET(physCollmap, phys_collmap, PhysCollmap);
+			WEAPON_SUBASSET(physCollmap, phys_collmap, PhysCollmap);
 
-			// WEAPON_SUBASSET(projectileModel, xmodel, XModel);
+			WEAPON_SUBASSET(projectileModel, xmodel, XModel);
 
-			/*WEAPON_SUBASSET(projExplosionEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(projExplosionEffect, fx, FxEffectDef);
 			WEAPON_SUBASSET(projDudEffect, fx, FxEffectDef);
 
 			WEAPON_SUBASSET(projExplosionSound, sound, snd_alias_list_t);
@@ -841,102 +917,102 @@ namespace ZoneTool
 			WEAPON_SUBASSET(projBeaconEffect, fx, FxEffectDef);
 			WEAPON_SUBASSET(projIgnitionEffect, fx, FxEffectDef);
 
-			WEAPON_SUBASSET(projIgnitionSound, sound, snd_alias_list_t);*/
+			WEAPON_SUBASSET(projIgnitionSound, sound, snd_alias_list_t);
 
-			//WEAPON_SUBASSET(tracerType, tracer, TracerDef);
+			WEAPON_SUBASSET(tracerType, tracer, TracerDef);
 
-			//WEAPON_SUBASSET(turretOverheatSound, sound, snd_alias_list_t);
-			//WEAPON_SUBASSET(turretOverheatEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(turretOverheatSound, sound, snd_alias_list_t);
+			WEAPON_SUBASSET(turretOverheatEffect, fx, FxEffectDef);
 
-			//WEAPON_SUBASSET(turretBarrelSpinMaxSnd, sound, snd_alias_list_t);
+			WEAPON_SUBASSET(turretBarrelSpinMaxSnd, sound, snd_alias_list_t);
 
-			//for (int i = 0; i < 4; i++)
-			//{
-			//	WEAPON_SUBASSET(turretBarrelSpinUpSnd[i], sound, snd_alias_list_t);
-			//	WEAPON_SUBASSET(turretBarrelSpinDownSnd[i], sound, snd_alias_list_t);
-			//}
+			for (int i = 0; i < 4; i++)
+			{
+				WEAPON_SUBASSET(turretBarrelSpinUpSnd[i], sound, snd_alias_list_t);
+				WEAPON_SUBASSET(turretBarrelSpinDownSnd[i], sound, snd_alias_list_t);
+			}
 
-			//WEAPON_SUBASSET(missileConeSoundAlias, sound, snd_alias_list_t);
-			//WEAPON_SUBASSET(missileConeSoundAliasAtBase, sound, snd_alias_list_t);
+			WEAPON_SUBASSET(missileConeSoundAlias, sound, snd_alias_list_t);
+			WEAPON_SUBASSET(missileConeSoundAliasAtBase, sound, snd_alias_list_t);
 		}
 
 		void IWeaponDef::load_depending(IZone* zone)
 		{
 			auto data = this->asset_;
 
-			//for (auto i = 0u; i < 6; i++)
-			//{
-			//	if (data->scopes && data->scopes[i])
-			//	{
-			//		zone->add_asset_of_type(attachment, this->asset_->scopes[i]->szInternalName);
-			//	}
+			for (auto i = 0u; i < 6; i++)
+			{
+				if (data->scopes && data->scopes[i])
+				{
+					zone->add_asset_of_type(attachment, this->asset_->scopes[i]->szInternalName);
+				}
 
-			//	if (i >= 3) continue;
-			//	if (data->others && data->others[i])
-			//	{
-			//		zone->add_asset_of_type(attachment, this->asset_->others[i]->szInternalName);
-			//	}
+				if (i >= 3) continue;
+				if (data->others && data->others[i])
+				{
+					zone->add_asset_of_type(attachment, this->asset_->others[i]->szInternalName);
+				}
 
-			//	// Projectile attachments require fixing.
-			//	// if (i >= 4) continue;
-			//	// if (data->attachment2[i])
-			//	// {
-			//	// 	zone->AddAssetOfType(attachment, this->asset_->attachment2[i]->szInternalName);
-			//	// }
-			//}
+				// Projectile attachments require fixing.
+				// if (i >= 4) continue;
+				// if (data->attachment2[i])
+				// {
+				// 	zone->AddAssetOfType(attachment, this->asset_->attachment2[i]->szInternalName);
+				// }
+			}
 
-			//if (data->soundOverrides)
-			//{
-			//	for (int i = 0; i < data->numSoundOverrides; i++)
-			//	{
-			//		if (data->soundOverrides[i].overrideSound)
-			//		{
-			//			zone->add_asset_of_type(sound, data->soundOverrides[i].overrideSound->name);
-			//		}
+			if (data->soundOverrides)
+			{
+				for (int i = 0; i < data->numSoundOverrides; i++)
+				{
+					if (data->soundOverrides[i].overrideSound)
+					{
+						zone->add_asset_of_type(sound, data->soundOverrides[i].overrideSound->name);
+					}
 
-			//		if (data->soundOverrides[i].altmodeSound)
-			//		{
-			//			zone->add_asset_of_type(sound, data->soundOverrides[i].altmodeSound->name);
-			//		}
-			//	}
-			//}
+					if (data->soundOverrides[i].altmodeSound)
+					{
+						zone->add_asset_of_type(sound, data->soundOverrides[i].altmodeSound->name);
+					}
+				}
+			}
 
-			//if (data->fxOverrides)
-			//{
-			//	for (int i = 0; i < data->numSoundOverrides; i++)
-			//	{
-			//		// if (data->fxOverrides[i].overrideFX)
-			//		// {
-			//		// 	zone->AddAssetOfType(fx, data->fxOverrides[i].overrideFX->name);
-			//		// }
+			if (data->fxOverrides)
+			{
+				for (int i = 0; i < data->numSoundOverrides; i++)
+				{
+					 //if (data->fxOverrides[i].overrideFX)
+					 //{
+					 //	zone->AddAssetOfType(fx, data->fxOverrides[i].overrideFX->name);
+					 //}
 
-			//		// if (data->fxOverrides[i].altmodeFX)
-			//		// {
-			//		// 	zone->AddAssetOfType(fx, data->fxOverrides[i].altmodeFX->name);
-			//		// }
-			//	}
-			//}
+					 //if (data->fxOverrides[i].altmodeFX)
+					 //{
+					 //	zone->AddAssetOfType(fx, data->fxOverrides[i].altmodeFX->name);
+					 //}
+				}
+			}
 
-			//if (data->dpadIcon)
-			//{
-			//	zone->add_asset_of_type(material, data->dpadIcon->name);
-			//}
+			if (data->dpadIcon)
+			{
+				zone->add_asset_of_type(material, data->dpadIcon->name);
+			}
 
-			//if (data->killIcon)
-			//{
-			//	zone->add_asset_of_type(material, data->killIcon->name);
-			//}
+			if (data->killIcon)
+			{
+				zone->add_asset_of_type(material, data->killIcon->name);
+			}
 
-			//if (data->szXAnims)
-			//{
-			//	for (int i = 0; i < 42; i++)
-			//	{
-			//		if (data->szXAnims[i])
-			//		{
-			//			// zone->add_asset_of_type(xanim, data->szXAnims[i]);
-			//		}
-			//	}
-			//}
+			if (data->szXAnims)
+			{
+				for (int i = 0; i < 42; i++)
+				{
+					if (data->szXAnims[i])
+					{
+						zone->add_asset_of_type(xanim, data->szXAnims[i]);
+					}
+				}
+			}
 
 			load_depending_WeaponDef(zone, data->weapDef);
 		}

@@ -132,22 +132,31 @@ namespace ZoneTool
 
 		void IScriptFile::dump(ScriptFile* asset)
 		{
-			/*auto fp_ = FileSystem::FileOpen(asset->name, "wb");
-
-			if (fp_)
+			if (!asset)
 			{
-				if (asset->compressedLen)
-				{
-					std::vector < std::uint8_t > uncompressed;
-					uncompressed.resize(asset->len);
-
-					auto status = uncompress(uncompressed.data(), (uLongf*)&asset->len, (Bytef*)asset->buffer, asset->compressedLen);
-
-					fwrite(uncompressed.data(), uncompressed.size(), 1, fp_);
-				}
+				return;
 			}
 
-			FileSystem::FileClose(fp_);*/
+			auto fp1 = FileSystem::FileOpen(va("%s.cgsc", asset->name), "wb");
+			auto fp2 = FileSystem::FileOpen(va("%s.cgsc.stack", asset->name), "wb");
+
+			if (fp1 && asset->bytecode)
+			{
+				fwrite(asset->bytecode, asset->bytecodeLen, 1, fp1);
+			}
+
+			if (fp2 && asset->buffer)
+			{
+				std::vector < std::uint8_t > uncompressed;
+				uncompressed.resize(asset->len);
+
+				auto status = uncompress(uncompressed.data(), (uLongf*)&asset->len, (Bytef*)asset->buffer, asset->compressedLen);
+
+				fwrite(uncompressed.data(), uncompressed.size(), 1, fp2);
+			}
+
+			FileSystem::FileClose(fp1);
+			FileSystem::FileClose(fp2);
 		}
 
 		IScriptFile::IScriptFile()

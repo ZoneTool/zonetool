@@ -447,9 +447,9 @@ namespace ZoneTool
 			WEAPON_READ_ASSET(xmodel, xmodel, stowOffsetModel);
 
 			// parse stowtag
-			if (!data["showTag"].is_null())
+			if (!data["stowTag"].is_null())
 			{
-				auto stowTag = data["showTag"].get<std::string>();
+				auto stowTag = data["stowTag"].get<std::string>();
 				weapon->stowTag = SL_AllocString(stowTag);
 			}
 

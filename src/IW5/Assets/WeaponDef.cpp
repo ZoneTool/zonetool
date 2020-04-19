@@ -862,8 +862,8 @@ namespace ZoneTool
 				}
 			}
 
-			/*WEAPON_SUBASSET(viewFlashEffect, fx, FxEffectDef);
-			WEAPON_SUBASSET(worldFlashEffect, fx, FxEffectDef);*/
+			WEAPON_SUBASSET(viewFlashEffect, fx, FxEffectDef);
+			WEAPON_SUBASSET(worldFlashEffect, fx, FxEffectDef);
 
 			for (auto i = 0u; i < 48; i++)
 			{
@@ -903,6 +903,8 @@ namespace ZoneTool
 			WEAPON_SUBASSET(rocketModel, xmodel, XModel);
 			WEAPON_SUBASSET(knifeModel, xmodel, XModel);
 			WEAPON_SUBASSET(worldKnifeModel, xmodel, XModel);
+
+			WEAPON_SUBASSET(stowOffsetModel, xmodel, XModel);
 
 			WEAPON_SUBASSET(hudIcon, material, Material);
 			WEAPON_SUBASSET(pickupIcon, material, Material);
@@ -991,15 +993,15 @@ namespace ZoneTool
 			{
 				for (int i = 0; i < data->numSoundOverrides; i++)
 				{
-					 //if (data->fxOverrides[i].overrideFX)
-					 //{
-					 //	zone->AddAssetOfType(fx, data->fxOverrides[i].overrideFX->name);
-					 //}
+					 if (data->fxOverrides[i].overrideFX)
+					 {
+					 	zone->add_asset_of_type(fx, data->fxOverrides[i].overrideFX->name);
+					 }
 
-					 //if (data->fxOverrides[i].altmodeFX)
-					 //{
-					 //	zone->AddAssetOfType(fx, data->fxOverrides[i].altmodeFX->name);
-					 //}
+					 if (data->fxOverrides[i].altmodeFX)
+					 {
+					 	zone->add_asset_of_type(fx, data->fxOverrides[i].altmodeFX->name);
+					 }
 				}
 			}
 
@@ -1011,6 +1013,22 @@ namespace ZoneTool
 			if (data->killIcon)
 			{
 				zone->add_asset_of_type(material, data->killIcon->name);
+			}
+
+			if (data->animOverrides)
+			{
+				for (auto i = 0u; i < data->numAnimOverrides; i++)
+				{
+					if (data->animOverrides[i].overrideAnim)
+					{
+						zone->add_asset_of_type(xanim, data->animOverrides[i].overrideAnim);
+					}
+
+					if (data->animOverrides[i].altmodeAnim)
+					{
+						zone->add_asset_of_type(xanim, data->animOverrides[i].altmodeAnim);
+					}
+				}
 			}
 
 			if (data->szXAnims)
@@ -1065,6 +1083,7 @@ namespace ZoneTool
 				ZoneBuffer::ClearPointer(&dest->gunXModel);
 			}
 
+			// Seems to be writting NULL, should fix at some point
 			if (data->handXModel)
 			{
 				dest->handXModel = reinterpret_cast<XModel*>(
@@ -1209,6 +1228,8 @@ namespace ZoneTool
 			WEAPON_SUBASSET(knifeModel, xmodel, XModel);
 			WEAPON_SUBASSET(worldKnifeModel, xmodel, XModel);
 
+			WEAPON_SUBASSET(stowOffsetModel, xmodel, XModel);
+
 			WEAPON_SUBASSET(hudIcon, material, Material);
 			WEAPON_SUBASSET(pickupIcon, material, Material);
 			WEAPON_SUBASSET(ammoCounterIcon, material, Material);
@@ -1339,9 +1360,6 @@ namespace ZoneTool
 
 			WEAPON_SUBASSET(missileConeSoundAlias, sound, snd_alias_list_t);
 			WEAPON_SUBASSET(missileConeSoundAliasAtBase, sound, snd_alias_list_t);
-
-			dest->stowOffsetModel = nullptr;
-			dest->stowTag = 0;
 		}
 		
 		void IWeaponDef::write(IZone* zone, ZoneBuffer* buf)
@@ -1564,7 +1582,10 @@ namespace ZoneTool
 #define WEAPON_DUMP_FIELD_ARR(__field__, __size__) \
 	for (auto idx##__field__ = 0; idx##__field__ < __size__; idx##__field__++) \
 	{ \
-		data[#__field__][idx##__field__] = asset->__field__[idx##__field__]; \
+		if (asset->__field__ && asset->__field__[idx##__field__]) \
+			data[#__field__][idx##__field__] = asset->__field__[idx##__field__]; \
+		else \
+			data[#__field__][idx##__field__] = ""; \
 	}
 
 #define WEAPON_DUMP_ASSET(__field__) \

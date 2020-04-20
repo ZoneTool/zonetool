@@ -4729,6 +4729,18 @@ namespace ZoneTool
 			FxGlassSystem glassSys;
 		};
 
+		struct FxImpactEntry
+		{
+			FxEffectDef* nonflesh[31];
+			FxEffectDef* flesh[4];
+		};
+
+		struct FxImpactTable
+		{
+			const char* name;
+			FxImpactEntry* table;
+		};
+
 		enum LbColType
 		{
 			LBCOL_TYPE_NUMBER = 0x0,

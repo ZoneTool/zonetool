@@ -245,12 +245,12 @@ namespace ZoneTool
 			// buf->save("debug\\" + this->name_ + ".zone");
 
 			// Compress buffer
-			auto buf_compressed = buf->compress_zlib();
+			auto buf_compressed = buf->compress_zstd();
 
 			// Generate FF header
 			auto header = this->m_zonemem->Alloc<XFileHeader>();
 			strcpy(header->header, "IWffu100");
-			header->version = 1;
+			header->version = 2000;
 			header->allowOnlineUpdate = 0;
 
 			// Save fastfile

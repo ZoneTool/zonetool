@@ -361,6 +361,7 @@ namespace ZoneTool
 
 		void IStructuredDataDef::dump(StructuredDataDefSet* asset)
 		{
+			ZONETOOL_INFO("loading \"%s\"", asset->name);
 		}
 	}
 }

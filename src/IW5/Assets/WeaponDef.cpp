@@ -2286,12 +2286,12 @@ namespace ZoneTool
 
 		void IWeaponDef::dump(WeaponCompleteDef* asset, const std::function<const char* (uint16_t)>& convertToString)
 		{
-			std::string path = "weapons/mp/"s + asset->szInternalName;
+			/*std::string path = "weapons/mp/"s + asset->szInternalName;
 			std::string json = dump_complete(asset, convertToString).dump(4);
 
 			auto file = FileSystem::FileOpen(path, "w"s);
 			fwrite(json.data(), json.size(), 1, file);
-			FileSystem::FileClose(file);
+			FileSystem::FileClose(file);*/
 		}
 	}
 }

@@ -212,7 +212,7 @@ namespace ZoneTool
 		void IGfxImage::dump_iwi(const std::string& name)
 		{
 			if (FileSystem::FileExists(name + ".iwi") && !std::filesystem::exists(
-				"main\\iw4_images\\" + name + ".iwi"))
+				"main\\iw5_images\\" + name + ".iwi"))
 			{
 				auto fp = fopen(
 					va("main\\%s\\images\\%s.iwi", FileSystem::GetFastFile().data(), name.data()).data(), "wb");

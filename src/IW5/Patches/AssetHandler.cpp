@@ -208,6 +208,7 @@ namespace ZoneTool
 					DUMPCASE(image, IGfxImage, GfxImage);
 					DUMPCASE(phys_collmap, IPhysCollmap, PhysCollmap);
 					DUMPCASE(loaded_sound, ILoadedSound, LoadedSound);
+					DUMPCASE(structureddatadef, IStructuredDataDef, StructuredDataDefSet);
 
 					DUMPCASE(techset, ITechset, MaterialTechniqueSet);
 					DUMPCASE(pixelshader, IPixelShader, PixelShader);

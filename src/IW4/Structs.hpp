@@ -2670,10 +2670,12 @@ namespace ZoneTool
 				};
 			};
 
-			unsigned int surfaceCount;
-			unsigned int startSurfIndex;
+			float radius;
+			unsigned short surfaceCount;
+			unsigned short startSurfIndex;
+			unsigned short surfaceCountNoDecal;
 		};
-
+		
 		struct MaterialMemory
 		{
 			Material* material;
@@ -2760,8 +2762,16 @@ namespace ZoneTool
 
 		struct GfxStaticModelInst
 		{
-			float mins[3];
-			float maxs[3];
+			union
+			{
+				Bounds bounds;
+
+				struct
+				{
+					float mins[3];
+					float maxs[3];
+				};
+			};
 			float lightingOrigin[3];
 		};
 
@@ -2781,13 +2791,21 @@ namespace ZoneTool
 			char lightmapIndex;
 			char reflectionProbeIndex;
 			char primaryLightIndex;
-			bool castsSunShadow;
+			char flags;
 		};
 
 		struct GfxCullGroup
 		{
-			float mins[3];
-			float maxs[3];
+			union
+			{
+				Bounds bounds;
+
+				struct
+				{
+					float mins[3];
+					float maxs[3];
+				};
+			};
 			//int surfaceCount;
 			//int startSurfIndex;
 		};
@@ -2814,13 +2832,15 @@ namespace ZoneTool
 		struct GfxStaticModelDrawInst
 		{
 			GfxPackedPlacement placement;
-			XModel* model;
-			unsigned __int16 smodelCacheIndex[4];
-			float cullDist;
+			XModel *model;
+			unsigned __int16 cullDist;
+			unsigned __int16 lightingHandle;
 			char reflectionProbeIndex;
 			char primaryLightIndex;
-			unsigned __int16 lightingHandle;
 			char flags;
+			char firstMtlSkinIndex;
+			GfxColor groundLighting;
+			unsigned __int16 cacheId[4];
 		};
 
 		struct GfxWorldDpvsDynamic
@@ -2890,17 +2910,10 @@ namespace ZoneTool
 			GfxSky* skies; // 4
 			int sunPrimaryLightIndex; // 4 // = 32
 			int primaryLightCount; // 4
-			int primaryLightEnvCount; // 4
-			union
-			{
-				struct
-				{
-					unsigned int sortKeyEffectDecal;
-					unsigned int sortKeyEffectAuto;
-					unsigned int sortKeyDistortion;
-				};
-				char unknown1[12]; // 16 // = 56 // Sortkeys. Don't know which ones though
-			};
+			unsigned int sortKeyLitDecal;
+			unsigned int sortKeyEffectDecal;
+			unsigned int sortKeyEffectAuto;
+			unsigned int sortKeyDistortion;
 			GfxWorldDpvsPlanes dpvsPlanes; // 16
 			GfxCellTreeCount* aabbTreeCounts; // Size: 4 * dpvsPlanes.cellCount // 4
 			GfxCellTree* aabbTree; // 4

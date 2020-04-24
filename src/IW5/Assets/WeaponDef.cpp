@@ -349,7 +349,7 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(float, scanAccel);
 			WEAPON_READ_FIELD(int, scanPauseTime);
 			WEAPON_READ_STRING(szScript);
-			WEAPON_READ_FIELD(float, fOOPosAnimLength[2]);
+			WEAPON_READ_FIELD_ARR(float, fOOPosAnimLength, 2);
 			WEAPON_READ_FIELD(int, minDamage);
 			WEAPON_READ_FIELD(int, minPlayerDamage);
 			WEAPON_READ_FIELD(float, fMaxDamageRange);
@@ -357,6 +357,7 @@ namespace ZoneTool
 			WEAPON_READ_FIELD(float, destabilizationRateTime);
 			WEAPON_READ_FIELD(float, destabilizationCurvatureMax);
 			WEAPON_READ_FIELD(int, destabilizeDistance);
+			WEAPON_READ_FIELD_ARR(float, locationDamageMultipliers, 20);
 			WEAPON_READ_STRING(fireRumble);
 			WEAPON_READ_STRING(meleeImpactRumble);
 			WEAPON_READ_ASSET(tracer, tracer, tracerType);
@@ -462,7 +463,6 @@ namespace ZoneTool
 			weapon->originalAccuracyGraphKnotCount = 0;
 			weapon->parallelBounce = nullptr;
 			weapon->perpendicularBounce = nullptr;
-			// weapon->locationDamageMultipliers = nullptr;
 
 			weapon->gunXModel = mem->Alloc<XModel*>(16);
 			weapon->worldModel = mem->Alloc<XModel*>(16);
@@ -2045,7 +2045,7 @@ namespace ZoneTool
 			WEAPON_DUMP_FIELD(destabilizationRateTime);
 			WEAPON_DUMP_FIELD(destabilizationCurvatureMax);
 			WEAPON_DUMP_FIELD(destabilizeDistance);
-			// float* locationDamageMultipliers);
+			WEAPON_DUMP_FIELD_ARR(locationDamageMultipliers, 20);
 			WEAPON_DUMP_FIELD(fireRumble);
 			WEAPON_DUMP_FIELD(meleeImpactRumble);
 			WEAPON_DUMP_ASSET(tracerType);

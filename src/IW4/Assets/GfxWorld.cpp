@@ -1575,10 +1575,10 @@ namespace ZoneTool
 						}
 
 						endian_convert(&static_model_draw_inst[i].model);
-						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[0]);
+						/*endian_convert(&static_model_draw_inst[i].smodelCacheIndex[0]);
 						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[1]);
 						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[2]);
-						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[3]);
+						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[3]);*/
 						endian_convert(&static_model_draw_inst[i].cullDist);
 						endian_convert(&static_model_draw_inst[i].lightingHandle);
 						endian_convert(&static_model_draw_inst[i].placement.origin[0]);

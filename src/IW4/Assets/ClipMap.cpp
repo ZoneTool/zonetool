@@ -256,12 +256,12 @@ namespace ZoneTool
 						endian_convert(&static_model[i].origin[0]);
 						endian_convert(&static_model[i].origin[1]);
 						endian_convert(&static_model[i].origin[2]);
-						endian_convert(&static_model[i].absmin[0]);
+						/*endian_convert(&static_model[i].absmin[0]);
 						endian_convert(&static_model[i].absmin[1]);
 						endian_convert(&static_model[i].absmin[2]);
 						endian_convert(&static_model[i].absmax[0]);
 						endian_convert(&static_model[i].absmax[1]);
-						endian_convert(&static_model[i].absmax[2]);
+						endian_convert(&static_model[i].absmax[2]);*/
 						for (auto a = 0; a < 3; a++)
 						{
 							for (auto b = 0; b < 3; b++)
@@ -368,12 +368,12 @@ namespace ZoneTool
 						endian_convert(&destLeaf[i].collAabbCount);
 						endian_convert(&destLeaf[i].brushContents);
 						endian_convert(&destLeaf[i].terrainContents);
-						endian_convert(&destLeaf[i].mins[0]);
+						/*endian_convert(&destLeaf[i].mins[0]);
 						endian_convert(&destLeaf[i].mins[1]);
 						endian_convert(&destLeaf[i].mins[2]);
 						endian_convert(&destLeaf[i].maxs[0]);
 						endian_convert(&destLeaf[i].maxs[1]);
-						endian_convert(&destLeaf[i].maxs[2]);
+						endian_convert(&destLeaf[i].maxs[2]);*/
 						endian_convert(&destLeaf[i].leafBrushNode);
 					}
 				}
@@ -568,12 +568,12 @@ namespace ZoneTool
 						endian_convert(&destCModels[a].leaf.collAabbCount);
 						endian_convert(&destCModels[a].leaf.brushContents);
 						endian_convert(&destCModels[a].leaf.terrainContents);
-						endian_convert(&destCModels[a].leaf.mins[0]);
+						/*endian_convert(&destCModels[a].leaf.mins[0]);
 						endian_convert(&destCModels[a].leaf.mins[1]);
 						endian_convert(&destCModels[a].leaf.mins[2]);
 						endian_convert(&destCModels[a].leaf.maxs[0]);
 						endian_convert(&destCModels[a].leaf.maxs[1]);
-						endian_convert(&destCModels[a].leaf.maxs[2]);
+						endian_convert(&destCModels[a].leaf.maxs[2]);*/
 						endian_convert(&destCModels[a].leaf.leafBrushNode);
 					}
 				}
@@ -873,7 +873,7 @@ namespace ZoneTool
 
 		void IClipMap::dump(clipMap_t* asset)
 		{
-			auto iw5_clipmap = new IW5::clipMap_t;
+			auto* iw5_clipmap = new IW5::clipMap_t;
 			memset(iw5_clipmap, 0, sizeof IW5::clipMap_t);
 
 			// convert clipmap to IW5 format
@@ -953,7 +953,7 @@ namespace ZoneTool
 
 			// free memory_
 			delete[] iw5_clipmap->cModels;
-			delete[] iw5_clipmap;
+			delete iw5_clipmap;
 		}
 	}
 }

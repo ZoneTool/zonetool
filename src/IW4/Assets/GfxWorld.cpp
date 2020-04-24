@@ -1852,7 +1852,7 @@ namespace ZoneTool
 		void IGfxWorld::dump(GfxWorld* asset)
 		{
 			// convert asset to IW5 format
-			auto iw5_asset = new IW5::GfxWorld;
+			auto* iw5_asset = new IW5::GfxWorld;
 			memset(iw5_asset, 0, sizeof IW5::GfxWorld);
 
 			// copy struct data
@@ -1881,7 +1881,7 @@ namespace ZoneTool
 
 			// free memory_
 			delete[] iw5_asset->cells;
-			delete[] iw5_asset;
+			delete iw5_asset;
 		}
 	}
 }

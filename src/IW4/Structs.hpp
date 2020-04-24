@@ -1666,11 +1666,10 @@ namespace ZoneTool
 
 		struct cbrushside_t
 		{
-			cplane_s* plane;
-			unsigned int materialNum;
-			/*unsigned __int16 materialNum;
+			cplane_s *plane;
+			unsigned __int16 materialNum;
 			char firstAdjacentSideOffset;
-			char edgeCount;*/
+			char edgeCount;
 		};
 
 		// ClipMap
@@ -3072,8 +3071,7 @@ namespace ZoneTool
 			XModel* xmodel;
 			float origin[3];
 			float invScaledAxis[3][3];
-			float absmin[3];
-			float absmax[3];
+			Bounds absBounds;
 		};
 
 		struct dmaterial_t
@@ -3091,13 +3089,12 @@ namespace ZoneTool
 
 		struct cLeaf_t
 		{
-			unsigned __int16 firstCollAabbIndex; // + 0
-			unsigned __int16 collAabbCount; // + 2
-			int brushContents; // + 6
-			int terrainContents; // + 10
-			float mins[3]; // + 22
-			float maxs[3]; // + 34
-			int leafBrushNode; // + 38
+			unsigned __int16 firstCollAabbIndex;
+			unsigned __int16 collAabbCount;
+			int brushContents;
+			int terrainContents;
+			Bounds bounds;
+			int leafBrushNode;
 		};
 
 		struct cLeafBrushNodeLeaf_t

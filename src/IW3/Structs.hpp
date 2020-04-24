@@ -1431,8 +1431,8 @@ namespace ZoneTool
 		{
 			const char* name;
 			char* entityString;
-			int numEntityChars;
-			MapTriggers trigger;
+			int numEntityChars; // The structure actually ends here...
+			MapTriggers trigger; // Pretty sure that's not correct.
 			// this goes on for a while but we don't need any of it
 		};
 

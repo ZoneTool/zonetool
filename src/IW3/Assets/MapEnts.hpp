@@ -12,10 +12,10 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		class IClipMap
+		class IMapEnts
 		{
 		public:
-			static void dump(clipMap_t* asset);
+			static void dump(MapEnts* asset);
 		};
 	}
 }

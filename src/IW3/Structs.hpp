@@ -1905,10 +1905,12 @@ namespace ZoneTool
 			snd_alias_list_t *sound;
 			// 			SndCurve *sndCurve;
 			clipMap_t* clipMap;
+			clipMap_t* col_map_mp;
 			ComWorld* comWorld;
 			// 			GameWorldSp *gameWorldSp;
 			GameWorldMp* gameWorldMp;
 			MapEnts* mapEnts;
+			MapEnts* map_ents;
 			GfxWorld* gfxWorld;
 			GfxWorld* gfx_map;
 			GfxLightDef* lightDef;

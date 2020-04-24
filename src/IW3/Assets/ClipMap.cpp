@@ -14,13 +14,11 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void IClipMap::dump(clipMap_t* asset)
+		void IClipMap::dump(clipMap_t* asset, ZoneMemory* mem)
 		{
-			ZoneMemory mem(20 * 1024 * 1024);
-
 			if (!asset) return;
 
-			auto* iw4_clipmap = mem.Alloc<IW4::clipMap_t>();
+			auto* iw4_clipmap = mem->Alloc<IW4::clipMap_t>();
 			memset(iw4_clipmap, 0, sizeof IW4::clipMap_t);
 
 			// convert clipmap to IW4 format
@@ -31,7 +29,7 @@ namespace ZoneTool
 			iw4_clipmap->cPlanes = (IW4::cplane_s*)asset->planes;
 
 			iw4_clipmap->numStaticModels = (int)asset->numStaticModels;
-			iw4_clipmap->staticModelList = mem.Alloc<IW4::cStaticModel_s>(iw4_clipmap->numStaticModels);
+			iw4_clipmap->staticModelList = mem->Alloc<IW4::cStaticModel_s>(iw4_clipmap->numStaticModels);
 			for (unsigned int i = 0; i < asset->numStaticModels; ++i)
 			{
 				std::memcpy(&iw4_clipmap->staticModelList[i], &asset->staticModelList[i].xmodel,
@@ -40,10 +38,16 @@ namespace ZoneTool
 			}
 
 			iw4_clipmap->numMaterials = (int)asset->numMaterials;
-			iw4_clipmap->materials = (IW4::dmaterial_t*)asset->materials;
+			iw4_clipmap->materials = mem->Alloc<IW4::dmaterial_t>(iw4_clipmap->numMaterials);
+			for (auto i = 0u; i < iw4_clipmap->numMaterials; i++)
+			{
+				iw4_clipmap->materials[i].material = mem->StrDup(asset->materials[i].material);
+				iw4_clipmap->materials[i].contentFlags = asset->materials[i].contentFlags;
+				iw4_clipmap->materials[i].surfaceFlags = asset->materials[i].surfaceFlags;
+			}
 
 			iw4_clipmap->numCBrushSides = (int)asset->numBrushSides;
-			iw4_clipmap->cBrushSides = mem.Alloc<IW4::cbrushside_t>(iw4_clipmap->numCBrushSides);
+			iw4_clipmap->cBrushSides = mem->Alloc<IW4::cbrushside_t>(iw4_clipmap->numCBrushSides);
 			for (unsigned int i = 0; i < asset->numStaticModels; ++i)
 			{
 				iw4_clipmap->cBrushSides[i].plane = (IW4::cplane_s*)asset->brushsides[i].plane;
@@ -59,7 +63,7 @@ namespace ZoneTool
 			iw4_clipmap->cNodes = (IW4::cNode_t*)asset->nodes;
 
 			iw4_clipmap->numCLeaf = (int)asset->numLeafs;
-			iw4_clipmap->cLeaf = mem.Alloc<IW4::cLeaf_t>(iw4_clipmap->numCLeaf);
+			iw4_clipmap->cLeaf = mem->Alloc<IW4::cLeaf_t>(iw4_clipmap->numCLeaf);
 			for (unsigned int i = 0; i < asset->numLeafs; ++i)
 			{
 				std::memcpy(&iw4_clipmap->cLeaf[i], &asset->leafs[i], sizeof(IW4::cStaticModel_s));
@@ -89,7 +93,7 @@ namespace ZoneTool
 			iw4_clipmap->collisionPartitions = (IW4::CollisionPartition*)asset->partitions;
 
 			iw4_clipmap->numCollisionAABBTrees = asset->aabbTreeCount;
-			iw4_clipmap->collisionAABBTrees = mem.Alloc<IW4::CollisionAabbTree>(iw4_clipmap->numCollisionAABBTrees);
+			iw4_clipmap->collisionAABBTrees = mem->Alloc<IW4::CollisionAabbTree>(iw4_clipmap->numCollisionAABBTrees);
 			for (int i = 0; i < asset->aabbTreeCount; ++i)
 			{
 				std::memcpy(&iw4_clipmap->collisionAABBTrees[i].origin, &asset->aabbTrees[i].origin, 12);
@@ -101,7 +105,7 @@ namespace ZoneTool
 
 			// cmodels!
 			iw4_clipmap->numCModels = (int)asset->numSubModels;
-			iw4_clipmap->cModels = mem.Alloc<IW4::cmodel_t>(iw4_clipmap->numCModels);
+			iw4_clipmap->cModels = mem->Alloc<IW4::cmodel_t>(iw4_clipmap->numCModels);
 			for (unsigned int i = 0; i < asset->numSubModels; ++i)
 			{
 				std::memcpy(&iw4_clipmap->cModels[i], &asset->cmodels[i], sizeof(IW4::cmodel_t));
@@ -110,9 +114,9 @@ namespace ZoneTool
 			}
 
 			iw4_clipmap->numBrushes = (short)asset->numBrushes;
-			iw4_clipmap->brushes = mem.Alloc<IW4::cbrush_t>(iw4_clipmap->numBrushes);
-			iw4_clipmap->brushBounds = mem.Alloc<IW4::Bounds>(iw4_clipmap->numBrushes);
-			iw4_clipmap->brushContents = mem.Alloc<int>(iw4_clipmap->numBrushes);
+			iw4_clipmap->brushes = mem->Alloc<IW4::cbrush_t>(iw4_clipmap->numBrushes);
+			iw4_clipmap->brushBounds = mem->Alloc<IW4::Bounds>(iw4_clipmap->numBrushes);
+			iw4_clipmap->brushContents = mem->Alloc<int>(iw4_clipmap->numBrushes);
 			for (unsigned int i = 0; i < asset->numBrushes; ++i)
 			{
 				std::memcpy(&iw4_clipmap->brushes[i].axialMaterialNum, &asset->brushes[i].axialMaterialNum,
@@ -134,7 +138,7 @@ namespace ZoneTool
 			}
 
 			iw4_clipmap->smodelNodeCount = 1;
-			iw4_clipmap->smodelNodes = mem.Alloc<IW4::SModelAabbNode>();
+			iw4_clipmap->smodelNodes = mem->Alloc<IW4::SModelAabbNode>();
 			if (asset->numStaticModels == 0)
 			{
 				iw4_clipmap->smodelNodes[0].bounds.halfSize[0] = -131072.000f;
@@ -170,7 +174,14 @@ namespace ZoneTool
 				iw4_clipmap->smodelNodes[0].firstChild = 0;
 			}
 
-			iw4_clipmap->mapEnts = (IW4::MapEnts*)asset->mapEnts;
+			iw4_clipmap->mapEnts = mem->Alloc<IW4::MapEnts>(); //  asset->mapEnts;
+			memcpy(iw4_clipmap->mapEnts, asset->mapEnts, sizeof MapEnts);
+
+			iw4_clipmap->mapEnts->stageCount = 1;
+			iw4_clipmap->mapEnts->stageNames = mem->Alloc<IW4::Stage>();
+			iw4_clipmap->mapEnts->stageNames[0].stageName = mem->StrDup("stage 0");
+			iw4_clipmap->mapEnts->stageNames[0].triggerIndex = 0x400;
+			iw4_clipmap->mapEnts->stageNames[0].sunPrimaryLightIndex = 0x1;
 
 			iw4_clipmap->dynEntCount[0] = asset->dynEntCount[0];
 			iw4_clipmap->dynEntCount[1] = asset->dynEntCount[1];
@@ -188,6 +199,10 @@ namespace ZoneTool
 			iw4_clipmap->dynEntCollList[1] = (IW4::DynEntityColl*)asset->dynEntCollList[1];
 			
 			iw4_clipmap->checksum = asset->checksum;
+
+			//iw4_clipmap->stageCount = 1;
+			//iw4_clipmap-> = mem->Alloc<IW4::Stage>();
+
 
 			IW4::IClipMap::dump(iw4_clipmap);
 		}

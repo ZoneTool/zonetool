@@ -13,10 +13,8 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		void IGfxWorld::dump(GfxWorld* world)
+		void IGfxWorld::dump(GfxWorld* world, ZoneMemory* mem)
 		{
-			ZoneMemory mem(20 * 1024 * 1024);
-
 			if (!world) return;
 
 			IW4::GfxSky sky;
@@ -48,9 +46,9 @@ namespace ZoneTool
 			// However, in IW4 it's not, so we have to extract the data
 			if (world->cells)
 			{
-				map.aabbTreeCounts = mem.Alloc<IW4::GfxCellTreeCount>(world->dpvsPlanes.cellCount);
-				map.aabbTree = mem.Alloc<IW4::GfxCellTree>(world->dpvsPlanes.cellCount);
-				map.cells = mem.Alloc<IW4::GfxCell>(world->dpvsPlanes.cellCount);
+				map.aabbTreeCounts = mem->Alloc<IW4::GfxCellTreeCount>(world->dpvsPlanes.cellCount);
+				map.aabbTree = mem->Alloc<IW4::GfxCellTree>(world->dpvsPlanes.cellCount);
+				map.cells = mem->Alloc<IW4::GfxCell>(world->dpvsPlanes.cellCount);
 
 				for (int i = 0; i < world->dpvsPlanes.cellCount; ++i)
 				{
@@ -63,7 +61,7 @@ namespace ZoneTool
 
 					if (world->cells[i].aabbTree)
 					{
-						map.aabbTree[i].aabbtree = mem.Alloc<IW4::GfxAabbTree>(world->cells[i].aabbTreeCount);
+						map.aabbTree[i].aabbtree = mem->Alloc<IW4::GfxAabbTree>(world->cells[i].aabbTreeCount);
 						std::memcpy(map.aabbTree[i].aabbtree, world->cells[i].aabbTree, sizeof(IW4::GfxAabbTree) * world->cells[i].aabbTreeCount);
 
 						for (int j = 0; j < world->cells[i].aabbTreeCount; ++j)
@@ -75,7 +73,7 @@ namespace ZoneTool
 
 					if (world->cells[i].portals)
 					{
-						map.cells[i].portals = mem.Alloc<IW4::GfxPortal>(world->cells[i].portalCount);
+						map.cells[i].portals = mem->Alloc<IW4::GfxPortal>(world->cells[i].portalCount);
 
 						// Map all portals, so we have them ready for the next loop (might be unnecessary, as they are mapped at runtime)
 						std::unordered_map<IW3::GfxPortal*, IW4::GfxPortal*> portalMap = { { nullptr, nullptr } };
@@ -140,8 +138,8 @@ namespace ZoneTool
 			// Split reflection images and probes
 			if (world->reflectionProbes)
 			{
-				map.worldDraw.reflectionImages = mem.Alloc<IW4::GfxImage*>(world->reflectionProbeCount);
-				map.worldDraw.reflectionProbes = mem.Alloc<IW4::GfxReflectionProbe>(world->reflectionProbeCount);
+				map.worldDraw.reflectionImages = mem->Alloc<IW4::GfxImage*>(world->reflectionProbeCount);
+				map.worldDraw.reflectionProbes = mem->Alloc<IW4::GfxReflectionProbe>(world->reflectionProbeCount);
 
 				for (unsigned int i = 0; i < world->reflectionProbeCount; ++i)
 				{
@@ -156,7 +154,7 @@ namespace ZoneTool
 
 			if (world->models)
 			{
-				map.models = mem.Alloc<IW4::GfxBrushModel>(world->modelCount);
+				map.models = mem->Alloc<IW4::GfxBrushModel>(world->modelCount);
 
 				for (int i = 0; i < world->modelCount; ++i)
 				{
@@ -183,7 +181,7 @@ namespace ZoneTool
 			map.outdoorImage = (IW4::GfxImage*)world->outdoorImage;
 
 			map.cellCasterBits[0] = world->cellCasterBits;
-			map.cellCasterBits[1] = reinterpret_cast<unsigned int*>(1); // This mustn't be null!
+			map.cellCasterBits[1] = world->cellCasterBits; // reinterpret_cast<unsigned int*>(1); // This mustn't be null!
 
 			map.sceneDynModel = (IW4::GfxSceneDynModel*)world->sceneDynModel;
 			map.sceneDynBrush = (IW4::GfxSceneDynBrush*)world->sceneDynBrush;
@@ -225,7 +223,7 @@ namespace ZoneTool
 
 			if (world->dpvs.smodelInsts)
 			{
-				map.dpvs.smodelInsts = mem.Alloc<IW4::GfxStaticModelInst>(world->dpvs.smodelCount);
+				map.dpvs.smodelInsts = mem->Alloc<IW4::GfxStaticModelInst>(world->dpvs.smodelCount);
 
 				for (unsigned int i = 0; i < world->dpvs.smodelCount; ++i)
 				{
@@ -240,8 +238,8 @@ namespace ZoneTool
 
 			if (world->dpvs.surfaces)
 			{
-				map.dpvs.surfaces = mem.Alloc<IW4::GfxSurface>(world->surfaceCount);
-				map.dpvs.cullGroups = mem.Alloc<IW4::GfxCullGroup>(world->surfaceCount);
+				map.dpvs.surfaces = mem->Alloc<IW4::GfxSurface>(world->surfaceCount);
+				map.dpvs.cullGroups = mem->Alloc<IW4::GfxCullGroup>(world->surfaceCount);
 
 				for (int i = 0; i < world->surfaceCount; ++i)
 				{
@@ -258,7 +256,7 @@ namespace ZoneTool
 
 			if (world->dpvs.smodelDrawInsts)
 			{
-				map.dpvs.smodelDrawInsts = mem.Alloc<IW4::GfxStaticModelDrawInst>(world->dpvs.smodelCount);
+				map.dpvs.smodelDrawInsts = mem->Alloc<IW4::GfxStaticModelDrawInst>(world->dpvs.smodelCount);
 
 				for (unsigned int i = 0; i < world->dpvs.smodelCount; ++i)
 				{
@@ -295,7 +293,7 @@ namespace ZoneTool
 			map.sortKeyDistortion = 0x2b;
 
 			int baseIndex = 0;
-			map.worldDraw.indices = mem.Alloc<unsigned short>(map.worldDraw.indexCount);
+			map.worldDraw.indices = mem->Alloc<unsigned short>(map.worldDraw.indexCount);
 			for (unsigned int i = 0; i < map.indexCount; ++i)
 			{
 				std::memcpy(&map.worldDraw.indices[baseIndex], &world->indices[map.dpvs.surfaces[i].tris.baseIndex], map.dpvs.surfaces[i].tris.triCount * 6);

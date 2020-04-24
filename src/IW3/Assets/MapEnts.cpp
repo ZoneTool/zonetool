@@ -235,13 +235,11 @@ namespace ZoneTool
 			std::memcpy((char*)ents->entityString, entString.data(), ents->numEntityChars);
 		}
 
-		void IMapEnts::dump(MapEnts* asset)
+		void IMapEnts::dump(MapEnts* asset, ZoneMemory* mem)
 		{
-			ZoneMemory mem(20 * 1024 * 1024);
-
 			if (!asset) return;
 
-			auto* mapents = mem.Alloc<IW4::MapEnts>();
+			auto* mapents = mem->Alloc<IW4::MapEnts>();
 			memset(mapents, 0, sizeof IW4::MapEnts);
 
 			mapents->name = asset->name;
@@ -249,13 +247,13 @@ namespace ZoneTool
 			mapents->numEntityChars = asset->numEntityChars;
 
 			mapents->stageCount = 1;
-			mapents->stageNames = mem.Alloc<IW4::Stage>();
-			mapents->stageNames[0].stageName = mem.StrDup("stage 0");
+			mapents->stageNames = mem->Alloc<IW4::Stage>();
+			mapents->stageNames[0].stageName = mem->StrDup("stage 0");
 			mapents->stageNames[0].triggerIndex = 0x400;
 			mapents->stageNames[0].sunPrimaryLightIndex = 0x1;
 
 			// Remove unsupported stuff
-			AdaptEntities(mapents, &mem);
+			AdaptEntities(mapents, mem);
 
 			IW4::IMapEnts::dump(mapents);
 		}

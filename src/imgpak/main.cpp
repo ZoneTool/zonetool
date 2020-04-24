@@ -109,36 +109,116 @@ void handle_entries(file& ff, std::vector<file*>& paks, ZoneTool::PakFile& img5)
 	endian_convert_entries(entries, count);
 }
 
-int main(int argc, char** argv)
+std::uint32_t read_sortkey(const std::filesystem::path& path)
 {
-	file img1("imagefile1.pakm");
-	file img2("imagefile2.pakm");
-	file img3("imagefile3.pakm");
-	file img4("imagefile4.pakm");
+	auto json_data = ""s;
+	auto file_size = std::filesystem::file_size(path);
+	json_data.resize(file_size);
 
-	std::vector<file*> paks = { &img1, &img2, &img3, &img4 };
+	auto path_nigger = path.string();
 
-	file ff("mp_shipment.ff");
-	file loadscreen("mp_shipment_load.ff");
-
-	// alloc new image pak
-	ZoneTool::PakFile img5(269);
-
-	handle_entries(ff, paks, img5);
-	handle_entries(loadscreen, paks, img5);
-
-	// destroy paks
-	for (auto& pak : paks)
+	auto fp = fopen(path_nigger.data(), "rb");
+	if (fp)
 	{
-		pak->destroy();
+		fread(&json_data[0], file_size, 1, fp);
+		fclose(fp);
 	}
 
-	// save data
-	ff.save();
-	loadscreen.save();
+	Json json = Json::parse(json_data);
+	return json["sortKey"].get<std::uint32_t>();
+}
 
-	// save image pak
-	img5.save("imagefile5.pak");
+int main(int argc, char** argv)
+{
+	//file img1("imagefile1.pakm");
+	//file img2("imagefile2.pakm");
+	//file img3("imagefile3.pakm");
+	//file img4("imagefile4.pakm");
+
+	//std::vector<file*> paks = { &img1, &img2, &img3, &img4 };
+
+	//file ff("mp_shipment.ff");
+	//file loadscreen("mp_shipment_load.ff");
+
+	//// alloc new image pak
+	//ZoneTool::PakFile img5(269);
+
+	//handle_entries(ff, paks, img5);
+	//handle_entries(loadscreen, paks, img5);
+
+	//// destroy paks
+	//for (auto& pak : paks)
+	//{
+	//	pak->destroy();
+	//}
+
+	//// save data
+	//ff.save();
+	//loadscreen.save();
+
+	//// save image pak
+	//img5.save("imagefile5.pak");
+
+	//return 0;
+
+	std::vector<std::filesystem::path> iw3_materials;
+	std::vector<std::filesystem::path> iw5_materials;
+
+	std::map<std::uint32_t, std::uint32_t> mapped_keys;
+
+	for (auto& itr : std::filesystem::directory_iterator("Z:\\Sortkey mapping\\iw3"))
+	{
+		if (std::filesystem::is_regular_file(itr))
+		{
+			iw3_materials.push_back(itr.path());
+		}
+	}
+
+	for (auto& itr : std::filesystem::directory_iterator("Z:\\Sortkey mapping\\iw5"))
+	{
+		if (std::filesystem::is_regular_file(itr))
+		{
+			iw5_materials.push_back(itr.path());
+		}
+	}
+
+	for (auto& iw3_mat : iw3_materials)
+	{
+		auto itr = std::find_if(iw5_materials.begin(), iw5_materials.end(), [iw3_mat](auto& iw5)
+		{
+			return iw5.filename() == iw3_mat.filename();
+		});
+
+		if (itr != iw5_materials.end())
+		{
+			printf("material %s exists in both games! using for comparison.\n", itr->filename().string().data());
+
+			auto iw3_key = read_sortkey(iw3_mat);
+			auto iw5_key = read_sortkey(*itr);
+			auto mapped_itr = mapped_keys.find(iw3_key);
+
+			if (mapped_itr == mapped_keys.end())
+			{
+				mapped_keys[iw3_key] = iw5_key;
+			}
+			else
+			{
+				if (mapped_itr->second != iw5_key)
+				{
+					printf("FOOPSIE WOOPS! %u was previously mapped to %u, but we just found a material trying to map key %u to %u\n", mapped_itr->first, mapped_itr->second, mapped_itr->first, iw5_key);
+				}
+			}
+		}
+	}
+
+	printf("std::map<std::uint32_t, std::uint32_t> mapped_keys {\n");
+	for (auto& key : mapped_keys)
+	{
+		printf("\t{ %u, %u },\n", key.first, key.second);
+	}
+	printf("};\n");
+
+	while (true) {}
 
 	return 0;
 }

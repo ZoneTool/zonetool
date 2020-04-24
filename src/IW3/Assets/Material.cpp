@@ -81,6 +81,30 @@ namespace ZoneTool
 				ITechset::dump_statebits(mat->techniqueSet->name, mat->stateBitsEntry);
 			}
 		}
+		
+		std::map<std::uint32_t, std::uint32_t> mapped_keys{
+			{ 0, 43 },
+			{ 3, 0 },
+			{ 4, 1 },
+			{ 5, 2 },
+			{ 6, 3 },
+			{ 7, 4 },
+			{ 8, 5 },
+			{ 9, 6 },
+			{ 10, 7 },
+			{ 11, 8 },
+			{ 12, 9 },
+			{ 24, 13 },
+			{ 38, 24 },
+			{ 39, 25 },
+			{ 40, 26 },
+			{ 41, 27 },
+			{ 42, 28 },
+			{ 43, 29 },
+			{ 48, 48 },
+			{ 58, 51 },
+			{ 59, 33 },
+		};
 
 		void IMaterial::dump(Material* mat, ZoneMemory* mem)
 		{
@@ -106,9 +130,20 @@ namespace ZoneTool
 				}
 
 				MATERIAL_DUMP_INT(gameFlags);
-				MATERIAL_DUMP_INT(sortKey);
+				// MATERIAL_DUMP_INT(sortKey);
 				MATERIAL_DUMP_INT(animationX);
 				MATERIAL_DUMP_INT(animationY);
+
+				auto key_itr = mapped_keys.find(mat->sortKey);
+				if (key_itr != mapped_keys.end())
+				{
+					matdata["sortKey"] = key_itr->second;
+				}
+				else
+				{
+					matdata["sortKey"] = mat->sortKey;
+					ZONETOOL_WARNING("[%s]: sortKey %u is not mapped!\n", mat->name, mat->sortKey);
+				}
 
 				matdata["unknown"] = 0;
 

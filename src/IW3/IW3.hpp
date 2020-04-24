@@ -22,6 +22,8 @@
 #include "Assets/LoadedSound.hpp"
 #include "Assets/Sound.hpp"
 #include "Assets/FxEffectDef.hpp"
+#include "Assets/ClipMap.hpp"
+#include "Assets/MapEnts.hpp"
 
 // oh nee toch niet
 

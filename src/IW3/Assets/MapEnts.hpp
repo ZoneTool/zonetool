@@ -15,7 +15,7 @@ namespace ZoneTool
 		class IMapEnts
 		{
 		public:
-			static void dump(MapEnts* asset);
+			static void dump(MapEnts* asset, ZoneMemory* mem);
 		};
 	}
 }

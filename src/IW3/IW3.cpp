@@ -173,6 +173,9 @@ namespace ZoneTool
 					DECLARE_ASSET(loaded_sound, ILoadedSound);
 					DECLARE_ASSET(sound, ISound);
 					DECLARE_ASSET(fx, IFxEffectDef);
+					DECLARE_ASSET(gfx_map, IGfxWorld);
+					DECLARE_ASSET(col_map_mp, IClipMap);
+					DECLARE_ASSET(map_ents, IMapEnts);
 				}
 			}
 		}

@@ -15,7 +15,7 @@ namespace ZoneTool
 		class IGfxWorld
 		{
 		public:
-			static void dump(GfxWorld* asset);
+			static void dump(GfxWorld* asset, ZoneMemory* mem);
 		};
 	}
 }

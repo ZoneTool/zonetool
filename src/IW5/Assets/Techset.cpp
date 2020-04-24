@@ -429,9 +429,30 @@ namespace ZoneTool
 			}
 		}
 		
+		void yeet(MaterialTechniqueSet* asset)
+		{
+			auto path = "techsets\\"s + asset->name + ".techset.txt";
+
+			auto fp = FileSystem::FileOpen(path, "wb");
+
+			for (auto i = 0u; i < 54; i++)
+			{
+				if (asset->techniques[i])
+				{
+					fprintf(fp, "%i: %s\n", i, asset->techniques[i]->hdr.name);
+				}
+				else
+				{
+					fprintf(fp, "%i: nullptr\n", i);
+				}
+			}
+
+			FileSystem::FileClose(fp);
+		}
+
 		void ITechset::dump(MaterialTechniqueSet* asset)
 		{
-			// dump_technique_data(asset);
+			yeet(asset);
 			
 			auto path = "techsets\\"s + asset->name + ".techset";
 			

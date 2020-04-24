@@ -480,6 +480,12 @@ namespace ZoneTool
 
 				iw5_statebits[dest_index] = statebits[i];
 			}
+
+			iw5_statebits[19] = iw5_statebits[17];
+			iw5_statebits[20] = iw5_statebits[18];
+			iw5_statebits[33] = iw5_statebits[35];
+			iw5_statebits[34] = iw5_statebits[36];
+			iw5_statebits[44] = iw5_statebits[43];
 			
 			IW5::ITechset::dump_statebits(techset, iw5_statebits);
 		}
@@ -580,11 +586,20 @@ namespace ZoneTool
 				}
 			}
 
+			// yeet
+			iw5_techset->techniques[19] = iw5_techset->techniques[17];
+			iw5_techset->techniques[20] = iw5_techset->techniques[18];
+			iw5_techset->techniques[33] = iw5_techset->techniques[35];
+			iw5_techset->techniques[34] = iw5_techset->techniques[36];
+			iw5_techset->techniques[44] = iw5_techset->techniques[43];
+
 			// IW5::ITechset::dump_technique_data(iw5_techset, false);
 			IW5::ITechset::dump(iw5_techset);
 
 			for (int i = 0; i < 54; i++)
 			{
+				if (i == 19 || i == 20 || i == 33 || i == 34 || i == 44) continue;
+
 				if (iw5_techset->techniques[i])
 				{
 					for (short pass = 0; pass < iw5_techset->techniques[i]->hdr.numPasses; pass++)

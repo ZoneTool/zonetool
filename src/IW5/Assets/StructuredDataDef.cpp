@@ -63,7 +63,19 @@ namespace ZoneTool
 		void IStructuredDataDef::patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex,
 		                                          std::map<int, newEnumEntry*> map)
 		{
-			StructuredDataEnum* currentEnum = &data->defs->enums[enumIndex];
+			StructuredDataDef* current_def = nullptr;
+			auto current_version = 0;
+
+			for (auto i = 0; i < data->defCount; i++)
+			{
+				if (data->defs[i].version > current_version)
+				{
+					current_version = data->defs[i].version;
+					current_def = &data->defs[i];
+				}
+			}
+
+			StructuredDataEnum* currentEnum = &current_def->enums[enumIndex];
 
 			// Check if new enum has already been built
 			if (newIndexCount[enumIndex])
@@ -156,7 +168,7 @@ namespace ZoneTool
 			}
 
 			// Patch mp/playerdata.def if needed
-			if (!strcmp(data->name, "mp/playerdata.def"))
+			if (data->name == "mp/playerdata.def"s)
 			{
 				// Weapons
 				addEntry(ENUM_WEAPONS, 1, "iw5_ak74u");
@@ -183,7 +195,7 @@ namespace ZoneTool
 
 				ZONETOOL_INFO("Statfiles patched.");
 			}
-			if (!strcmp(data->name, "mp/recipes.def"))
+			else if (data->name == "mp/recipes.def"s)
 			{
 				// Weapons
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
@@ -206,6 +218,28 @@ namespace ZoneTool
 				// addEntry((enum_type)9, 3, "gtnw");
 
 				ZONETOOL_INFO("Recipes patched.");
+			}
+			else if (data->name == "mp/prestigedata.def"s)
+			{
+				addEntry((enumType_s)5, 1, "iw5_ak74u");
+				addEntry((enumType_s)7, 1, "iw5_ak74u");
+			}
+			else if (data->name == "mp/resetdata.def"s)
+			{
+				addEntry((enumType_s)0, 1, "iw5_ak74u");
+			}
+			else if (data->name == "mp/elitecreateaclass.def"s)
+			{
+				addEntry((enumType_s)1, 1, "iw5_ak74u");
+			}
+			else if (data->name == "mp/clientmatchdata.def"s)
+			{
+				addEntry((enumType_s)0, 1, "iw5_ak74u");
+			}
+			else if (data->name == "mp/matchdata.def"s)
+			{
+				addEntry((enumType_s)3, 1, "iw5_ak74u");
+				addEntry((enumType_s)4, 1, "iw5_ak74u");
 			}
 
 			// Increment version
@@ -362,6 +396,30 @@ namespace ZoneTool
 		void IStructuredDataDef::dump(StructuredDataDefSet* asset)
 		{
 			ZONETOOL_INFO("loading \"%s\"", asset->name);
+
+			if (asset)
+			{
+				StructuredDataDef* current_def = nullptr;
+				auto current_version = 0;
+
+				for (auto i = 0; i < asset->defCount; i++)
+				{
+					if (asset->defs[i].version > current_version)
+					{
+						current_version = asset->defs[i].version;
+						current_def = &asset->defs[i];
+					}
+				}
+
+				for (auto i = 0; i < current_def->enumCount; i++)
+				{
+					ZONETOOL_INFO("\tenum %i:", i);
+					for (auto j = 0; j < current_def->enums[i].entryCount; j++)
+					{
+						ZONETOOL_INFO("\t\t%i: %s", current_def->enums[i].entries[j].index, current_def->enums[i].entries[j].name);
+					}
+				}
+			}
 		}
 	}
 }

@@ -364,6 +364,14 @@ namespace ZoneTool
 					}
 				}
 			}
+
+			//iw4_statebits[IW4::] = 0;
+			//iw4_statebits[0] = 0;
+			//iw4_statebits[0] = 0;
+			//iw4_statebits[0] = 0;
+			//iw4_statebits[0] = 0;
+			//iw4_statebits[0] = 0;
+
 			
 			IW4::ITechset::dump_statebits(techset, iw4_statebits);
 		}

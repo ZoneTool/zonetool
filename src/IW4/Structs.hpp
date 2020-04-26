@@ -2640,35 +2640,13 @@ namespace ZoneTool
 
 		struct GfxBrushModelWritable
 		{
-			union
-			{
-				Bounds bounds;
-
-				struct
-				{
-					float mins[3];
-					float maxs[3];
-				};
-			};
-
-			float mip1radiusSq;
+			Bounds bounds;
 		};
 
 		struct GfxBrushModel
 		{
 			GfxBrushModelWritable writable;
-
-			union
-			{
-				Bounds bounds;
-
-				struct
-				{
-					float mins[3];
-					float maxs[3];
-				};
-			};
-
+			Bounds bounds;
 			float radius;
 			unsigned short surfaceCount;
 			unsigned short startSurfIndex;

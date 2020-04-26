@@ -226,59 +226,66 @@ namespace ZoneTool
 						auto origsize = FileSystem::FileSize(origfp);
 						auto bytes = FileSystem::ReadBytes(origfp, origsize);
 
-						//if (bytes.size() > 3)
-						//{
-						//	const auto version = bytes[3];
+						if (bytes.size() > 3)
+						{
+							const auto version = bytes[3];
 
-						//	if (version != 8 && version != 9)
-						//	{
-						//		if (version == 6)
-						//		{
-						//			constexpr auto iw5_header_size = sizeof(GfxImageFileHeader);
-						//			constexpr auto iw3_header_size = sizeof(IW3_GfxImageFileHeader);
-						//			
-						//			ZONETOOL_INFO("Converting IWI %s from version %u to version %u...", name.data(), version, 8);
+							if (version != 8 && version != 9)
+							{
+								if (version == 6)
+								{
+									constexpr auto iw5_header_size = sizeof(GfxImageFileHeader);
+									constexpr auto iw3_header_size = sizeof(IW3_GfxImageFileHeader);
+									
+									ZONETOOL_INFO("Converting IWI %s from version %u to version %u...", name.data(), version, 8);
 
-						//			// parse iw3 header
-						//			IW3_GfxImageFileHeader iw3_header;
-						//			memcpy(&iw3_header, bytes.data(), iw3_header_size);
+									// parse iw3 header
+									IW3_GfxImageFileHeader iw3_header;
+									memcpy(&iw3_header, bytes.data(), iw3_header_size);
 
-						//			// generate iw5 header
-						//			GfxImageFileHeader header = {};
-						//			memset(&header, 0, sizeof GfxImageFileHeader);
-						//			
-						//			memcpy(header.tag, iw3_header.tag, 3);
-						//			header.version = 8;
-						//			header.format = iw3_header.format;
-						//			header.unused = false;
-						//			memcpy(header.dimensions, iw3_header.dimensions, sizeof(__int16[3]));
-						//			memcpy(header.fileSizeForPicmip, iw3_header.fileSizeForPicmip, sizeof(int[4]));
+									// generate iw5 header
+									GfxImageFileHeader header = {};
+									memset(&header, 0, sizeof GfxImageFileHeader);
+									
+									memcpy(header.tag, iw3_header.tag, 3);
+									header.version = 8;
+									header.format = iw3_header.format;
+									header.unused = false;
+									memcpy(header.dimensions, iw3_header.dimensions, sizeof(__int16[3]));
+									memcpy(header.fileSizeForPicmip, iw3_header.fileSizeForPicmip, sizeof(int[4]));
 
-						//			// transform iwi flags
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_NOPICMIP, file_image_flags_t::IMG_FLAG_NOPICMIP);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_NOMIPMAPS, file_image_flags_t::IMG_FLAG_NOMIPMAPS);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CUBEMAP, file_image_flags_t::IMG_FLAG_MAPTYPE_CUBE);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_VOLMAP, file_image_flags_t::IMG_FLAG_MAPTYPE_3D);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_STREAMING, file_image_flags_t::IMG_FLAG_STREAMING);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_LEGACY_NORMALS, file_image_flags_t::IMG_FLAG_LEGACY_NORMALS);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_U, file_image_flags_t::IMG_FLAG_CLAMP_U);
-						//			translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_V, file_image_flags_t::IMG_FLAG_CLAMP_V);
-						//			
-						//			// write iw5 header
-						//			fwrite(&header, iw5_header_size, 1, fp);
-						//			
-						//			// write iw3 image buffer
-						//			fwrite(&bytes[iw3_header_size], bytes.size() - iw3_header_size, 1, fp);
-						//			fclose(fp);
-						//		}
-						//		else
-						//		{
-						//			ZONETOOL_FATAL("IWI of version %u is not supported for conversion. IWI file was %s.", version, name.data());
-						//		}
+									// transform iwi flags
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_NOPICMIP, file_image_flags_t::IMG_FLAG_NOPICMIP);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_NOMIPMAPS, file_image_flags_t::IMG_FLAG_NOMIPMAPS);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CUBEMAP, file_image_flags_t::IMG_FLAG_MAPTYPE_CUBE);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_VOLMAP, file_image_flags_t::IMG_FLAG_MAPTYPE_3D);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_STREAMING, file_image_flags_t::IMG_FLAG_STREAMING);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_LEGACY_NORMALS, file_image_flags_t::IMG_FLAG_LEGACY_NORMALS);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_U, file_image_flags_t::IMG_FLAG_CLAMP_U);
+									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_V, file_image_flags_t::IMG_FLAG_CLAMP_V);
+									header.flags |= static_cast<std::uint32_t>(file_image_flags_t::IMG_FLAG_ALPHA_WEIGHTED_COLORS);
+									header.flags |= static_cast<std::uint32_t>(file_image_flags_t::IMG_FLAG_GAMMA_SRGB);
 
-						//		return;
-						//	}
-						//}
+									for (auto i = 0u; i < 4; i++)
+									{
+										header.fileSizeForPicmip[i] += 4;
+									}
+
+									// write iw5 header
+									fwrite(&header, iw5_header_size, 1, fp);
+									
+									// write iw3 image buffer
+									fwrite(&bytes[iw3_header_size], bytes.size() - iw3_header_size, 1, fp);
+									fclose(fp);
+								}
+								else
+								{
+									ZONETOOL_FATAL("IWI of version %u is not supported for conversion. IWI file was %s.", version, name.data());
+								}
+
+								return;
+							}
+						}
 
 						// write original data
 						fwrite(&bytes[0], bytes.size(), 1, fp);

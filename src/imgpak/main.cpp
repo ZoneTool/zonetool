@@ -109,7 +109,7 @@ void handle_entries(file& ff, std::vector<file*>& paks, ZoneTool::PakFile& img5)
 	endian_convert_entries(entries, count);
 }
 
-std::uint32_t read_sortkey(const std::filesystem::path& path)
+std::pair<std::string, std::uint32_t> read_sortkey_and_techset(const std::filesystem::path& path)
 {
 	auto json_data = ""s;
 	auto file_size = std::filesystem::file_size(path);
@@ -125,7 +125,7 @@ std::uint32_t read_sortkey(const std::filesystem::path& path)
 	}
 
 	Json json = Json::parse(json_data);
-	return json["sortKey"].get<std::uint32_t>();
+	return { json["techniqueSet->name"].get<std::string>(), json["sortKey"].get<std::uint32_t>() };
 }
 
 int main(int argc, char** argv)
@@ -164,55 +164,119 @@ int main(int argc, char** argv)
 	std::vector<std::filesystem::path> iw3_materials;
 	std::vector<std::filesystem::path> iw5_materials;
 
-	std::map<std::uint32_t, std::uint32_t> mapped_keys;
+	std::vector<std::pair<std::string, std::uint32_t>> iw3_keys;
+	std::vector<std::pair<std::string, std::uint32_t>> iw5_keys;
 
-	for (auto& itr : std::filesystem::directory_iterator("Z:\\Sortkey mapping\\iw3"))
+	std::unordered_map<std::uint32_t, std::vector<std::uint32_t>> mapped_keys;
+	std::map<std::uint32_t, std::uint32_t> final_map;
+
+	// find materials
+	for (auto& itr : std::filesystem::recursive_directory_iterator("E:\\SteamLibrary\\steamapps\\common\\Call of Duty 4\\dump"))
 	{
-		if (std::filesystem::is_regular_file(itr))
+		if (std::filesystem::is_regular_file(itr) && strstr(itr.path().string().data(), "\\materials\\"))
 		{
 			iw3_materials.push_back(itr.path());
 		}
 	}
-
-	for (auto& itr : std::filesystem::directory_iterator("Z:\\Sortkey mapping\\iw5"))
+	for (auto& itr : std::filesystem::recursive_directory_iterator("E:\\SteamLibrary\\steamapps\\common\\Call of Duty Modern Warfare 2\\dump"))
 	{
-		if (std::filesystem::is_regular_file(itr))
+		if (std::filesystem::is_regular_file(itr) && strstr(itr.path().string().data(), "\\materials\\"))
 		{
 			iw5_materials.push_back(itr.path());
 		}
 	}
 
+	printf("found a total of %u materials to analyse...\n", iw3_materials.size() + iw5_materials.size());
+	printf("parsing...\n");
+
+	// map techsets & sort keys
 	for (auto& iw3_mat : iw3_materials)
 	{
-		auto itr = std::find_if(iw5_materials.begin(), iw5_materials.end(), [iw3_mat](auto& iw5)
+		iw3_keys.push_back(read_sortkey_and_techset(iw3_mat));
+	}
+	for (auto& iw5_mat : iw5_materials)
+	{
+		iw5_keys.push_back(read_sortkey_and_techset(iw5_mat));
+	}
+
+	printf("mapping...\n");
+
+	// 
+	for (auto& iw5_key : iw5_keys)
+	{
+		const auto itr = std::find_if(iw3_keys.begin(), iw3_keys.end(), [iw5_key](auto& iw3_key)
 		{
-			return iw5.filename() == iw3_mat.filename();
+			if (iw5_key.first == iw3_key.first)
+			{
+				return true;
+			}
+
+			if (iw5_key.first.find("_sat") != std::string::npos)
+			{
+				if (iw5_key.first == iw3_key.first + "_sat")
+				{
+					printf("mapped iw5 %s to iw3 %s because it looks similar.\n", iw5_key.first.data(), iw3_key.first.data());
+					return true;
+				}
+			}
+
+			return false;
 		});
 
-		if (itr != iw5_materials.end())
+		if (itr != iw3_keys.end())
 		{
-			printf("material %s exists in both games! using for comparison.\n", itr->filename().string().data());
-
-			auto iw3_key = read_sortkey(iw3_mat);
-			auto iw5_key = read_sortkey(*itr);
-			auto mapped_itr = mapped_keys.find(iw3_key);
-
-			if (mapped_itr == mapped_keys.end())
+			auto map_vec_itr = mapped_keys.find(itr->second);
+			if (map_vec_itr != mapped_keys.end())
 			{
-				mapped_keys[iw3_key] = iw5_key;
+				map_vec_itr->second.push_back(iw5_key.second);
 			}
 			else
 			{
-				if (mapped_itr->second != iw5_key)
-				{
-					printf("FOOPSIE WOOPS! %u was previously mapped to %u, but we just found a material trying to map key %u to %u\n", mapped_itr->first, mapped_itr->second, mapped_itr->first, iw5_key);
-				}
+				mapped_keys[itr->second].push_back(iw5_key.second);
 			}
 		}
 	}
 
+	// go through all maps and extract the maps that occur the most
+	for (auto& key_pair : mapped_keys)
+	{
+		auto iw3_key = key_pair.first;
+		auto iw5_key = 0u;
+
+		std::unordered_map<std::uint32_t, std::size_t> key_count;
+
+		// find best match
+		for (auto& iw5_keys : key_pair.second)
+		{
+			if (key_count.find(iw5_keys) != key_count.end())
+			{
+				key_count[iw5_keys] += 1;
+			}
+			else
+			{
+				key_count[iw5_keys] = 1;
+			}
+		}
+
+		// yeet
+		auto cur_count = 0u;
+		for (auto& iw5_keys : key_count)
+		{
+			if (cur_count < iw5_keys.second)
+			{
+				iw5_key = iw5_keys.first;
+				cur_count = iw5_keys.second;
+			}
+		}
+
+		// finally
+		final_map[iw3_key] = iw5_key;
+	}
+
+	printf("done!\n\n");
+
 	printf("std::map<std::uint32_t, std::uint32_t> mapped_keys {\n");
-	for (auto& key : mapped_keys)
+	for (auto& key : final_map)
 	{
 		printf("\t{ %u, %u },\n", key.first, key.second);
 	}

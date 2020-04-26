@@ -926,6 +926,8 @@ namespace ZoneTool
 				ZoneBuffer::ClearPointer(&dest->dpvs.smodelInsts);
 			}
 
+			data->models->surfaceCount;
+
 			if (data->dpvs.surfaces)
 			{
 				buf->align(3);
@@ -938,10 +940,14 @@ namespace ZoneTool
 						surface[i].material = reinterpret_cast<Material*>(zone->get_asset_pointer(
 							material, data->dpvs.surfaces[i].material->name));
 					}
+
+					assert(surface[i].material != nullptr);
 				}
 
 				ZoneBuffer::ClearPointer(&dest->dpvs.surfaces);
 			}
+			assert(data->indexCount > 0);
+			assert(data->dpvs.surfaces != nullptr);
 
 			if (data->dpvs.cullGroups)
 			{

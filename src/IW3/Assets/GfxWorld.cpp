@@ -169,6 +169,8 @@ namespace ZoneTool
 					map.models[i].surfaceCountNoDecal = world->models[i].surfaceCountNoDecal;
 				}
 			}
+			assert(sizeof IW3::GfxBrushModel == 56);
+			assert(sizeof IW4::GfxBrushModel == 60);
 
 			map.bounds.compute(world->mins, world->maxs);
 
@@ -251,6 +253,8 @@ namespace ZoneTool
 					map.dpvs.surfaces[i].flags = world->dpvs.surfaces[i].flags;
 
 					map.dpvs.cullGroups[i].bounds.compute(world->dpvs.surfaces[i].bounds[0], world->dpvs.surfaces[i].bounds[1]); // Verified
+
+					assert(map.dpvs.surfaces[i].material != nullptr);
 				}
 			}
 

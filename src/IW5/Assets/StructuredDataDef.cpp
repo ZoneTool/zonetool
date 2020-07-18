@@ -173,8 +173,8 @@ namespace ZoneTool
 				// Weapons
 				addEntry(ENUM_WEAPONS, 1, "iw5_ak74u");
 				addEntry(ENUM_WEAPONS2, 1, "iw5_ak74u");
-				//addEntry(ENUM_WEAPONS, 2, "iw5_cheytac");
-				//addEntry(ENUM_WEAPONS2, 2, "iw5_cheytac");
+				addEntry(ENUM_WEAPONS, 2, "iw5_cheytac");
+				addEntry(ENUM_WEAPONS2, 2, "iw5_cheytac");
 
 				// Gametypes
 				// addEntry(ENUM_GAMETYPES, 1, "oneflag");
@@ -200,8 +200,8 @@ namespace ZoneTool
 				// Weapons
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
 				addEntry((enumType_s)6, 1, "iw5_ak74u");
-				//addEntry((enumType_s)0, 2, "iw5_cheytac");
-				//addEntry((enumType_s)6, 2, "iw5_cheytac");
+				addEntry((enumType_s)0, 2, "iw5_cheytac");
+				addEntry((enumType_s)6, 2, "iw5_cheytac");
 
 				//// Custom camos
 				//addEntry((enumType_s)2, 1, "plutonium");
@@ -223,23 +223,30 @@ namespace ZoneTool
 			{
 				addEntry((enumType_s)5, 1, "iw5_ak74u");
 				addEntry((enumType_s)7, 1, "iw5_ak74u");
+				addEntry((enumType_s)5, 2, "iw5_cheytac");
+				addEntry((enumType_s)7, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/resetdata.def"s)
 			{
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
+				addEntry((enumType_s)0, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/elitecreateaclass.def"s)
 			{
 				addEntry((enumType_s)1, 1, "iw5_ak74u");
+				addEntry((enumType_s)1, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/clientmatchdata.def"s)
 			{
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
+				addEntry((enumType_s)0, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/matchdata.def"s)
 			{
 				addEntry((enumType_s)3, 1, "iw5_ak74u");
 				addEntry((enumType_s)4, 1, "iw5_ak74u");
+				addEntry((enumType_s)3, 2, "iw5_cheytac");
+				addEntry((enumType_s)4, 2, "iw5_cheytac");
 			}
 
 			// Increment version

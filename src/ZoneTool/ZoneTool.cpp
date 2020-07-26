@@ -238,7 +238,7 @@ namespace ZoneTool
 			{
 				if (row->fields_[0] == "localize"s && row->numOfFields_ >= 3)
 				{
-					ZONETOOL_INFO("Adding lcoalized string to zone...");
+					ZONETOOL_INFO("Adding localized string to zone...");
 
 					struct LocalizeStruct
 					{

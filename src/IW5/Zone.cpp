@@ -261,7 +261,7 @@ namespace ZoneTool
 			fastfile.write(buf_compressed.data(), buf_compressed.size());
 
 			std::string localappdata = getenv("LOCALAPPDATA");
-			fastfile.save(localappdata + "\\Plutonium\\storage\\iw5\\zone\\" + this->name_ + ".ff");
+			fastfile.save(localappdata + "\\Plutonium-staging\\storage\\iw5\\zone\\" + this->name_ + ".ff");
 
 			// oxygen output paths
 			// fastfile.save("C:\\Users\\RektInator\\AppData\\Local\\Plutonium\\storage\\iw5\\zone\\" + this->name_ + ".ff");

@@ -14,8 +14,6 @@ namespace ZoneTool
 	{
 		ModelSurface* IXSurface::parse(const std::string& name, ZoneMemory* mem)
 		{
-			sizeof XSurface;
-
 			AssetReader read(mem);
 
 			if (!read.open("XSurface\\" + name + ".xse"))

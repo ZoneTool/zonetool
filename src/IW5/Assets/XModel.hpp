@@ -20,6 +20,7 @@ namespace ZoneTool
 		private:
 			std::string name_;
 			XModel* asset_;
+			bool is_scope_model_;
 
 		public:
 			static XModel* parse_new(const std::string& name, ZoneMemory* mem, const std::string& filename, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);

@@ -110,7 +110,7 @@ namespace ZoneTool
 
 			if (fp)
 			{
-				if (asset->compressedLen)
+				if (asset->compressedLen > 0)
 				{
 					std::vector<std::uint8_t> uncompressed;
 					uncompressed.resize(asset->len);
@@ -119,6 +119,10 @@ namespace ZoneTool
 					                         asset->compressedLen);
 
 					fwrite(uncompressed.data(), uncompressed.size(), 1, fp);
+				}
+				else if (asset->len > 0)
+				{
+					fwrite(asset->buffer, asset->len, 1, fp);
 				}
 			}
 

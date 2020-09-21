@@ -31,6 +31,7 @@ namespace ZoneTool
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump(Font_s* asset);
+			Font_s* parse(const std::string& name, ZoneMemory* mem);
 		};
 	}
 }

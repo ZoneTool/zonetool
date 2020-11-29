@@ -1587,10 +1587,7 @@ namespace ZoneTool
 #define WEAPON_DUMP_FIELD_ARR(__field__, __size__) \
 	for (auto idx##__field__ = 0; idx##__field__ < __size__; idx##__field__++) \
 	{ \
-		if (asset->__field__ && asset->__field__[idx##__field__]) \
-			data[#__field__][idx##__field__] = asset->__field__[idx##__field__]; \
-		else \
-			data[#__field__][idx##__field__] = ""; \
+		data[#__field__][idx##__field__] = asset->__field__[idx##__field__]; \
 	}
 
 #define WEAPON_DUMP_ASSET(__field__) \

@@ -15,6 +15,9 @@ namespace ZoneTool
 	{		
 		void IWeaponDef::dump(WeaponCompleteDef* weapon)
 		{
+			return;
+
+			// experimental iw5 dump code
 			auto iw5_weapon = new IW5::WeaponCompleteDef;
 			memset(iw5_weapon, 0, sizeof IW5::WeaponCompleteDef);
 

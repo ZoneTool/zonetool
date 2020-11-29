@@ -124,7 +124,7 @@ namespace ZoneTool
 			{
 				FileSystem::SetFastFile(fastfile);
 
-				static FILE* csvFile;
+				static FILE* csvFile = nullptr;
 
 				// open csv file for dumping 
 				if (!csvFile)
@@ -167,6 +167,7 @@ namespace ZoneTool
 
 					referencedAssets.clear();
 					FileSystem::FileClose(csvFile);
+					csvFile = nullptr;
 
 					is_dumping_complete = true;
 				}

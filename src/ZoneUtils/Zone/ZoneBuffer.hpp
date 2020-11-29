@@ -346,11 +346,11 @@ namespace ZoneTool
 		void save(const std::string& filename);
 		void save_image_pak(const std::string& filename);
 
-		static std::vector<std::uint8_t> compress_zlib(const std::uint8_t* data, const std::size_t size);
-		static std::vector<std::uint8_t> compress_zlib(const std::vector<std::uint8_t>& data);
+		static std::vector<std::uint8_t> compress_zlib(const std::uint8_t* data, const std::size_t size, bool compress_blocks = false);
+		static std::vector<std::uint8_t> compress_zlib(const std::vector<std::uint8_t>& data, bool compress_blocks = false);
 		
 		std::vector<std::uint8_t> compress_zstd();
-		std::vector<std::uint8_t> compress_zlib();
+		std::vector<std::uint8_t> compress_zlib(bool compress_blocks = false);
 		void encrypt();
 	};
 }

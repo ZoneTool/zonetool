@@ -193,11 +193,12 @@ char**>(0x00799278)[type]);
 			auto fastfile = static_cast<std::string>((char*)(*(DWORD*)0x112A680 + 4));
 
 			// generate CSV for fastfile
+			static FILE* csvFile = nullptr;
+
 			if (isVerifying || isDumping)
 			{
 				FileSystem::SetFastFile(fastfile);
 
-				static FILE* csvFile;
 
 				// open csv file for dumping 
 				if (!csvFile)
@@ -246,6 +247,10 @@ char**>(0x00799278)[type]);
 
 					// clear referenced assets array because we are done dumping
 					referencedAssets.clear();
+
+					// clear csv file static variable for next dumps
+					FileSystem::FileClose(csvFile);
+					csvFile = nullptr;
 
 					// mark dumping as complete to exit the process if it has been started using the command line
 					if (currentDumpingZone == fastfile)

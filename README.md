@@ -3,7 +3,6 @@
 ![stars](https://img.shields.io/github/stars/ZoneTool/zonetool.svg)
 ![GitHub forks](https://img.shields.io/github/forks/ZoneTool/zonetool)
 ![GitHub issues](https://img.shields.io/github/issues/ZoneTool/zonetool)
-[![discord](https://discordapp.com/api/guilds/290238678352134145/widget.png)](https://discord.gg/a6JM2Tv)
 <p align="center"><img src="plutonium_logo.jpg" alt="Plutonium"/>
 
 # zonetool
@@ -124,6 +123,9 @@ Special thanks to the following people:
 * X3RX35
 * homura
 * Sofika
+
+## Discord
+Join our discord server at https://discord.gg/a6JM2Tv or https://discord.gg/plutonium
 
 ## Donate
 If you like my work, feel free to contribute!

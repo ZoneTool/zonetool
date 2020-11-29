@@ -100,6 +100,21 @@ namespace ZoneTool
 			asset->physPreset = read.read_asset<PhysPreset>();
 			asset->physCollmap = read.read_asset<PhysCollmap>();
 
+			// fix tags
+			for (auto i = 0u; i < asset->numBones; i++)
+			{
+				auto tag_name = std::string(SL_ConvertToString(asset->boneNames[i]));
+
+				// fix xmodel tags
+				if (tag_name.find("tag_") != std::string::npos &&
+					tag_name.find("_scope") != std::string::npos &&
+					tag_name.find("thermal") == std::string::npos)
+				{
+					ZONETOOL_INFO("fixing tag %s -> tag_scope", tag_name.data());
+					asset->boneNames[i] = SL_AllocString("tag_scope");
+				}
+			}
+			
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
 #endif
@@ -116,8 +131,7 @@ namespace ZoneTool
 		{
 			this->is_scope_model_ = false;
 			this->name_ = name;
-			this->asset_ = this->parse(name, mem);
-
+						
 			if ((name.find("weapon_") != std::string::npos || name.find("viewmodel_") != std::string::npos) &&
 				name.find("_scope") != std::string::npos &&
 				!FileSystem::FileExists("XModel\\" + name + ".xme6"))
@@ -176,10 +190,40 @@ namespace ZoneTool
 					model->lods[0].surfaces->xSurficies = new XSurface[allocated_surfaces.size()];
 					memcpy(model->lods[0].surfaces->xSurficies, allocated_surfaces.data(), sizeof XSurface * allocated_surfaces.size());
 
+					// remove all bones besides for tag_scope
+					XBoneInfo scope_info = {};
+					auto found_bone = false;
+					
+					for (auto i = 0u; i < model->numBones; i++)
+					{
+						if (SL_ConvertToString(model->boneNames[i]) == "tag_scope"s)
+						{
+							memcpy(&scope_info, &model->boneInfo[i], sizeof XBoneInfo);
+							found_bone = true;
+							break;
+						}
+					}
+
+					if (found_bone)
+					{
+						model->numBones = 1;
+						model->numRootBones = 1;
+						memcpy(&model->boneInfo[0], &scope_info, sizeof XBoneInfo);
+						model->boneNames[0] = SL_AllocString("tag_scope");
+					}
+					else
+					{
+						ZONETOOL_FATAL("You dun goofed");
+					}
+
 					//
 					this->is_scope_model_ = true;
 					this->asset_ = model;
 				}
+			}
+			else
+			{
+				this->asset_ = this->parse(name, mem);
 			}
 			
 			// don't reparse the surfaces

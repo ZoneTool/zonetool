@@ -25,7 +25,7 @@ namespace ZoneTool
 			if (name == "cheytacscope")
 			{
 				auto scope = mem->Alloc<AttachmentDef>();
-				auto base = DB_FindXAssetHeader(attachment, /*name.data()*/ "l96a1scope", 1).attachment;
+				auto base = DB_FindXAssetHeader(attachment, /*name.data()*/ "msrscope", 1).attachment;
 
 				memcpy(scope, base, sizeof AttachmentDef);
 				scope->szInternalName = mem->StrDup(name);

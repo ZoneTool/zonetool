@@ -53,9 +53,9 @@ function ZoneTool:project()
 
         filter "toolset:msc*"
             postbuildcommands {
-                "if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\SteamLibrary\\steamapps\\common\\Call of Duty 4\\zoneiw3.dll\" )",
-                "if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\SteamLibrary\\steamapps\\common\\Call of Duty Modern Warfare 2\\zonetool.dll\" )",
-                "if \"%COMPUTERNAME%\" == \"DESKTOP-CDFBECH\" ( copy /y \"$(TargetPath)\" \"E:\\SteamLibrary\\steamapps\\common\\Call of Duty Modern Warfare 3\\zonetool.dll\" )",
+                "if \"%COMPUTERNAME%\" == \"DESKTOP-QM2NUQP\" ( copy /y \"$(TargetPath)\" \"H:\\SteamLibrary\\steamapps\\common\\Call of Duty 4\\zoneiw3.dll\" )",
+                "if \"%COMPUTERNAME%\" == \"DESKTOP-QM2NUQP\" ( copy /y \"$(TargetPath)\" \"H:\\SteamLibrary\\steamapps\\common\\Call of Duty Modern Warfare 2\\zonetool.dll\" )",
+                "if \"%COMPUTERNAME%\" == \"DESKTOP-QM2NUQP\" ( copy /y \"$(TargetPath)\" \"H:\\SteamLibrary\\steamapps\\common\\Call of Duty Modern Warfare 3\\zonetool.dll\" )",
                 "if \"%COMPUTERNAME%\" == \"DESKTOP-G5EPE91\" ( copy /y \"$(TargetPath)\" \"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty 4\\zoneiw3.dll\" )",
                 "if \"%COMPUTERNAME%\" == \"DESKTOP-G5EPE91\" ( copy /y \"$(TargetPath)\" \"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty Modern Warfare 2\\zonetool.dll\" )",
                 "if \"%COMPUTERNAME%\" == \"DESKTOP-G5EPE91\" ( copy /y \"$(TargetPath)\" \"D:\\Program Files (x86)\\Steam\\steamapps\\common\\Call of Duty Modern Warfare 3\\zonetool.dll\" )",

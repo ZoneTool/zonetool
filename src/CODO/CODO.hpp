@@ -31,7 +31,7 @@ namespace ZoneTool::CODO
 		std::shared_ptr<ZoneBuffer> alloc_buffer() override;
 		void load_zone(const std::string& name) override;
 		void unload_zones() override;
-		bool is_valid_asset_type(std::string& type) override;
+		bool is_valid_asset_type(const std::string& type) override;
 		std::int32_t type_to_int(std::string type) override;
 		std::string type_to_string(std::int32_t type) override;
         bool supports_building() override;

@@ -54,7 +54,7 @@ namespace ZoneTool
 
 			void patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex, std::map<int, newEnumEntry*> map);
 
-			void IStructuredDataDef::manipulate(StructuredDataDefSet* data);
+			void manipulate(StructuredDataDefSet* data);
 
 		public:
 			IStructuredDataDef();

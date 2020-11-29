@@ -155,7 +155,7 @@ namespace ZoneTool
 
 		void IComWorld::dump(ComWorld* asset, bool fromIW5)
 		{
-			Json& data = asset->ToJson(fromIW5);
+			const auto data = asset->ToJson(fromIW5);
 
 			std::string path = asset->name + ".comworld"s;
 			std::string json = data.dump(4);

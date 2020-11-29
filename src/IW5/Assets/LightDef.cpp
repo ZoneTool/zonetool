@@ -134,7 +134,7 @@ namespace ZoneTool
 
 		void ILightDef::dump(GfxLightDef* asset)
 		{
-			Json& data = asset->ToJson();
+			const auto data = asset->ToJson();
 
 			std::string path = "lights/"s + asset->name + ".lightdef"s;
 			std::string json = data.dump(4);

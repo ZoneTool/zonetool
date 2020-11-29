@@ -269,7 +269,7 @@ namespace ZoneTool
 				{
 					if (row->numOfFields_ >= 2)
 					{
-						if (linker->is_valid_asset_type(std::string(row->fields_[0])))
+						if (linker->is_valid_asset_type(row->fields_[0]))
 						{
 							try
 							{

@@ -45,6 +45,7 @@ workspace "zonetool"
 	filter {}
 
 	buildoptions "/std:c++latest"
+	buildoptions "/Zc:strictStrings-"
 	systemversion "latest"
 	symbols "On"
 	editandcontinue "Off"

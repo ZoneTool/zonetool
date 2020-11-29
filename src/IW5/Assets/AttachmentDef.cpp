@@ -517,14 +517,14 @@ namespace ZoneTool
 
 		void IAttachmentDef::dump(AttachmentDef* asset)
 		{
-			Json& data = asset->ToJson();
+			//const auto data = asset->ToJson();
 
-			std::string path = "attachments\\mp\\"s + asset->szInternalName;
-			std::string json = data.dump(4);
+			//std::string path = "attachments\\mp\\"s + asset->szInternalName;
+			//std::string json = data.dump(4);
 
-			auto file = FileSystem::FileOpen(path, "w"s);
-			fwrite(json.data(), json.size(), 1, file);
-			FileSystem::FileClose(file);
+			//auto file = FileSystem::FileOpen(path, "w"s);
+			//fwrite(json.data(), json.size(), 1, file);
+			//FileSystem::FileClose(file);
 		}
 	}
 }

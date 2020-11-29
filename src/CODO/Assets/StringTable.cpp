@@ -31,7 +31,7 @@ namespace ZoneTool::CODO
 				fread(buf.get(), len, 1, fp);
 				fclose(fp);
 
-				std::vector<std::string> rows = split(std::string(buf.get()), '\n');
+				std::vector<std::string> rows = split(buf.get(), '\n');
 
 				for (auto& row : rows)
 				{

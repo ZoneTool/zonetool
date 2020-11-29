@@ -308,7 +308,7 @@ namespace ZoneTool
 		{
 		}
 
-		bool Linker::is_valid_asset_type(std::string& type)
+		bool Linker::is_valid_asset_type(const std::string& type)
 		{
 			return this->type_to_int(type) >= 0;
 		}

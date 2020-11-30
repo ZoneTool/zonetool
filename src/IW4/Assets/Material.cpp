@@ -185,7 +185,7 @@ namespace ZoneTool
 		}
 
 		GfxImage* Image_Parse(const char* name, char semantic, char category, char flags,
-		                      ZoneMemory* mem)
+			ZoneMemory* mem)
 		{
 			_IWI* buf = LoadIWIHeader(name, mem);
 
@@ -213,7 +213,7 @@ namespace ZoneTool
 		}
 
 		MaterialImage* Material_ParseMaps(const std::string& material, nlohmann::json& matdata,
-		                                  ZoneMemory* mem)
+			ZoneMemory* mem)
 		{
 			auto mat = mem->Alloc<MaterialImage>(matdata.size());
 
@@ -231,7 +231,7 @@ namespace ZoneTool
 				if (img.empty())
 				{
 					MessageBoxA(nullptr, &va("Image name for material %s seems to be empty!", &material[0])[0], nullptr,
-					            0);
+						0);
 				}
 			}
 
@@ -397,201 +397,58 @@ namespace ZoneTool
 
 		void IMaterial::write(IZone* zone, ZoneBuffer* buf)
 		{
-			// sizeof Material;
+			auto dest = buf->at<Material>();
+			auto data = this->asset_;
 
-			if (zone->get_target() == zone_target::pc)
+			buf->write(data);
+			buf->push_stream(3);
+			START_LOG_STREAM;
+
+			dest->name = buf->write_str(this->name());
+
+			if (data->techniqueSet)
 			{
-				auto dest = buf->at<Material>();
-				auto data = this->asset_;
-
-				buf->write(data);
-				buf->push_stream(3);
-				START_LOG_STREAM;
-
-				dest->name = buf->write_str(this->name());
-
-				if (data->techniqueSet)
-				{
-					dest->techniqueSet = reinterpret_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(
-						techset, data->techniqueSet->name));
-				}
-
-				if (data->maps)
-				{
-					buf->align(3);
-					auto destmaps = buf->write(data->maps, data->numMaps);
-
-					for (int i = 0; i < data->numMaps; i++)
-					{
-						if (data->maps[i].semantic == 11)
-						{
-							ZONETOOL_ERROR("Watermaps are not supported.");
-							destmaps[i].image = nullptr;
-						}
-						else
-						{
-							if (data->maps[i].image)
-							{
-								destmaps[i].image = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
-									image, data->maps[i].image->name));
-							}
-						}
-					}
-
-					ZoneBuffer::ClearPointer(&dest->maps);
-				}
-
-				if (data->constantTable)
-				{
-					dest->constantTable = buf->write_s(15, data->constantTable, data->constantCount);
-				}
-
-				if (data->stateMap)
-				{
-					dest->stateMap = buf->write_s(3, data->stateMap, data->stateBitsCount);
-				}
-
-				END_LOG_STREAM;
-				buf->pop_stream();
+				dest->techniqueSet = reinterpret_cast<MaterialTechniqueSet*>(zone->get_asset_pointer(
+					techset, data->techniqueSet->name));
 			}
-			else
+
+			if (data->maps)
 			{
-				alpha::Material alpha_material = {};
+				buf->align(3);
+				auto destmaps = buf->write(data->maps, data->numMaps);
 
-				// transform data
-				memcpy(&alpha_material, this->asset_, 16);
-				memcpy(&alpha_material.textureCount, &this->asset_->numMaps, 5);
-				memcpy(&alpha_material.techniqueSet, &this->asset_->techniqueSet, 16);
-				alpha_material.subMaterials = nullptr;
-
-				std::unordered_map<MaterialTechniqueType, alpha::MaterialTechniqueType> actual_meme =
+				for (int i = 0; i < data->numMaps; i++)
 				{
-					{ TECHNIQUE_DEPTH_PREPASS, alpha::TECHNIQUE_DEPTH_PREPASS },
-					{ TECHNIQUE_BUILD_FLOAT_Z, alpha::TECHNIQUE_BUILD_FLOAT_Z },
-					{ TECHNIQUE_BUILD_SHADOWMAP_DEPTH, alpha::TECHNIQUE_BUILD_SHADOWMAP_DEPTH },
-					{ TECHNIQUE_BUILD_SHADOWMAP_COLOR, alpha::TECHNIQUE_BUILD_SHADOWMAP_COLOR },
-					{ TECHNIQUE_UNLIT, alpha::TECHNIQUE_UNLIT },
-					{ TECHNIQUE_EMISSIVE, alpha::TECHNIQUE_EMISSIVE },
-					{ TECHNIQUE_EMISSIVE_DFOG, alpha::TECHNIQUE_EMISSIVE_DFOG },
-					{ TECHNIQUE_EMISSIVE_SHADOW, alpha::TECHNIQUE_EMISSIVE_SHADOW },
-					{ TECHNIQUE_EMISSIVE_SHADOW_DFOG, alpha::TECHNIQUE_EMISSIVE_SHADOW_DFOG },
-					{ TECHNIQUE_LIT, alpha::TECHNIQUE_LIT },
-					{ TECHNIQUE_LIT_DFOG, alpha::TECHNIQUE_LIT_DFOG },
-					{ TECHNIQUE_LIT_SUN, alpha::TECHNIQUE_LIT_SUN },
-					{ TECHNIQUE_LIT_SUN_DFOG, alpha::TECHNIQUE_LIT_SUN_DFOG },
-					{ TECHNIQUE_LIT_SUN_SHADOW, alpha::TECHNIQUE_LIT_SUN_SHADOW },
-					{ TECHNIQUE_LIT_SUN_SHADOW_DFOG, alpha::TECHNIQUE_LIT_SUN_SHADOW_DFOG },
-					{ TECHNIQUE_LIT_SPOT, alpha::TECHNIQUE_LIT_SPOT },
-					{ TECHNIQUE_LIT_SPOT_DFOG, alpha::TECHNIQUE_LIT_SPOT_DFOG },
-					{ TECHNIQUE_LIT_SPOT_SHADOW, alpha::TECHNIQUE_LIT_SPOT_SHADOW },
-					{ TECHNIQUE_LIT_SPOT_SHADOW_DFOG, alpha::TECHNIQUE_LIT_SPOT_SHADOW_DFOG },
-					{ TECHNIQUE_LIT_OMNI, alpha::TECHNIQUE_LIT_OMNI },
-					{ TECHNIQUE_LIT_OMNI_DFOG, alpha::TECHNIQUE_LIT_OMNI_DFOG },
-					{ TECHNIQUE_LIT_OMNI_SHADOW, alpha::TECHNIQUE_LIT_OMNI_SHADOW },
-					{ TECHNIQUE_LIT_OMNI_SHADOW_DFOG, alpha::TECHNIQUE_LIT_OMNI_SHADOW_DFOG },
-					{ TECHNIQUE_LIGHT_SPOT, alpha::TECHNIQUE_LIGHT_SPOT },
-					{ TECHNIQUE_LIGHT_OMNI, alpha::TECHNIQUE_LIGHT_OMNI },
-					{ TECHNIQUE_LIGHT_SPOT_SHADOW, alpha::TECHNIQUE_LIGHT_SPOT_SHADOW },
-					{ TECHNIQUE_FAKELIGHT_NORMAL, alpha::TECHNIQUE_FAKELIGHT_NORMAL },
-					{ TECHNIQUE_FAKELIGHT_VIEW, alpha::TECHNIQUE_FAKELIGHT_VIEW },
-					{ TECHNIQUE_SUNLIGHT_PREVIEW, alpha::TECHNIQUE_SUNLIGHT_PREVIEW },
-					{ TECHNIQUE_CASE_TEXTURE, alpha::TECHNIQUE_CASE_TEXTURE },
-					{ TECHNIQUE_WIREFRAME_SOLID, alpha::TECHNIQUE_WIREFRAME_SOLID },
-					{ TECHNIQUE_WIREFRAME_SHADED, alpha::TECHNIQUE_WIREFRAME_SHADED },
-					{ TECHNIQUE_DEBUG_BUMPMAP, alpha::TECHNIQUE_DEBUG_BUMPMAP },
-				};
-				
-				for (auto i = 0u; i < 48; i++)
-				{
-					const auto itr = actual_meme.find(MaterialTechniqueType(i));
-					if (itr != actual_meme.end())
+					if (data->maps[i].semantic == 11)
 					{
-						alpha_material.stateBitsEntry[itr->second] = this->asset_->stateBitsEntry[i];
+						ZONETOOL_ERROR("Watermaps are not supported.");
+						destmaps[i].image = nullptr;
 					}
-				}
-				
-				auto data = &alpha_material;
-				auto dest = buf->write(data);
-				
-				buf->push_stream(3);
-
-				dest->name = buf->write_str(this->name());
-
-				if (data->techniqueSet)
-				{
-					dest->techniqueSet = reinterpret_cast<alpha::MaterialTechniqueSet*>(zone->get_asset_pointer(
-						techset, data->techniqueSet->name));
-				}
-
-				if (data->textureTable)
-				{
-					buf->align(3);
-					auto destmaps = buf->write(data->textureTable, data->textureCount);
-
-					for (int i = 0; i < data->textureCount; i++)
+					else
 					{
-						if (data->textureTable[i].semantic == 11)
+						if (data->maps[i].image)
 						{
-							ZONETOOL_ERROR("Watermaps are not supported.");
-							destmaps[i].image = nullptr;
+							destmaps[i].image = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
+								image, data->maps[i].image->name));
 						}
-						else
-						{
-							if (data->textureTable[i].image)
-							{
-								destmaps[i].image = reinterpret_cast<GfxImage*>(zone->get_asset_pointer(
-									image, data->textureTable[i].image->name));
-							}
-						}
-
-						endian_convert(&destmaps[i].image);
-						endian_convert(&destmaps[i].typeHash);
-					}
-
-					ZoneBuffer::ClearPointer(&dest->textureTable);
-				}
-
-				if (data->constantTable)
-				{
-					MaterialConstantDef* destConstantTable = nullptr;
-					dest->constantTable = buf->write_s(15, data->constantTable, data->constantCount, sizeof MaterialConstantDef, &destConstantTable);
-
-					for (auto i = 0u; i < data->stateBitsCount; i++)
-					{
-						endian_convert(&destConstantTable[i].name);
-						endian_convert(&destConstantTable[i].nameHash);
-						endian_convert(&destConstantTable[i].literal[0]);
-						endian_convert(&destConstantTable[i].literal[1]);
-						endian_convert(&destConstantTable[i].literal[2]);
-						endian_convert(&destConstantTable[i].literal[3]);
 					}
 				}
 
-				if (data->stateBitsTable)
-				{
-					GfxStateBits* destStateBits = nullptr;
-					dest->stateBitsTable = buf->write_s(3, data->stateBitsTable, data->stateBitsCount, sizeof GfxStateBits, &destStateBits);
-
-					for (auto i = 0u; i < data->stateBitsCount; i++)
-					{
-						endian_convert(&destStateBits[i].loadBits[0]);
-						endian_convert(&destStateBits[i].loadBits[1]);
-					}
-				}
-				
-				buf->pop_stream();
-
-				endian_convert(&dest->name);
-				endian_convert(&dest->surfaceTypeBits);
-				endian_convert(&dest->drawSurf.packed);
-				endian_convert(&dest->techniqueSet);
-				endian_convert(&dest->textureTable);
-				endian_convert(&dest->constantTable);
-				endian_convert(&dest->stateBitsTable);
-
-				// alloc callback memory for textures
-				buf->inc_stream(5, dest->textureCount * 4);
+				ZoneBuffer::ClearPointer(&dest->maps);
 			}
+
+			if (data->constantTable)
+			{
+				dest->constantTable = buf->write_s(15, data->constantTable, data->constantCount);
+			}
+
+			if (data->stateMap)
+			{
+				dest->stateMap = buf->write_s(3, data->stateMap, data->stateBitsCount);
+			}
+
+			END_LOG_STREAM;
+			buf->pop_stream();
 		}
 
 		void IMaterial::dump(Material* asset)

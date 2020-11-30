@@ -173,6 +173,9 @@ namespace ZoneTool
 					DECLARE_ASSET(loaded_sound, ILoadedSound);
 					DECLARE_ASSET(sound, ISound);
 					DECLARE_ASSET(fx, IFxEffectDef);
+					DECLARE_ASSET(gfx_map, IGfxWorld);
+					DECLARE_ASSET(col_map_mp, IClipMap);
+					DECLARE_ASSET(map_ents, IMapEnts);
 				}
 			}
 		}
@@ -305,7 +308,7 @@ namespace ZoneTool
 		{
 		}
 
-		bool Linker::is_valid_asset_type(std::string& type)
+		bool Linker::is_valid_asset_type(const std::string& type)
 		{
 			return this->type_to_int(type) >= 0;
 		}

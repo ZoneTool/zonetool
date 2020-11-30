@@ -79,7 +79,7 @@ namespace ZoneTool
 
 		void ILeaderBoardDef::dump(LeaderBoardDef* asset)
 		{
-			Json& data = asset->ToJson();
+			const auto data = asset->ToJson();
 
 			std::string path = "leaderboards\\"s + asset->name;
 			std::string json = data.dump(4);

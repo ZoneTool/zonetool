@@ -26,7 +26,7 @@ namespace ZoneTool
 		virtual void load_zone(const std::string& name) = 0;
 		virtual void unload_zones() = 0;
 
-		virtual bool is_valid_asset_type(std::string& type) = 0;
+		virtual bool is_valid_asset_type(const std::string& type) = 0;
 		virtual std::int32_t type_to_int(std::string type) = 0;
 		virtual std::string type_to_string(std::int32_t type) = 0;
 		

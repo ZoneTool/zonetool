@@ -204,10 +204,12 @@ namespace ZoneTool
 					DUMPCASE(sound, ISound, snd_alias_list_t);
 					DUMPCASE(stringtable, IStringTable, StringTable);
 					DUMPCASE(rawfile, IRawFile, RawFile);
+					DUMPCASE(scriptfile, IScriptFile, ScriptFile);
 					DUMPCASE(weapon, IWeaponDef, WeaponCompleteDef);
 					DUMPCASE(image, IGfxImage, GfxImage);
 					DUMPCASE(phys_collmap, IPhysCollmap, PhysCollmap);
 					DUMPCASE(loaded_sound, ILoadedSound, LoadedSound);
+					DUMPCASE(structureddatadef, IStructuredDataDef, StructuredDataDefSet);
 
 					DUMPCASE(techset, ITechset, MaterialTechniqueSet);
 					DUMPCASE(pixelshader, IPixelShader, PixelShader);

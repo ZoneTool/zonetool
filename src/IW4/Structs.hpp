@@ -1110,6 +1110,12 @@ namespace ZoneTool
 			SoundData sound;
 		};
 #pragma pack(push, 4)
+		union $C8D87EB0090687D323381DFB7A82089C
+		{
+			float slavePercentage;
+			float masterPercentage;
+		};
+		
 		struct snd_alias_t
 		{
 			const char* aliasName;
@@ -1125,13 +1131,13 @@ namespace ZoneTool
 			float pitchMax;
 			float distMin;
 			float distMax;
+			float velocityMin;
 			int flags;
-			float slavePercentage;
+			$C8D87EB0090687D323381DFB7A82089C ___u15;
 			float probability;
 			float lfePercentage;
 			float centerPercentage;
 			int startDelay;
-			int pad2;
 			SndCurve* volumeFalloffCurve;
 			float envelopMin;
 			float envelopMax;
@@ -1193,53 +1199,60 @@ namespace ZoneTool
 			weapStance_t stance;
 			void* viewFlashEffect;
 			void* worldFlashEffect;
-			snd_alias_list_t* pickupSound;
-			snd_alias_list_t* pickupSoundPlayer;
-			snd_alias_list_t* ammoPickupSound;
-			snd_alias_list_t* ammoPickupSoundPlayer;
-			snd_alias_list_t* projectileSound;
-			snd_alias_list_t* pullbackSound;
-			snd_alias_list_t* pullbackSoundPlayer;
-			snd_alias_list_t* fireSound;
-			snd_alias_list_t* fireSoundPlayer;
-			snd_alias_list_t* fireSoundPlayerAkimbo;
-			snd_alias_list_t* fireLoopSound;
-			snd_alias_list_t* fireLoopSoundPlayer;
-			snd_alias_list_t* fireStopSound;
-			snd_alias_list_t* fireStopSoundPlayer;
-			snd_alias_list_t* fireLastSound;
-			snd_alias_list_t* fireLastSoundPlayer;
-			snd_alias_list_t* emptyFireSound;
-			snd_alias_list_t* emptyFireSoundPlayer;
-			snd_alias_list_t* meleeSwipeSound;
-			snd_alias_list_t* meleeSwipeSoundPlayer;
-			snd_alias_list_t* meleeHitSound;
-			snd_alias_list_t* meleeMissSound;
-			snd_alias_list_t* rechamberSound;
-			snd_alias_list_t* rechamberSoundPlayer;
-			snd_alias_list_t* reloadSound;
-			snd_alias_list_t* reloadSoundPlayer;
-			snd_alias_list_t* reloadEmptySound;
-			snd_alias_list_t* reloadEmptySoundPlayer;
-			snd_alias_list_t* reloadStartSound;
-			snd_alias_list_t* reloadStartSoundPlayer;
-			snd_alias_list_t* reloadEndSound;
-			snd_alias_list_t* reloadEndSoundPlayer;
-			snd_alias_list_t* detonateSound;
-			snd_alias_list_t* detonateSoundPlayer;
-			snd_alias_list_t* nightVisionWearSound;
-			snd_alias_list_t* nightVisionWearSoundPlayer;
-			snd_alias_list_t* nightVisionRemoveSound;
-			snd_alias_list_t* nightVisionRemoveSoundPlayer;
-			snd_alias_list_t* altSwitchSound;
-			snd_alias_list_t* altSwitchSoundPlayer;
-			snd_alias_list_t* raiseSound;
-			snd_alias_list_t* raiseSoundPlayer;
-			snd_alias_list_t* firstRaiseSound;
-			snd_alias_list_t* firstRaiseSoundPlayer;
-			snd_alias_list_t* putawaySound;
-			snd_alias_list_t* putawaySoundPlayer;
-			snd_alias_list_t* scanSound;
+			union
+			{
+				struct
+				{
+					snd_alias_list_t* pickupSound;
+					snd_alias_list_t* pickupSoundPlayer;
+					snd_alias_list_t* ammoPickupSound;
+					snd_alias_list_t* ammoPickupSoundPlayer;
+					snd_alias_list_t* projectileSound;
+					snd_alias_list_t* pullbackSound;
+					snd_alias_list_t* pullbackSoundPlayer;
+					snd_alias_list_t* fireSound;
+					snd_alias_list_t* fireSoundPlayer;
+					snd_alias_list_t* fireSoundPlayerAkimbo;
+					snd_alias_list_t* fireLoopSound;
+					snd_alias_list_t* fireLoopSoundPlayer;
+					snd_alias_list_t* fireStopSound;
+					snd_alias_list_t* fireStopSoundPlayer;
+					snd_alias_list_t* fireLastSound;
+					snd_alias_list_t* fireLastSoundPlayer;
+					snd_alias_list_t* emptyFireSound;
+					snd_alias_list_t* emptyFireSoundPlayer;
+					snd_alias_list_t* meleeSwipeSound;
+					snd_alias_list_t* meleeSwipeSoundPlayer;
+					snd_alias_list_t* meleeHitSound;
+					snd_alias_list_t* meleeMissSound;
+					snd_alias_list_t* rechamberSound;
+					snd_alias_list_t* rechamberSoundPlayer;
+					snd_alias_list_t* reloadSound;
+					snd_alias_list_t* reloadSoundPlayer;
+					snd_alias_list_t* reloadEmptySound;
+					snd_alias_list_t* reloadEmptySoundPlayer;
+					snd_alias_list_t* reloadStartSound;
+					snd_alias_list_t* reloadStartSoundPlayer;
+					snd_alias_list_t* reloadEndSound;
+					snd_alias_list_t* reloadEndSoundPlayer;
+					snd_alias_list_t* detonateSound;
+					snd_alias_list_t* detonateSoundPlayer;
+					snd_alias_list_t* nightVisionWearSound;
+					snd_alias_list_t* nightVisionWearSoundPlayer;
+					snd_alias_list_t* nightVisionRemoveSound;
+					snd_alias_list_t* nightVisionRemoveSoundPlayer;
+					snd_alias_list_t* altSwitchSound;
+					snd_alias_list_t* altSwitchSoundPlayer;
+					snd_alias_list_t* raiseSound;
+					snd_alias_list_t* raiseSoundPlayer;
+					snd_alias_list_t* firstRaiseSound;
+					snd_alias_list_t* firstRaiseSoundPlayer;
+					snd_alias_list_t* putawaySound;
+					snd_alias_list_t* putawaySoundPlayer;
+					snd_alias_list_t* scanSound;
+				};
+				snd_alias_list_t* sounds[47];
+			};
 			snd_alias_list_t** bounceSound;
 			void* viewShellEjectEffect;
 			void* worldShellEjectEffect;
@@ -1666,11 +1679,10 @@ namespace ZoneTool
 
 		struct cbrushside_t
 		{
-			cplane_s* plane;
-			unsigned int materialNum;
-			/*unsigned __int16 materialNum;
+			cplane_s *plane;
+			unsigned __int16 materialNum;
 			char firstAdjacentSideOffset;
-			char edgeCount;*/
+			char edgeCount;
 		};
 
 		// ClipMap
@@ -2062,8 +2074,8 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames2
 		{
-			__int16* frames;
-			char indices[1];
+			__int16(*frames)[2];
+			XAnimDynamicIndices indices;
 		};
 
 		union XAnimDeltaPartQuatData2
@@ -2080,7 +2092,7 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames
 		{
-			__int16 (*frames)[2];
+			__int16(*frames)[4];
 			XAnimDynamicIndices indices;
 		};
 
@@ -2641,39 +2653,19 @@ namespace ZoneTool
 
 		struct GfxBrushModelWritable
 		{
-			union
-			{
-				Bounds bounds;
-
-				struct
-				{
-					float mins[3];
-					float maxs[3];
-				};
-			};
-
-			float mip1radiusSq;
+			Bounds bounds;
 		};
 
 		struct GfxBrushModel
 		{
 			GfxBrushModelWritable writable;
-
-			union
-			{
-				Bounds bounds;
-
-				struct
-				{
-					float mins[3];
-					float maxs[3];
-				};
-			};
-
-			unsigned int surfaceCount;
-			unsigned int startSurfIndex;
+			Bounds bounds;
+			float radius;
+			unsigned short surfaceCount;
+			unsigned short startSurfIndex;
+			unsigned short surfaceCountNoDecal;
 		};
-
+		
 		struct MaterialMemory
 		{
 			Material* material;
@@ -2760,8 +2752,16 @@ namespace ZoneTool
 
 		struct GfxStaticModelInst
 		{
-			float mins[3];
-			float maxs[3];
+			union
+			{
+				Bounds bounds;
+
+				struct
+				{
+					float mins[3];
+					float maxs[3];
+				};
+			};
 			float lightingOrigin[3];
 		};
 
@@ -2781,13 +2781,21 @@ namespace ZoneTool
 			char lightmapIndex;
 			char reflectionProbeIndex;
 			char primaryLightIndex;
-			bool castsSunShadow;
+			char flags;
 		};
 
 		struct GfxCullGroup
 		{
-			float mins[3];
-			float maxs[3];
+			union
+			{
+				Bounds bounds;
+
+				struct
+				{
+					float mins[3];
+					float maxs[3];
+				};
+			};
 			//int surfaceCount;
 			//int startSurfIndex;
 		};
@@ -2814,13 +2822,15 @@ namespace ZoneTool
 		struct GfxStaticModelDrawInst
 		{
 			GfxPackedPlacement placement;
-			XModel* model;
-			unsigned __int16 smodelCacheIndex[4];
-			float cullDist;
+			XModel *model;
+			unsigned __int16 cullDist;
+			unsigned __int16 lightingHandle;
 			char reflectionProbeIndex;
 			char primaryLightIndex;
-			unsigned __int16 lightingHandle;
 			char flags;
+			char firstMtlSkinIndex;
+			GfxColor groundLighting;
+			unsigned __int16 cacheId[4];
 		};
 
 		struct GfxWorldDpvsDynamic
@@ -2890,17 +2900,10 @@ namespace ZoneTool
 			GfxSky* skies; // 4
 			int sunPrimaryLightIndex; // 4 // = 32
 			int primaryLightCount; // 4
-			int primaryLightEnvCount; // 4
-			union
-			{
-				struct
-				{
-					unsigned int sortKeyEffectDecal;
-					unsigned int sortKeyEffectAuto;
-					unsigned int sortKeyDistortion;
-				};
-				char unknown1[12]; // 16 // = 56 // Sortkeys. Don't know which ones though
-			};
+			unsigned int sortKeyLitDecal;
+			unsigned int sortKeyEffectDecal;
+			unsigned int sortKeyEffectAuto;
+			unsigned int sortKeyDistortion;
 			GfxWorldDpvsPlanes dpvsPlanes; // 16
 			GfxCellTreeCount* aabbTreeCounts; // Size: 4 * dpvsPlanes.cellCount // 4
 			GfxCellTree* aabbTree; // 4
@@ -3059,8 +3062,7 @@ namespace ZoneTool
 			XModel* xmodel;
 			float origin[3];
 			float invScaledAxis[3][3];
-			float absmin[3];
-			float absmax[3];
+			Bounds absBounds;
 		};
 
 		struct dmaterial_t
@@ -3078,13 +3080,12 @@ namespace ZoneTool
 
 		struct cLeaf_t
 		{
-			unsigned __int16 firstCollAabbIndex; // + 0
-			unsigned __int16 collAabbCount; // + 2
-			int brushContents; // + 6
-			int terrainContents; // + 10
-			float mins[3]; // + 22
-			float maxs[3]; // + 34
-			int leafBrushNode; // + 38
+			unsigned __int16 firstCollAabbIndex;
+			unsigned __int16 collAabbCount;
+			int brushContents;
+			int terrainContents;
+			Bounds bounds;
+			int leafBrushNode;
 		};
 
 		struct cLeafBrushNodeLeaf_t

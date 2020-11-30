@@ -3,7 +3,7 @@
 // Call of Duty titles. 
 //
 // Project: https://github.com/ZoneTool/zonetool
-// Author: RektInator (https://github.com/RektInator)
+// Author: momo5502 (https://github.com/momo5502)
 // License: GNU GPL v3.0
 // ========================================================
 #pragma once
@@ -12,10 +12,10 @@ namespace ZoneTool
 {
 	namespace IW3
 	{
-		class IGfxWorld
+		class IMapEnts
 		{
 		public:
-			static void dump(GfxWorld* asset, ZoneMemory* mem);
+			static void dump(MapEnts* asset, ZoneMemory* mem);
 		};
 	}
 }

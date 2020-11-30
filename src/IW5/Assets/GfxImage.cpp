@@ -212,7 +212,7 @@ namespace ZoneTool
 		void IGfxImage::dump_iwi(const std::string& name)
 		{
 			if (FileSystem::FileExists(name + ".iwi") && !std::filesystem::exists(
-				"main\\iw4_images\\" + name + ".iwi"))
+				"main\\iw5_images\\" + name + ".iwi"))
 			{
 				auto fp = fopen(
 					va("main\\%s\\images\\%s.iwi", FileSystem::GetFastFile().data(), name.data()).data(), "wb");
@@ -263,7 +263,14 @@ namespace ZoneTool
 									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_LEGACY_NORMALS, file_image_flags_t::IMG_FLAG_LEGACY_NORMALS);
 									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_U, file_image_flags_t::IMG_FLAG_CLAMP_U);
 									translate_flags(&iw3_header, &header, iw3_file_image_flags_t::IMG_FLAG_CLAMP_V, file_image_flags_t::IMG_FLAG_CLAMP_V);
-									
+									header.flags |= static_cast<std::uint32_t>(file_image_flags_t::IMG_FLAG_ALPHA_WEIGHTED_COLORS);
+									header.flags |= static_cast<std::uint32_t>(file_image_flags_t::IMG_FLAG_GAMMA_SRGB);
+
+									for (auto i = 0u; i < 4; i++)
+									{
+										header.fileSizeForPicmip[i] += 4;
+									}
+
 									// write iw5 header
 									fwrite(&header, iw5_header_size, 1, fp);
 									

@@ -12,7 +12,7 @@ namespace ZoneTool
 {
 	PakFile::PakFile(const std::uint32_t version)
 	{
-		this->buffer_ = std::make_shared<ZoneBuffer>(1024 * 1024 * 100);
+		this->buffer_ = std::make_shared<ZoneBuffer>(1024 * 1024 * 200);
 		this->buffer_->init_streams(1);
 		
 		// write header
@@ -23,19 +23,31 @@ namespace ZoneTool
 		endian_convert(dest_version);
 	}
 
-	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::vector<std::uint8_t>& pixels) const
+	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::uint8_t* pixels, const std::size_t size, const bool is_compressed) const
 	{
 		// get start position
 		auto start_location = this->buffer_->size();
 
 		// write image data
-		auto compressed = ZoneBuffer::compress_zlib(pixels);
-		this->buffer_->write_stream(compressed.data(), compressed.size(), 1);
+		if (!is_compressed)
+		{
+			auto compressed = ZoneBuffer::compress_zlib(pixels, size);
+			this->buffer_->write_stream(compressed.data(), compressed.size(), 1);
+		}
+		else
+		{
+			this->buffer_->write_stream(pixels, size, 1);
+		}
 
 		// get end position
 		auto end_location = this->buffer_->size();
 
 		return { start_location, end_location };
+	}
+
+	std::pair<std::uint32_t, std::uint32_t> PakFile::add_entry(const std::vector<std::uint8_t>& pixels) const
+	{
+		return add_entry(pixels.data(), pixels.size());
 	}
 
 	void PakFile::save(const std::string& filename)

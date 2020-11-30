@@ -24,7 +24,7 @@ namespace ZoneTool
 			IXSurface();
 			~IXSurface();
 
-			ModelSurface* parse(const std::string& name, ZoneMemory* mem);
+			static ModelSurface* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void init(void* asset, ZoneMemory* mem) override;

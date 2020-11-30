@@ -103,7 +103,7 @@ namespace ZoneTool
 			VMProtectBeginUltra("IW5::IClipMap::parse");
 #endif
 
-			auto colmap = mem->Alloc<clipMap_t>();
+			auto* colmap = mem->Alloc<clipMap_t>();
 
 			colmap->name = read.read_string();
 			colmap->isInUse = read.read_int();
@@ -255,6 +255,17 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			colmap->dynEntClientList[1] = new DynEntityClient[colmap->dynEntCount[1]];
 			colmap->dynEntCollList[0] = new DynEntityColl[colmap->dynEntCount[0]];
 			colmap->dynEntCollList[1] = new DynEntityColl[colmap->dynEntCount[1]];
+#else
+			colmap->dynEntDefList[0] = 0;
+			colmap->dynEntDefList[1] = 0;
+			colmap->dynEntPoseList[0] = 0;
+			colmap->dynEntPoseList[1] = 0;
+			colmap->dynEntClientList[0] = 0;
+			colmap->dynEntClientList[1] = 0;
+			colmap->dynEntCollList[0] = 0;
+			colmap->dynEntCollList[1] = 0;
+			colmap->dynEntCount[0] = 0;
+			colmap->dynEntCount[1] = 0;
 #endif
 
 			// parse stages
@@ -332,43 +343,43 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				}
 			}
 
-			if (data->dynEntDefList[0])
-			{
-				for (int i = 0; i < data->dynEntCount[0]; i++)
-				{
-					if (data->dynEntDefList[0][i].xModel)
-					{
-						zone->add_asset_of_type(xmodel, data->dynEntDefList[0][i].xModel->name);
-					}
-					if (data->dynEntDefList[0][i].destroyFx)
-					{
-						zone->add_asset_of_type(fx, data->dynEntDefList[0][i].destroyFx->name);
-					}
-					if (data->dynEntDefList[0][i].physPreset)
-					{
-						zone->add_asset_of_type(physpreset, data->dynEntDefList[0][i].physPreset->name);
-					}
-				}
-			}
+			//if (data->dynEntDefList[0])
+			//{
+			//	for (int i = 0; i < data->dynEntCount[0]; i++)
+			//	{
+			//		if (data->dynEntDefList[0][i].xModel)
+			//		{
+			//			zone->add_asset_of_type(xmodel, data->dynEntDefList[0][i].xModel->name);
+			//		}
+			//		if (data->dynEntDefList[0][i].destroyFx)
+			//		{
+			//			zone->add_asset_of_type(fx, data->dynEntDefList[0][i].destroyFx->name);
+			//		}
+			//		if (data->dynEntDefList[0][i].physPreset)
+			//		{
+			//			zone->add_asset_of_type(physpreset, data->dynEntDefList[0][i].physPreset->name);
+			//		}
+			//	}
+			//}
 
-			if (data->dynEntDefList[1])
-			{
-				for (int i = 0; i < data->dynEntCount[1]; i++)
-				{
-					if (data->dynEntDefList[1][i].xModel)
-					{
-						zone->add_asset_of_type(xmodel, data->dynEntDefList[1][i].xModel->name);
-					}
-					if (data->dynEntDefList[1][i].destroyFx)
-					{
-						zone->add_asset_of_type(fx, data->dynEntDefList[1][i].destroyFx->name);
-					}
-					if (data->dynEntDefList[1][i].physPreset)
-					{
-						zone->add_asset_of_type(physpreset, data->dynEntDefList[1][i].physPreset->name);
-					}
-				}
-			}
+			//if (data->dynEntDefList[1])
+			//{
+			//	for (int i = 0; i < data->dynEntCount[1]; i++)
+			//	{
+			//		if (data->dynEntDefList[1][i].xModel)
+			//		{
+			//			zone->add_asset_of_type(xmodel, data->dynEntDefList[1][i].xModel->name);
+			//		}
+			//		if (data->dynEntDefList[1][i].destroyFx)
+			//		{
+			//			zone->add_asset_of_type(fx, data->dynEntDefList[1][i].destroyFx->name);
+			//		}
+			//		if (data->dynEntDefList[1][i].physPreset)
+			//		{
+			//			zone->add_asset_of_type(physpreset, data->dynEntDefList[1][i].physPreset->name);
+			//		}
+			//	}
+			//}
 
 			if (data->mapEnts)
 			{

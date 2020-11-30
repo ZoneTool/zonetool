@@ -45,6 +45,7 @@ workspace "zonetool"
 	filter {}
 
 	buildoptions "/std:c++latest"
+	buildoptions "/Zc:strictStrings-"
 	systemversion "latest"
 	symbols "On"
 	editandcontinue "Off"
@@ -105,6 +106,7 @@ workspace "zonetool"
 	-- Projects
 	-- ========================
 
+	include "src/ImgPak.lua"
 	include "src/ZoneTool.lua"
 	include "src/ZoneUtils.lua"
 	include "src/IW3.lua"
@@ -112,6 +114,7 @@ workspace "zonetool"
 	include "src/IW5.lua"
 	include "src/CODO.lua"
 
+	ImgPak:project()
 	ZoneTool:project()
 	ZoneUtils:project()
 	IW3:project()

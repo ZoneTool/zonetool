@@ -107,7 +107,7 @@ namespace ZoneTool
 			DB_LoadXAssets(&zone, 1, 1);
 		}
 
-		bool Linker::is_valid_asset_type(std::string& type)
+		bool Linker::is_valid_asset_type(const std::string& type)
 		{
 			return this->type_to_int(type) >= 0;
 		}

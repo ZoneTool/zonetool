@@ -1575,10 +1575,10 @@ namespace ZoneTool
 						}
 
 						endian_convert(&static_model_draw_inst[i].model);
-						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[0]);
+						/*endian_convert(&static_model_draw_inst[i].smodelCacheIndex[0]);
 						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[1]);
 						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[2]);
-						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[3]);
+						endian_convert(&static_model_draw_inst[i].smodelCacheIndex[3]);*/
 						endian_convert(&static_model_draw_inst[i].cullDist);
 						endian_convert(&static_model_draw_inst[i].lightingHandle);
 						endian_convert(&static_model_draw_inst[i].placement.origin[0]);
@@ -1852,7 +1852,7 @@ namespace ZoneTool
 		void IGfxWorld::dump(GfxWorld* asset)
 		{
 			// convert asset to IW5 format
-			auto iw5_asset = new IW5::GfxWorld;
+			auto* iw5_asset = new IW5::GfxWorld;
 			memset(iw5_asset, 0, sizeof IW5::GfxWorld);
 
 			// copy struct data
@@ -1881,7 +1881,7 @@ namespace ZoneTool
 
 			// free memory_
 			delete[] iw5_asset->cells;
-			delete[] iw5_asset;
+			delete iw5_asset;
 		}
 	}
 }

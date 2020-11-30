@@ -1176,6 +1176,7 @@ namespace ZoneTool
 			SoundData sound;
 		};
 
+#pragma pack(push, 4)
 		struct snd_alias_t
 		{
 			const char* aliasName;
@@ -1187,40 +1188,27 @@ namespace ZoneTool
 			int sequence;
 			float volMin;
 			float volMax;
+			int volModIndex;
 			float pitchMin;
 			float pitchMax;
 			float distMin;
 			float distMax;
+			float velocityMin;
 			int flags;
+			char masterPriority;
+			float masterPercentage;
 			float slavePercentage;
 			float probability;
 			float lfePercentage;
 			float centerPercentage;
 			int startDelay;
-			int pad2;
-			char missingData[12]; // need to find out what this is and where its actually placed.
 			SndCurve* volumeFalloffCurve;
 			float envelopMin;
 			float envelopMax;
 			float envelopPercentage;
 			SpeakerMap* speakerMap;
-
-			Json ToJson()
-			{
-				Json data;
-
-				JSON_STRING(aliasName);
-				JSON_STRING(subtitle);
-				JSON_STRING(secondaryAliasName);
-				JSON_STRING(chainAliasName);
-				JSON_STRING(mixerGroup);
-
-				// JSON_ASSET(soundFile, SoundFile);
-				JSON_ASSET(volumeFalloffCurve, SndCurve);
-
-				return data;
-			}
 		};
+#pragma pack(pop)
 
 		struct snd_alias_list_t
 		{
@@ -1232,17 +1220,6 @@ namespace ZoneTool
 
 			snd_alias_t* head;
 			int count;
-
-			Json ToJson()
-			{
-				Json data;
-
-				JSON_STRING(name);
-				JSON_STRUCT_ARR(head, count);
-				JSON_FIELD(count);
-
-				return data;
-			}
 		};
 
 		// Tracers
@@ -1372,8 +1349,8 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames2
 		{
-			__int16* frames;
-			char indices[1];
+			__int16(*frames)[2];
+			XAnimDynamicIndices indices;
 		};
 
 		union XAnimDeltaPartQuatData2
@@ -1390,7 +1367,7 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames
 		{
-			__int16 (*frames)[2];
+			__int16(*frames)[4];
 			XAnimDynamicIndices indices;
 		};
 
@@ -3253,6 +3230,7 @@ namespace ZoneTool
 
 		typedef BYTE _BYTE;
 
+#pragma pack(push, 4)
 		struct StateTimers
 		{
 			int iFireDelay;
@@ -3382,7 +3360,6 @@ namespace ZoneTool
 				};
 				snd_alias_list_t* sounds[48];
 			};
-			
 			snd_alias_list_t** bounceSound;
 			snd_alias_list_t** rollingSound;
 			FxEffectDef* viewShellEjectEffect;
@@ -3709,6 +3686,7 @@ namespace ZoneTool
 			unsigned __int16 stowTag;
 			XModel* stowOffsetModel;
 		};
+#pragma pack(pop)
 
 		struct AnimOverrideEntry
 		{
@@ -4434,106 +4412,6 @@ namespace ZoneTool
 			bool hideIronSightsWithThisAttachment;
 			bool shareAmmoWithAlt;
 			char pad[2];
-
-			void Parse(Json& data, ZoneMemory* mem)
-			{
-				JSON_PARSE_STRING(szInternalName);
-				JSON_PARSE_STRING(szDisplayName);
-
-				JSON_PARSE_INT32(type);
-				JSON_PARSE_INT32(weaponType);
-				JSON_PARSE_INT32(weapClass);
-
-				JSON_PARSE_FLOAT(ammunitionScale);
-				JSON_PARSE_FLOAT(damageScale);
-				JSON_PARSE_FLOAT(damageScaleMin);
-				JSON_PARSE_FLOAT(stateTimersScale);
-				JSON_PARSE_FLOAT(fireTimersScale);
-				JSON_PARSE_FLOAT(idleSettingsScale);
-				JSON_PARSE_FLOAT(adsSettingsScale);
-				JSON_PARSE_FLOAT(adsSettingsScaleMain);
-				JSON_PARSE_FLOAT(hipSpreadScale);
-				JSON_PARSE_FLOAT(gunKickScale);
-				JSON_PARSE_FLOAT(viewKickScale);
-				JSON_PARSE_FLOAT(viewCenterScale);
-				JSON_PARSE_FLOAT(loadIndex);
-				JSON_PARSE_FLOAT(hideIronSightsWithThisAttachment);
-				JSON_PARSE_FLOAT(shareAmmoWithAlt);
-				JSON_PARSE_FLOAT(viewKickScale);
-				JSON_PARSE_FLOAT(viewCenterScale);
-
-				JSON_PARSE_STRUCT(ammogeneral, AttAmmoGeneral);
-				JSON_PARSE_STRUCT(sight, AttSight);
-				JSON_PARSE_STRUCT(reload, AttReload);
-				JSON_PARSE_STRUCT(addOns, AttAddOns);
-				JSON_PARSE_STRUCT(general, AttGeneral);
-				JSON_PARSE_STRUCT(ammunition, AttAmmunition);
-				JSON_PARSE_STRUCT(idleSettings, AttIdleSettings);
-				JSON_PARSE_STRUCT(damage, AttDamage);
-				JSON_PARSE_STRUCT(locationDamage, AttLocationDamage);
-				JSON_PARSE_STRUCT(scopeDriftSettings, AttScopeDriftSettings);
-				JSON_PARSE_STRUCT(adsSettings, AttADSSettings);
-				JSON_PARSE_STRUCT(adsSettingsMain, AttADSSettings);
-				JSON_PARSE_STRUCT(hipSpread, AttHipSpread);
-				JSON_PARSE_STRUCT(gunKick, AttGunKick);
-				JSON_PARSE_STRUCT(viewKick, AttViewKick);
-				JSON_PARSE_STRUCT(adsOverlay, AttADSOverlay);
-				JSON_PARSE_STRUCT(ui, AttUI);
-				JSON_PARSE_STRUCT(rumbles, AttRumbles);
-				JSON_PARSE_STRUCT(projectile, AttProjectile);
-			}
-
-			Json ToJson()
-			{
-				Json data;
-
-				JSON_STRING(szInternalName);
-				JSON_STRING(szDisplayName);
-
-				JSON_FIELD(type);
-				JSON_FIELD(weaponType);
-				JSON_FIELD(weapClass);
-
-				JSON_FIELD(ammunitionScale);
-				JSON_FIELD(damageScale);
-				JSON_FIELD(damageScaleMin);
-				JSON_FIELD(stateTimersScale);
-				JSON_FIELD(fireTimersScale);
-				JSON_FIELD(idleSettingsScale);
-				JSON_FIELD(adsSettingsScale);
-				JSON_FIELD(adsSettingsScaleMain);
-				JSON_FIELD(hipSpreadScale);
-				JSON_FIELD(gunKickScale);
-				JSON_FIELD(viewKickScale);
-				JSON_FIELD(viewCenterScale);
-				JSON_FIELD(loadIndex);
-				JSON_FIELD(hideIronSightsWithThisAttachment);
-				JSON_FIELD(shareAmmoWithAlt);
-				JSON_FIELD(viewKickScale);
-				JSON_FIELD(viewCenterScale);
-
-				JSON_STRUCT(ammogeneral);
-				JSON_STRUCT(sight);
-				JSON_STRUCT(reload);
-				JSON_STRUCT(addOns);
-				JSON_STRUCT(general);
-				JSON_STRUCT(ammunition);
-				JSON_STRUCT(idleSettings);
-				JSON_STRUCT(damage);
-				JSON_STRUCT(locationDamage);
-				JSON_STRUCT(scopeDriftSettings);
-				JSON_STRUCT(adsSettings);
-				JSON_STRUCT(adsSettingsMain);
-				JSON_STRUCT(hipSpread);
-				JSON_STRUCT(gunKick);
-				JSON_STRUCT(viewKick);
-				JSON_STRUCT(adsOverlay);
-				JSON_STRUCT(ui);
-				JSON_STRUCT(rumbles);
-				JSON_STRUCT(projectile);
-
-				return data;
-			}
 		};
 
 #pragma pack(push, 4)
@@ -4726,6 +4604,18 @@ namespace ZoneTool
 		{
 			char* name;
 			FxGlassSystem glassSys;
+		};
+
+		struct FxImpactEntry
+		{
+			FxEffectDef* nonflesh[31];
+			FxEffectDef* flesh[4];
+		};
+
+		struct FxImpactTable
+		{
+			const char* name;
+			FxImpactEntry* table;
 		};
 
 		enum LbColType

@@ -8,6 +8,8 @@
 // ========================================================
 #pragma once
 
+#include <Windows.h>
+
 #include <initializer_list>
 #include <functional>
 #include <filesystem>
@@ -250,7 +252,7 @@ static std::vector<std::string> split(const std::string& rawInput, const std::ve
 	return strings;
 }
 
-static std::vector<std::string> split(std::string& str, char delimiter)
+static std::vector<std::string> split(const std::string& str, char delimiter)
 {
 	return split(str, std::vector<char>({delimiter}));
 }

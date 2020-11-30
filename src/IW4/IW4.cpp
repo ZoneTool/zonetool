@@ -479,11 +479,115 @@ char**>(0x00799278)[type]);
 		{
 			ZONETOOL_INFO("compiling opcode %u", opcode);
 		}
+
+		auto should_log = false;
+		void LogFile(const std::string& log)
+		{
+			if (!should_log)
+			{
+				return;
+			}
+
+			static auto did_delete = false;
+			if (!did_delete && std::filesystem::exists("Z:\\loading-zt.txt"))
+			{
+				did_delete = true;
+				std::filesystem::remove("Z:\\loading-zt.txt");
+			}
+
+			static auto fp = fopen("Z:\\loading-zt.txt", "a");
+			fprintf(fp, log.data());
+			fflush(fp);
+		}
 		
+		void __declspec(naked) Load_Stream(bool atStreamStart, char* data, int count)
+		{
+			static auto load_stream = 0x470E35;
+			__asm
+			{
+				cmp byte ptr[esp + 4], 0;
+				jmp load_stream;
+			}
+		}
+
+		void Load_StreamHook(bool atStreamStart, char* data, int count)
+		{
+			if (atStreamStart)
+			{
+				LogFile(va("Load_Stream: Reading %u bytes.\n", count));
+			}
+
+			Load_Stream(atStreamStart, data, count);
+		}
+
+		void __declspec(naked) DB_PushStreamPos(int stream)
+		{
+			static auto db_pushstreampos = 0x458A25;
+			__asm
+			{
+				mov eax, ds:0x16e5578
+				jmp db_pushstreampos;
+			}
+		}
+
+		void DB_PushStreamPosHook(int stream)
+		{
+			LogFile(va("DB_PushStreamPos: Setting stream to %u\n", stream));
+			DB_PushStreamPos(stream);
+		}
+
+		void __declspec(naked) DB_PopStreamPos()
+		{
+			static auto db_popstreampos = 0x4D1D65;
+			__asm
+			{
+				mov eax, ds:0x16E5548;
+				jmp db_popstreampos;
+			}
+		}
+
+		void DB_PopStreamPosHook()
+		{
+			LogFile(va("DB_PopStreamPos: Popped stream\n"));
+			DB_PopStreamPos();
+		}
+
+		void log_align(int align)
+		{
+			LogFile(va("DB_AllocStreamPos: Aligning buffer by %i\n", align));
+		}
+
+#undef not
+
+		void __declspec(naked) DB_AllocStreamPosHook()
+		{
+			__asm
+			{
+				mov ecx, [esp + 4];
+				pushad;
+				push ecx;
+				call log_align;
+				add esp, 4;
+				popad;
+				mov eax, ds:0x16e5554;
+				add eax, ecx;
+				not ecx;
+				and eax, ecx;
+				mov ds:0x16e5554, eax;
+				retn;
+			}
+		}
+
 		void Linker::startup()
 		{
 			if (this->is_used())
 			{
+				// 
+				Memory(0x470E30).jump(Load_StreamHook);
+				Memory(0x458A20).jump(DB_PushStreamPosHook);
+				Memory(0x4D1D60).jump(DB_PopStreamPosHook);
+				Memory(0x418380).jump(DB_AllocStreamPosHook);
+
 				// for compiling GSC scripts
 				ZoneTool::register_command("compilescript", [](auto args)
 				{
@@ -711,7 +815,7 @@ char**>(0x00799278)[type]);
 		{
 		}
 
-		bool Linker::is_valid_asset_type(std::string& type)
+		bool Linker::is_valid_asset_type(const std::string& type)
 		{
 			return this->type_to_int(type) >= 0;
 		}
@@ -761,6 +865,7 @@ char**>(0x00799278)[type]);
 
 		void Linker::verify_zone(const std::string& name)
 		{
+			should_log = true;
 			isVerifying = true;
 			currentDumpingZone = name;
 			load_zone(name);

@@ -101,43 +101,19 @@ namespace ZoneTool
 		}
 	}
 
-	void build_zone(ILinker* linker, std::string& fastfile)
+	void parse_csv_file(ILinker* linker, IZone* zone, const std::string& fastfile, const std::string& csv_file)
 	{
-		// make sure FS is correct.
-		FileSystem::SetFastFile(fastfile);
-
-		ZONETOOL_INFO("Building fastfile \"%s\" for game \"%s\"", fastfile.data(), linker->version());
-
-		auto zone = linker->alloc_zone(fastfile);
-		if (zone == nullptr)
-		{
-			ZONETOOL_ERROR("An error occured while building fastfile \"%s\": Are you out of memory?", fastfile.data());
-			return;
-		}
-
-		// set default zone target to PC
-		zone->set_target(zone_target::pc);
-
-		if (linker->version() == "IW4"s)
-		{
-			zone->set_target_version(zone_target_version::iw4_release);
-		}
-		else if (linker->version() == "IW5"s)
-		{
-			zone->set_target_version(zone_target_version::iw5_release);
-		}
-		
-		auto path = "zone_source\\" + fastfile + ".csv";
-		const auto parser = CsvParser_new(path.data(), ",", false);
+		auto path = "zone_source\\" + csv_file + ".csv";
+		auto* parser = CsvParser_new(path.data(), ",", false);
 
 		if (!parser)
 		{
-			ZONETOOL_ERROR("Couldn't build zone \"%s\": CSV file does not exist!", fastfile.data());
+			ZONETOOL_ERROR("Could not find csv file \"%s\" to build zone!", csv_file.data());
 			return;
 		}
 
-		auto isReferencing = false;
-		auto row = CsvParser_getRow(parser);
+		auto is_referencing = false;
+		auto* row = CsvParser_getRow(parser);
 		while (row != nullptr)
 		{
 			// parse options
@@ -154,7 +130,11 @@ namespace ZoneTool
 			}
 			if (row->fields_[0] == "require"s)
 			{
-				linker->load_zone(std::string(row->fields_[1]));
+				linker->load_zone(row->fields_[1]);
+			}
+			else if (row->fields_[0] == "include"s)
+			{
+				parse_csv_file(linker, zone, fastfile, row->fields_[1]);
 			}
 			// 
 			else if (row->fields_[0] == "target"s)
@@ -205,7 +185,7 @@ namespace ZoneTool
 			{
 				if (row->numOfFields_ >= 2)
 				{
-					isReferencing = row->fields_[1] == "true"s;
+					is_referencing = row->fields_[1] == "true"s;
 				}
 			}
 			// add assets that are required for maps
@@ -218,22 +198,22 @@ namespace ZoneTool
 			{
 				try
 				{
-					add_assets_using_iterator(fastfile, "fx", "fx", ".fxe", true, zone.get());
-					add_assets_using_iterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone.get());
-					add_assets_using_iterator(fastfile, "xmodel", "XModel", ".xme6", true, zone.get());
+					add_assets_using_iterator(fastfile, "fx", "fx", ".fxe", true, zone);
+					add_assets_using_iterator(fastfile, "xanimparts", "XAnim", ".xae2", true, zone);
+					add_assets_using_iterator(fastfile, "xmodel", "XModel", ".xme6", true, zone);
 				}
 				catch (std::exception& ex)
 				{
 					ZONETOOL_FATAL("A fatal exception occured while building zone \"%s\", exception was: %s\n", fastfile.data(), ex.what());
 				}
 			}
-				// this will force external assets to be used
+			// this will force external assets to be used
 			else if (row->fields_[0] == "forceExternalAssets"s)
 			{
 				ZONETOOL_WARNING("forceExternalAssets has been turned on!");
 				FileSystem::ForceExternalAssets(true);
 			}
-				// if entry is not an option, it should be an asset.
+			// if entry is not an option, it should be an asset.
 			else
 			{
 				if (row->fields_[0] == "localize"s && row->numOfFields_ >= 3)
@@ -269,13 +249,13 @@ namespace ZoneTool
 				{
 					if (row->numOfFields_ >= 2)
 					{
-						if (linker->is_valid_asset_type(std::string(row->fields_[0])))
+						if (linker->is_valid_asset_type(row->fields_[0]))
 						{
 							try
 							{
 								zone->add_asset_of_type(
 									row->fields_[0],
-									((isReferencing) ? ","s : ""s) + row->fields_[1]
+									((is_referencing) ? ","s : ""s) + row->fields_[1]
 								);
 							}
 							catch (std::exception& ex)
@@ -295,6 +275,35 @@ namespace ZoneTool
 
 		// free csv parser
 		CsvParser_destroy(parser);
+	}
+	
+	void build_zone(ILinker* linker, const std::string& fastfile)
+	{
+		// make sure FS is correct.
+		FileSystem::SetFastFile(fastfile);
+
+		ZONETOOL_INFO("Building fastfile \"%s\" for game \"%s\"", fastfile.data(), linker->version());
+
+		auto zone = linker->alloc_zone(fastfile);
+		if (zone == nullptr)
+		{
+			ZONETOOL_ERROR("An error occured while building fastfile \"%s\": Are you out of memory?", fastfile.data());
+			return;
+		}
+
+		// set default zone target to PC
+		zone->set_target(zone_target::pc);
+
+		if (linker->version() == "IW4"s)
+		{
+			zone->set_target_version(zone_target_version::iw4_release);
+		}
+		else if (linker->version() == "IW5"s)
+		{
+			zone->set_target_version(zone_target_version::iw5_release);
+		}
+		
+		parse_csv_file(linker, zone.get(), fastfile, fastfile);
 
 		// allocate zone buffer
 		auto buffer = linker->alloc_buffer();

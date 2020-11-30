@@ -63,7 +63,19 @@ namespace ZoneTool
 		void IStructuredDataDef::patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex,
 		                                          std::map<int, newEnumEntry*> map)
 		{
-			StructuredDataEnum* currentEnum = &data->defs->enums[enumIndex];
+			StructuredDataDef* current_def = nullptr;
+			auto current_version = 0;
+
+			for (auto i = 0; i < data->defCount; i++)
+			{
+				if (data->defs[i].version > current_version)
+				{
+					current_version = data->defs[i].version;
+					current_def = &data->defs[i];
+				}
+			}
+
+			StructuredDataEnum* currentEnum = &current_def->enums[enumIndex];
 
 			// Check if new enum has already been built
 			if (newIndexCount[enumIndex])
@@ -156,7 +168,7 @@ namespace ZoneTool
 			}
 
 			// Patch mp/playerdata.def if needed
-			if (!strcmp(data->name, "mp/playerdata.def"))
+			if (data->name == "mp/playerdata.def"s)
 			{
 				// Weapons
 				addEntry(ENUM_WEAPONS, 1, "iw5_ak74u");
@@ -170,20 +182,20 @@ namespace ZoneTool
 				// addEntry(ENUM_GAMETYPES, 3, "gtnw");
 
 				// Custom camos
-				addEntry(ENUM_CAMOS, 1, "plutonium");
+				//addEntry(ENUM_CAMOS, 1, "plutonium");
 
 				// Reticles
-				addEntry(ENUM_RETICLES, 1, "ret7");
-				addEntry(ENUM_RETICLES, 2, "ret8");
-				addEntry(ENUM_RETICLES, 3, "ret9");
-				addEntry(ENUM_RETICLES, 4, "ret10");
+				//addEntry(ENUM_RETICLES, 1, "ret7");
+				//addEntry(ENUM_RETICLES, 2, "ret8");
+				//addEntry(ENUM_RETICLES, 3, "ret9");
+				//addEntry(ENUM_RETICLES, 4, "ret10");
 
 				// Attachments
 				// 
 
 				ZONETOOL_INFO("Statfiles patched.");
 			}
-			if (!strcmp(data->name, "mp/recipes.def"))
+			else if (data->name == "mp/recipes.def"s)
 			{
 				// Weapons
 				addEntry((enumType_s)0, 1, "iw5_ak74u");
@@ -191,14 +203,14 @@ namespace ZoneTool
 				addEntry((enumType_s)0, 2, "iw5_cheytac");
 				addEntry((enumType_s)6, 2, "iw5_cheytac");
 
-				// Custom camos
-				addEntry((enumType_s)2, 1, "plutonium");
+				//// Custom camos
+				//addEntry((enumType_s)2, 1, "plutonium");
 
-				// Reticles
-				addEntry((enumType_s)5, 1, "ret7");
-				addEntry((enumType_s)5, 2, "ret8");
-				addEntry((enumType_s)5, 3, "ret9");
-				addEntry((enumType_s)5, 4, "ret10");
+				//// Reticles
+				//addEntry((enumType_s)5, 1, "ret7");
+				//addEntry((enumType_s)5, 2, "ret8");
+				//addEntry((enumType_s)5, 3, "ret9");
+				//addEntry((enumType_s)5, 4, "ret10");
 
 				// Gametypes
 				// addEntry((enum_type)9, 1, "oneflag");
@@ -207,9 +219,38 @@ namespace ZoneTool
 
 				ZONETOOL_INFO("Recipes patched.");
 			}
+			else if (data->name == "mp/prestigedata.def"s)
+			{
+				addEntry((enumType_s)5, 1, "iw5_ak74u");
+				addEntry((enumType_s)7, 1, "iw5_ak74u");
+				addEntry((enumType_s)5, 2, "iw5_cheytac");
+				addEntry((enumType_s)7, 2, "iw5_cheytac");
+			}
+			else if (data->name == "mp/resetdata.def"s)
+			{
+				addEntry((enumType_s)0, 1, "iw5_ak74u");
+				addEntry((enumType_s)0, 2, "iw5_cheytac");
+			}
+			else if (data->name == "mp/elitecreateaclass.def"s)
+			{
+				addEntry((enumType_s)1, 1, "iw5_ak74u");
+				addEntry((enumType_s)1, 2, "iw5_cheytac");
+			}
+			else if (data->name == "mp/clientmatchdata.def"s)
+			{
+				addEntry((enumType_s)0, 1, "iw5_ak74u");
+				addEntry((enumType_s)0, 2, "iw5_cheytac");
+			}
+			else if (data->name == "mp/matchdata.def"s)
+			{
+				addEntry((enumType_s)3, 1, "iw5_ak74u");
+				addEntry((enumType_s)4, 1, "iw5_ak74u");
+				addEntry((enumType_s)3, 2, "iw5_cheytac");
+				addEntry((enumType_s)4, 2, "iw5_cheytac");
+			}
 
 			// Increment version
-			data->defs->version += 1;
+			// data->defs->version += 1;
 
 			// Patch enums
 			for (int i = 0; i < ENUM_COUNT; i++)
@@ -361,6 +402,31 @@ namespace ZoneTool
 
 		void IStructuredDataDef::dump(StructuredDataDefSet* asset)
 		{
+			ZONETOOL_INFO("loading \"%s\"", asset->name);
+
+			if (asset)
+			{
+				StructuredDataDef* current_def = nullptr;
+				auto current_version = 0;
+
+				for (auto i = 0; i < asset->defCount; i++)
+				{
+					if (asset->defs[i].version > current_version)
+					{
+						current_version = asset->defs[i].version;
+						current_def = &asset->defs[i];
+					}
+				}
+
+				for (auto i = 0; i < current_def->enumCount; i++)
+				{
+					ZONETOOL_INFO("\tenum %i:", i);
+					for (auto j = 0; j < current_def->enums[i].entryCount; j++)
+					{
+						ZONETOOL_INFO("\t\t%i: %s", current_def->enums[i].entries[j].index, current_def->enums[i].entries[j].name);
+					}
+				}
+			}
 		}
 	}
 }

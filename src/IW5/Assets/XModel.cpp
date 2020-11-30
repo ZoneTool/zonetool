@@ -108,15 +108,141 @@ namespace ZoneTool
 		}
 
 		XModel* IXModel::parse(std::string name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
-		{
+		{			
 			return IXModel::parse_new(name, mem, "XModel\\" + name + ".xme6", allocString);
 		}
 
 		void IXModel::init(const std::string& name, ZoneMemory* mem)
 		{
+			this->is_scope_model_ = false;
 			this->name_ = name;
-			this->asset_ = this->parse(name, mem);
+						
+			if ((name.find("weapon_") != std::string::npos || name.find("viewmodel_") != std::string::npos) &&
+				name.find("_scope") != std::string::npos &&
+				!FileSystem::FileExists("XModel\\" + name + ".xme6"))
+			{
+				const auto model = IXModel::parse_new(name, mem, "XModel\\" + name.substr(0, name.size() - 6) + ".xme6", SL_AllocString);
 
+				if (model != nullptr)
+				{
+					ZONETOOL_INFO("Raping sniper model to create a scope!");
+
+					std::vector<XSurface> allocated_surfaces;
+					std::vector<std::pair<Material*, std::int32_t>> scope_surfaces;
+
+					for (auto i = 0u; i < model->lods[0].numSurfacesInLod; i++)
+					{
+						if (static_cast<std::string>(model->materials[i]->name).find("scope") != std::string::npos)
+						{
+							scope_surfaces.push_back({ model->materials[i], i });
+						}
+					}
+
+					if (scope_surfaces.empty())
+					{
+						ZONETOOL_FATAL("Trying to rebuild scope model failed: No surfaces to build scope model!");
+					}
+
+					// alloc surfaces
+					allocated_surfaces.resize(scope_surfaces.size());
+
+					// force parse XSurfaces
+					const auto surfaces = IXSurface::parse(model->lods[0].surfaces->name, mem);
+
+					// copy XSurfaces
+					for (auto i = 0u; i < scope_surfaces.size(); i++)
+					{
+						memcpy(&allocated_surfaces[i], &surfaces->xSurficies[scope_surfaces[i].second], sizeof XSurface);
+					}
+
+					// rebuild surfaces / model info
+					model->numLods = 1;
+					model->numSurfaces = scope_surfaces.size();
+
+					// kill other lod data
+					memset(&model->lods[1], 0, sizeof XSurfaceLod * 3);
+
+					// fix materials
+					for (auto i = 0u; i < scope_surfaces.size(); i++)
+					{
+						model->materials[i] = scope_surfaces[i].first;
+					}
+
+					// rebuild lod
+					model->lods[0].numSurfacesInLod = allocated_surfaces.size();
+					model->lods[0].surfaces->name = mem->StrDup(va("%s_scope", model->lods[0].surfaces->name));
+					model->lods[0].surfaces->xSurficiesCount = allocated_surfaces.size();
+					model->lods[0].surfaces->xSurficies = new XSurface[allocated_surfaces.size()];
+					memcpy(model->lods[0].surfaces->xSurficies, allocated_surfaces.data(), sizeof XSurface * allocated_surfaces.size());
+
+					// remove all bones besides for tag_scope
+					XBoneInfo scope_info = {};
+					auto found_bone = false;
+					
+					for (auto i = 0u; i < model->numBones; i++)
+					{
+						if (SL_ConvertToString(model->boneNames[i]) == "tag_scope"s)
+						{
+							memcpy(&scope_info, &model->boneInfo[i], sizeof XBoneInfo);
+							found_bone = true;
+							break;
+						}
+					}
+
+					if (found_bone)
+					{
+						model->numBones = 0;
+						model->numRootBones = 0;
+						memcpy(&model->boneInfo[0], &scope_info, sizeof XBoneInfo);
+						model->boneNames[0] = SL_AllocString("tag_scope");
+					}
+					else
+					{
+						ZONETOOL_FATAL("You dun goofed");
+					}
+
+					// test
+					model->numColSurfs = 0;
+					model->numSurfaces = 0;
+
+					for (auto i = 0; i < 4; i++)
+					{
+						model->lods[i].numSurfacesInLod = 0;
+						if (model->lods[i].surfaces)
+						{
+							model->lods[i].surfaces->xSurficiesCount = 0;
+						}
+					}
+					
+					//
+					this->is_scope_model_ = true;
+					this->asset_ = model;
+				}
+			}
+			else
+			{
+				this->asset_ = this->parse(name, mem);
+				
+				// fix tags
+				//for (auto i = 0u; i < this->asset_->numBones; i++)
+				//{
+				//	auto tag_name = std::string(SL_ConvertToString(this->asset_->boneNames[i]));
+
+				//	// fix xmodel tags
+				//	if (tag_name.find("tag_") != std::string::npos &&
+				//		tag_name.find("_scope") != std::string::npos &&
+				//		tag_name.find("thermal") == std::string::npos)
+				//	{
+				//		ZONETOOL_INFO("fixing tag %s -> tag_scope", tag_name.data());
+				//		this->asset_->boneNames[i] = SL_AllocString("tag_scope");
+				//	}
+				//}
+
+			}
+			
+			// don't reparse the surfaces
+			// this->is_scope_model_ = true;
+			
 			if (!this->asset_)
 			{
 				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data(), 1).xmodel;
@@ -166,12 +292,19 @@ namespace ZoneTool
 			}
 
 			// XSurfaces
-			for (std::int32_t i = 0; i < 4; i++)
+			for (auto i = 0u; i < data->numLods; i++)
 			{
 				if (data->lods[i].surfaces)
 				{
-					// Add the pointer rather than re-finding it by name, because it might have been parsed.
-					zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
+					// write by pointer when fucking with scopes
+					if (is_scope_model_)
+					{
+						zone->add_asset_of_type_by_pointer(xmodelsurfs, data->lods[i].surfaces);
+					}
+					else
+					{
+						zone->add_asset_of_type(xmodelsurfs, data->lods[i].surfaces->name);
+					}
 				}
 			}
 

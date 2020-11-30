@@ -270,21 +270,11 @@ namespace ZoneTool
 				if (asset->delta->quat2)
 				{
 					asset->delta->quat2 = reader.read_raw<XAnimDeltaPartQuat2>();
-
-					if (asset->delta->quat2->size && asset->delta->quat2->u.frames.frames)
-					{
-						asset->delta->quat2->u.frames.frames = reader.read_raw<short>();
-					}
 				}
 				
 				if (asset->delta->quat)
 				{
 					asset->delta->quat = reader.read_raw<XAnimDeltaPartQuat>();
-
-					if (asset->delta->quat->size && asset->delta->quat->u.frames.frames)
-					{
-						asset->delta->quat->u.frames.frames = reader.read_raw<short[2]>();
-					}
 				}
 			}
 
@@ -812,6 +802,11 @@ namespace ZoneTool
 						{
 							extra_size += asset->delta->quat2->size + 1;
 						}
+
+						if (asset->delta->quat2->u.frames.frames)
+						{
+							extra_size += (asset->delta->quat2->size * 4) + 4;
+						}
 					}
 					else
 					{
@@ -820,11 +815,6 @@ namespace ZoneTool
 					}
 
 					dump.dump_raw(asset->delta->quat2, sizeof(XAnimDeltaPartQuat2) + extra_size);
-
-					if (asset->delta->quat2->size && asset->delta->quat2->u.frames.frames)
-					{
-						dump.dump_raw(asset->delta->quat2->u.frames.frames, (asset->delta->quat2->size * 4) + 4);
-					}
 				}
 
 				if (asset->delta->quat)
@@ -841,6 +831,11 @@ namespace ZoneTool
 						{
 							extra_size += asset->delta->quat->size + 1;
 						}
+
+						if (asset->delta->quat->u.frames.frames)
+						{
+							extra_size += (asset->delta->quat->size * 8) + 8;
+						}
 					}
 					else
 					{
@@ -849,11 +844,6 @@ namespace ZoneTool
 					}
 
 					dump.dump_raw(asset->delta->quat, sizeof(XAnimDeltaPartQuat) + extra_size);
-
-					if (asset->delta->quat->size && asset->delta->quat->u.frames.frames)
-					{
-						dump.dump_raw(asset->delta->quat->u.frames.frames, (asset->delta->quat->size * 8) + 8);
-					}
 				}
 			}
 

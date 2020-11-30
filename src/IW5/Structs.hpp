@@ -1349,8 +1349,8 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames2
 		{
-			__int16* frames;
-			char indices[1];
+			__int16(*frames)[2];
+			XAnimDynamicIndices indices;
 		};
 
 		union XAnimDeltaPartQuatData2
@@ -1367,7 +1367,7 @@ namespace ZoneTool
 
 		struct XAnimDeltaPartQuatDataFrames
 		{
-			__int16 (*frames)[2];
+			__int16(*frames)[4];
 			XAnimDynamicIndices indices;
 		};
 

@@ -123,6 +123,7 @@ Special thanks to the following people:
 * X3RX35
 * homura
 * Sofika
+* Gamecheat13
 
 ## Discord
 Join our discord server at https://discord.gg/a6JM2Tv or https://discord.gg/plutonium

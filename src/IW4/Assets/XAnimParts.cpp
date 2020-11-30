@@ -74,9 +74,9 @@ namespace ZoneTool::IW4
 
 	void IXAnimParts::write(IZone* zone, ZoneBuffer* buf)
 	{
-		auto data = this->asset_;
-		auto dest = buf->write(data);
-		
+		auto* data = this->asset_;
+		auto* dest = buf->write(data);
+
 		buf->push_stream(3);
 		START_LOG_STREAM;
 
@@ -88,7 +88,7 @@ namespace ZoneTool::IW4
 			buf->write_stream(data->tagnames, sizeof(short), data->boneCount[9]);
 			dest->tagnames = reinterpret_cast<unsigned short*>(-1);
 		}
-		if (data->notify) // notify
+		if (data->notify) // notetracks
 		{
 			buf->align(3);
 			buf->write_stream(data->notify, sizeof(XAnimNotifyInfo), data->notifyCount);
@@ -98,9 +98,8 @@ namespace ZoneTool::IW4
 		if (data->delta) // XAnimDeltaParts
 		{
 			buf->align(3);
-
-			auto partdata = data->delta;
-			auto partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
+			auto* partdata = data->delta;
+			auto* partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
 			buf->write_stream(partdata, sizeof(XAnimDeltaPart), 1);
 
 			if (partdata->trans)
@@ -112,10 +111,10 @@ namespace ZoneTool::IW4
 					buf->write_stream(&partdata->trans->u, 0x1C, 1); // not full struct
 					if (data->framecount > 0x100)
 						buf->write_stream(&partdata->trans->u.frames.indices,
-						                  sizeof(short), partdata->trans->size + 1);
+							sizeof(short), partdata->trans->size + 1);
 					else
 						buf->write_stream(&partdata->trans->u.frames.indices, sizeof(char),
-						                  partdata->trans->size + 1);
+							partdata->trans->size + 1);
 
 					if (partdata->trans->u.frames.frames._1)
 					{
@@ -123,16 +122,14 @@ namespace ZoneTool::IW4
 						{
 							buf->align(0);
 							buf->write_stream(partdata->trans->u.frames.frames._1, sizeof(char) * 3,
-							                  partdata->trans->size + 1);
+								partdata->trans->size + 1);
 						}
 						else
 						{
 							buf->align(3);
 							buf->write_stream(partdata->trans->u.frames.frames._2, sizeof(short) * 3,
-							                  partdata->trans->size + 1);
+								partdata->trans->size + 1);
 						}
-
-						//dest->trans->u.frames.frames = (char*)-1;
 					}
 				}
 				else buf->write_stream(partdata->trans->u.frame0, sizeof(float), 3);
@@ -141,27 +138,34 @@ namespace ZoneTool::IW4
 
 			if (partdata->quat2)
 			{
+				ZONETOOL_INFO("Write - Delta:Quat2");
 				buf->align(3);
 				buf->write_stream(partdata->quat2, 4, 1); // not full struct
 				if (partdata->quat2->size)
 				{
 					buf->write_stream(&partdata->quat2->u, 0x4, 1); // not full struct
-					if (data->framecount > 0x100)
+					if (data->framecount > 255)
+					{
 						buf->write_stream(&partdata->quat2->u.frames.indices,
-						                  sizeof(short), partdata->quat2->size + 1);
+							sizeof(short), partdata->quat2->size + 1);
+					}
 					else
+					{
 						buf->write_stream(&partdata->quat2->u.frames.indices, sizeof(char),
-						                  partdata->quat2->size + 1);
+							partdata->quat2->size + 1);
+					}
 
 					if (partdata->quat2->u.frames.frames)
 					{
 						buf->align(3);
 						buf->write_stream(partdata->quat2->u.frames.frames, sizeof(short) * 2,
-						                  partdata->quat2->size + 1);
-						//dest->quat2->u.frames.frames = (short*)-1;
+							partdata->quat2->size + 1);
 					}
 				}
-				else buf->write_stream(partdata->quat2->u.frame0, sizeof(short) * 2, 1);
+				else
+				{
+					buf->write_stream(partdata->quat2->u.frame0, sizeof(short) * 2, 1);
+				}
 				partdest->quat2 = reinterpret_cast<XAnimDeltaPartQuat2*>(-1);
 			}
 
@@ -169,26 +173,33 @@ namespace ZoneTool::IW4
 			{
 				buf->align(3);
 				buf->write_stream(partdata->quat, 4, 1);
+
 				if (partdata->quat->size)
 				{
 					buf->write_stream(&partdata->quat->u, 4, 1); // not full struct
 
-					if (data->framecount > 0x100)
+					if (data->framecount > 255)
+					{
 						buf->write_stream(&partdata->quat->u.frames.indices,
-						                  sizeof(short), partdata->quat->size + 1);
+							sizeof(short), partdata->quat->size + 1);
+					}
 					else
+					{
 						buf->write_stream(&partdata->quat->u.frames.indices, sizeof(char),
-						                  partdata->quat->size + 1);
+							partdata->quat->size + 1);
+					}
 
 					if (partdata->quat->u.frames.frames)
 					{
 						buf->align(3);
 						buf->write_stream(partdata->quat->u.frames.frames, sizeof(short) * 4,
-						                  partdata->quat->size + 1);
+							partdata->quat->size + 1);
 					}
 				}
 				else
+				{
 					buf->write_stream(partdata->quat->u.frame0, sizeof(short) * 4, 1);
+				}
 
 				partdest->quat = reinterpret_cast<XAnimDeltaPartQuat*>(-1);
 			}

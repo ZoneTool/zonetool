@@ -186,7 +186,6 @@ namespace ZoneTool
 			}
 
 			ZONETOOL_INFO("Parsing XAE3 file \"%s\"...", name.c_str());
-			ZONETOOL_WARNING("You are using an outdated animation! Redump the animations using a newer version of zonetool!");
 
 			auto* asset = reader.read_single<XAnimParts>();
 			asset->name = reader.read_string();

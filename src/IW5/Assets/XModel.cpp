@@ -100,21 +100,6 @@ namespace ZoneTool
 			asset->physPreset = read.read_asset<PhysPreset>();
 			asset->physCollmap = read.read_asset<PhysCollmap>();
 
-			// fix tags
-			for (auto i = 0u; i < asset->numBones; i++)
-			{
-				auto tag_name = std::string(SL_ConvertToString(asset->boneNames[i]));
-
-				// fix xmodel tags
-				if (tag_name.find("tag_") != std::string::npos &&
-					tag_name.find("_scope") != std::string::npos &&
-					tag_name.find("thermal") == std::string::npos)
-				{
-					ZONETOOL_INFO("fixing tag %s -> tag_scope", tag_name.data());
-					asset->boneNames[i] = SL_AllocString("tag_scope");
-				}
-			}
-			
 #ifdef USE_VMPROTECT
 			VMProtectEnd();
 #endif
@@ -237,6 +222,22 @@ namespace ZoneTool
 			else
 			{
 				this->asset_ = this->parse(name, mem);
+				
+				// fix tags
+				//for (auto i = 0u; i < this->asset_->numBones; i++)
+				//{
+				//	auto tag_name = std::string(SL_ConvertToString(this->asset_->boneNames[i]));
+
+				//	// fix xmodel tags
+				//	if (tag_name.find("tag_") != std::string::npos &&
+				//		tag_name.find("_scope") != std::string::npos &&
+				//		tag_name.find("thermal") == std::string::npos)
+				//	{
+				//		ZONETOOL_INFO("fixing tag %s -> tag_scope", tag_name.data());
+				//		this->asset_->boneNames[i] = SL_AllocString("tag_scope");
+				//	}
+				//}
+
 			}
 			
 			// don't reparse the surfaces

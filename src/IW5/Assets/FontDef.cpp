@@ -27,7 +27,7 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data()).font;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data(), 1).font;
 			}
 		}
 

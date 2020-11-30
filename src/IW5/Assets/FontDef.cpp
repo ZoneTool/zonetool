@@ -95,12 +95,6 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
-#define FONT_STRING(target, parent, prop) target prop = strdup(parent[#prop].get<std::string>().c_str())
-#define FONT_FLOAT(target, parent, prop) target prop = parent[#prop].get<float>()
-#define FONT_INT(target, parent, prop) target prop = parent[#prop].get<int>()
-#define FONT_BYTE(target, parent, prop) target prop = parent[#prop].get<char>()
-#define FONT_USHORT(target, parent, prop) target prop = parent[#prop].get<unsigned __int16>()
-
 		Font_s* IFontDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = name;
@@ -120,8 +114,8 @@ namespace ZoneTool
 
 			auto font = mem->Alloc<Font_s>();
 			font->name = strdup(fontdata["fontName"].get<std::string>().c_str());
-			FONT_INT(font->, fontdata, glyphCount);
-			FONT_INT(font->, fontdata, pixelHeight);
+			font->glyphCount = fontdata["glyphCount"].get<int>();
+			font->pixelHeight = fontdata["pixelHeight"].get<int>();
 
 			font->material = mem->Alloc<Material>();
 			font->material->name = strdup(fontdata["material"].get<std::string>().c_str());
@@ -132,16 +126,16 @@ namespace ZoneTool
 
 			for (int i = 0; i < font->glyphCount; i++)
 			{
-				FONT_USHORT(font->glyphs[i]., fontdata["glyphs"][i], letter);
-				FONT_BYTE(font->glyphs[i]., fontdata["glyphs"][i], x0);
-				FONT_BYTE(font->glyphs[i]., fontdata["glyphs"][i], y0);
-				FONT_BYTE(font->glyphs[i]., fontdata["glyphs"][i], dx);
-				FONT_BYTE(font->glyphs[i]., fontdata["glyphs"][i], pixelWidth);
-				FONT_BYTE(font->glyphs[i]., fontdata["glyphs"][i], pixelHeight);
-				FONT_FLOAT(font->glyphs[i]., fontdata["glyphs"][i], s0);
-				FONT_FLOAT(font->glyphs[i]., fontdata["glyphs"][i], t0);
-				FONT_FLOAT(font->glyphs[i]., fontdata["glyphs"][i], s1);
-				FONT_FLOAT(font->glyphs[i]., fontdata["glyphs"][i], t1);
+				font->glyphs[i].letter = fontdata["glyphs"][i].get<unsigned __int16>();
+				font->glyphs[i].x0 = fontdata["glyphs"][i].get<char>();
+				font->glyphs[i].y0 = fontdata["glyphs"][i].get<char>();
+				font->glyphs[i].dx = fontdata["glyphs"][i].get<char>();
+				font->glyphs[i].pixelWidth = fontdata["glyphs"][i].get<char>();
+				font->glyphs[i].pixelHeight = fontdata["glyphs"][i].get<char>();
+				font->glyphs[i].s0, fontdata["glyphs"][i].get<float>();
+				font->glyphs[i].t0, fontdata["glyphs"][i].get<float>();
+				font->glyphs[i].s1, fontdata["glyphs"][i].get<float>();
+				font->glyphs[i].t1, fontdata["glyphs"][i].get<float>();
 			}
 
 			return font;

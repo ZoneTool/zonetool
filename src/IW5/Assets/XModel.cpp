@@ -206,8 +206,8 @@ namespace ZoneTool
 
 					if (found_bone)
 					{
-						model->numBones = 1;
-						model->numRootBones = 1;
+						model->numBones = 0;
+						model->numRootBones = 0;
 						memcpy(&model->boneInfo[0], &scope_info, sizeof XBoneInfo);
 						model->boneNames[0] = SL_AllocString("tag_scope");
 					}

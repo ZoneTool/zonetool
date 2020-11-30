@@ -25,6 +25,7 @@ namespace ZoneTool
 		DUMP_TYPE_ARRAY = 3,
 		DUMP_TYPE_OFFSET = 4,
 		DUMP_TYPE_FLOAT = 5,
+		DUMP_TYPE_RAW = 6,
 	};
 
 	const char DUMP_EXISTING = 1;
@@ -223,6 +224,46 @@ namespace ZoneTool
 		template <typename T> void dump_single(T* asset)
 		{
 			return this->dump_array(asset, 1);
+		}
+
+		template <typename T> void dump_raw(T* data, int size)
+		{
+			if (fp)
+			{
+				if (data && size > 0)
+				{
+					int listIndex = 0;
+					for (auto oldEntry : list)
+					{
+						if (sizeof(T) == oldEntry.entrySize &&
+							// Filter out the structs it definitely can't be without having to actually save what struct it is
+							reinterpret_cast<int>(oldEntry.start) <= int(data) && // Check if it is in the range of the current array
+							reinterpret_cast<int>(oldEntry.start) + (oldEntry.entryCount ? oldEntry.entryCount - 1 : 0) * oldEntry.
+							entrySize >= int(data) && // ^
+							(int(data) - reinterpret_cast<int>(oldEntry.start)) % oldEntry.entrySize == 0)
+							// Check if the data is actually at the start of an array entry
+						{
+							this->write_internal<std::int32_t>(listIndex, DUMP_TYPE_OFFSET);
+							this->write_internal<std::int32_t>((int(data) - reinterpret_cast<int>(oldEntry.start)) / oldEntry.entrySize);
+							return;
+						}
+						listIndex++;
+					}
+
+					dumpListEntry entry;
+					entry.entryCount = 1;
+					entry.entrySize = size;
+					entry.start = static_cast<void*>(data);
+					list.push_back(entry);
+
+					this->write_internal<std::uint32_t>(size, DUMP_TYPE_RAW);
+					fwrite(data, size, 1, fp);
+				}
+				else
+				{
+					this->write_internal<std::uint32_t>(0, DUMP_TYPE_RAW);
+				}
+			}
 		}
 	};
 
@@ -480,6 +521,47 @@ namespace ZoneTool
 		template <typename T> T* read_single()
 		{
 			return this->read_array<T>();
+		}
+
+		template <typename T> T* read_raw()
+		{
+			if (fp_)
+			{
+				const auto type = this->read_internal<char>();
+
+				if (type == DUMP_TYPE_RAW)
+				{
+					const auto size = this->read_internal<std::uint32_t>();
+
+					if (size <= 0)
+					{
+						return nullptr;
+					}
+
+					auto nArray = memory_->ManualAlloc<T>(size);
+					fread(static_cast<void*>(nArray), size, 1, fp_);
+
+					dumpListEntry entry;
+					entry.entryCount = 1;
+					entry.entrySize = size;
+					entry.start = static_cast<void*>(nArray);
+					list.push_back(entry);
+
+					return nArray;
+				}
+				if (type == DUMP_TYPE_OFFSET)
+				{
+					const auto listIndex = this->read_internal<int>();
+					const auto arrayIndex = this->read_internal<int>();
+
+					return reinterpret_cast<T*>(reinterpret_cast<int>(list[listIndex].start) + list[listIndex].entrySize * arrayIndex);
+				}
+
+				printf("Reader error: Type not DUMP_TYPE_ARRAY or DUMP_TYPE_OFFSET but %i\n", type);
+				throw;
+			}
+
+			return nullptr;
 		}
 	};
 }

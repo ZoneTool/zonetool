@@ -19,7 +19,7 @@ namespace ZoneTool
 		{
 			const auto path = "XAnim\\"s + name + ".xae"s;
 
-			const auto file = FileSystem::FileOpen(path, "rb");
+			auto* file = FileSystem::FileOpen(path, "rb");
 			if (!file)
 			{
 				return nullptr;
@@ -107,7 +107,10 @@ namespace ZoneTool
 				return nullptr;
 			}
 
-			auto asset = reader.read_single<XAnimParts>();
+			ZONETOOL_INFO("Parsing XAE2 file \"%s\"...", name.c_str());
+			ZONETOOL_WARNING("You are using an outdated animation! Redump the animations using a newer version of zonetool!");
+
+			auto* asset = reader.read_single<XAnimParts>();
 			asset->name = reader.read_string();
 
 			asset->tagnames = mem->Alloc<unsigned short>(asset->boneCount[9]);
@@ -172,10 +175,132 @@ namespace ZoneTool
 			return asset;
 		}
 
+		XAnimParts* IXAnimParts::parse_xae3(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
+		{
+			const auto path = "XAnim\\"s + name + ".xae3";
+
+			AssetReader reader(mem);
+			if (!reader.open(path))
+			{
+				return nullptr;
+			}
+
+			ZONETOOL_INFO("Parsing XAE3 file \"%s\"...", name.c_str());
+			ZONETOOL_WARNING("You are using an outdated animation! Redump the animations using a newer version of zonetool!");
+
+			auto* asset = reader.read_single<XAnimParts>();
+			asset->name = reader.read_string();
+
+			asset->tagnames = mem->Alloc<unsigned short>(asset->boneCount[9]);
+			for (auto bone = 0; bone < asset->boneCount[9]; bone++)
+			{
+				asset->tagnames[bone] = allocString(reader.read_string());
+			}
+
+			if (asset->dataByte)
+			{
+				asset->dataByte = reader.read_array<char>();
+			}
+			if (asset->dataShort)
+			{
+				asset->dataShort = reader.read_array<short>();
+			}
+			if (asset->dataInt)
+			{
+				asset->dataInt = reader.read_array<int>();
+			}
+			if (asset->randomDataShort)
+			{
+				asset->randomDataShort = reader.read_array<short>();
+			}
+			if (asset->randomDataByte)
+			{
+				asset->randomDataByte = reader.read_array<char>();
+			}
+			if (asset->randomDataInt)
+			{
+				asset->randomDataInt = reader.read_array<int>();
+			}
+			if (asset->indices.data)
+			{
+				if (asset->framecount > 255)
+				{
+					asset->indices._2 = reader.read_array<std::uint16_t>();
+				}
+				else
+				{
+					asset->indices._1 = reader.read_array<char>();
+				}
+			}
+
+			if (asset->notetracks)
+			{
+				asset->notetracks = reader.read_array<XAnimNotifyInfo>();
+
+				for (auto i = 0; i < asset->notetrackCount; i++)
+				{
+					asset->notetracks[i].name = allocString(reader.read_string());
+				}
+			}
+
+			if (asset->delta)
+			{
+				asset->delta = reader.read_single<XAnimDeltaPart>();
+
+				if (asset->delta->trans)
+				{
+					asset->delta->trans = reader.read_raw<XAnimPartTrans>();
+
+					if (asset->delta->trans->size)
+					{
+						if (asset->delta->trans->u.frames.frames._1)
+						{
+							if (asset->delta->trans->smallTrans)
+							{
+								asset->delta->trans->u.frames.frames._1 = reader.read_raw<char[3]>();
+							}
+							else
+							{
+								asset->delta->trans->u.frames.frames._2 = reader.read_raw<unsigned short[3]>();
+							}
+						}
+					}
+				}
+
+				if (asset->delta->quat2)
+				{
+					asset->delta->quat2 = reader.read_raw<XAnimDeltaPartQuat2>();
+
+					if (asset->delta->quat2->size && asset->delta->quat2->u.frames.frames)
+					{
+						asset->delta->quat2->u.frames.frames = reader.read_raw<short>();
+					}
+				}
+				
+				if (asset->delta->quat)
+				{
+					asset->delta->quat = reader.read_raw<XAnimDeltaPartQuat>();
+
+					if (asset->delta->quat->size && asset->delta->quat->u.frames.frames)
+					{
+						asset->delta->quat->u.frames.frames = reader.read_raw<short[2]>();
+					}
+				}
+			}
+
+			reader.close();
+
+			return asset;
+		}
+
 		XAnimParts* IXAnimParts::parse(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
-			auto parsed = IXAnimParts::parse_xae2(name, mem, allocString);
+			auto parsed = IXAnimParts::parse_xae3(name, mem, allocString);
 
+			if (!parsed)
+			{
+				parsed = IXAnimParts::parse_xae2(name, mem, allocString);
+			}
 			if (!parsed)
 			{
 				parsed = IXAnimParts::parse_xae(name, mem, allocString);
@@ -247,8 +372,8 @@ namespace ZoneTool
 
 		void IXAnimParts::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -271,13 +396,10 @@ namespace ZoneTool
 			if (data->delta) // XAnimDeltaParts
 			{
 				buf->align(3);
-
-				auto partdata = data->delta;
-				auto partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
+				auto* partdata = data->delta;
+				auto* partdest = reinterpret_cast<XAnimDeltaPart*>(buf->at());
 				buf->write_stream(partdata, sizeof(XAnimDeltaPart), 1);
-
-				sizeof XAnimPartTransData;
-
+				
 				if (partdata->trans)
 				{
 					buf->align(3);
@@ -306,8 +428,6 @@ namespace ZoneTool
 								buf->write_stream(partdata->trans->u.frames.frames._2, sizeof(short) * 3,
 									partdata->trans->size + 1);
 							}
-
-							//dest->trans->u.frames.frames = (char*)-1;
 						}
 					}
 					else buf->write_stream(partdata->trans->u.frame0, sizeof(float), 3);
@@ -316,27 +436,34 @@ namespace ZoneTool
 
 				if (partdata->quat2)
 				{
+					ZONETOOL_INFO("Write - Delta:Quat2");
 					buf->align(3);
 					buf->write_stream(partdata->quat2, 4, 1); // not full struct
 					if (partdata->quat2->size)
 					{
 						buf->write_stream(&partdata->quat2->u, 0x4, 1); // not full struct
-						if (data->framecount > 0x100)
+						if (data->framecount > 255)
+						{
 							buf->write_stream(&partdata->quat2->u.frames.indices,
 								sizeof(short), partdata->quat2->size + 1);
+						}
 						else
+						{
 							buf->write_stream(&partdata->quat2->u.frames.indices, sizeof(char),
 								partdata->quat2->size + 1);
+						}
 
 						if (partdata->quat2->u.frames.frames)
 						{
 							buf->align(3);
 							buf->write_stream(partdata->quat2->u.frames.frames, sizeof(short) * 2,
 								partdata->quat2->size + 1);
-							//dest->quat2->u.frames.frames = (short*)-1;
 						}
 					}
-					else buf->write_stream(partdata->quat2->u.frame0, sizeof(short) * 2, 1);
+					else 
+					{
+						buf->write_stream(partdata->quat2->u.frame0, sizeof(short) * 2, 1);
+					}
 					partdest->quat2 = reinterpret_cast<XAnimDeltaPartQuat2*>(-1);
 				}
 
@@ -344,16 +471,21 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write_stream(partdata->quat, 4, 1);
+					
 					if (partdata->quat->size)
 					{
 						buf->write_stream(&partdata->quat->u, 4, 1); // not full struct
 
-						if (data->framecount > 0x100)
+						if (data->framecount > 255)
+						{
 							buf->write_stream(&partdata->quat->u.frames.indices,
 								sizeof(short), partdata->quat->size + 1);
+						}
 						else
+						{
 							buf->write_stream(&partdata->quat->u.frames.indices, sizeof(char),
 								partdata->quat->size + 1);
+						}
 
 						if (partdata->quat->u.frames.frames)
 						{
@@ -363,7 +495,9 @@ namespace ZoneTool
 						}
 					}
 					else
+					{
 						buf->write_stream(partdata->quat->u.frame0, sizeof(short) * 4, 1);
+					}
 
 					partdest->quat = reinterpret_cast<XAnimDeltaPartQuat*>(-1);
 				}
@@ -438,7 +572,7 @@ namespace ZoneTool
 				return;
 			}
 
-			const auto file = FileSystem::FileOpen(path, "wb");
+			auto* file = FileSystem::FileOpen(path, "wb");
 
 			// Write XAE file
 			fwrite(asset, sizeof XAnimParts, 1, file);
@@ -557,64 +691,178 @@ namespace ZoneTool
 				}
 			}
 
+			dump.dump_int(0);
+			dump.close();
+		}
 
+		void IXAnimParts::dump_xae3(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)
+		{
+			const auto path = "XAnim\\"s + asset->name + ".xae3";
 
-			/*if (asset->delta)
+			AssetDumper dump;
+			if (!dump.open(path))
 			{
-				dump.Single(asset->delta);
+				return;
+			}
+
+			dump.dump_single(asset);
+			dump.dump_string(asset->name);
+
+			for (auto bone = 0; bone < asset->boneCount[9]; bone++)
+			{
+				dump.dump_string(convertToString(asset->tagnames[bone]));
+			}
+
+			if (asset->dataByte)
+			{
+				dump.dump_array(asset->dataByte, asset->dataByteCount);
+			}
+			if (asset->dataShort)
+			{
+				dump.dump_array(asset->dataShort, asset->dataShortCount);
+			}
+			if (asset->dataInt)
+			{
+				dump.dump_array(asset->dataInt, asset->dataIntCount);
+			}
+			if (asset->randomDataShort)
+			{
+				dump.dump_array(asset->randomDataShort, asset->randomDataShortCount);
+			}
+			if (asset->randomDataByte)
+			{
+				dump.dump_array(asset->randomDataByte, asset->randomDataByteCount);
+			}
+			if (asset->randomDataInt)
+			{
+				dump.dump_array(asset->randomDataInt, asset->randomDataIntCount);
+			}
+
+			if (asset->indices.data)
+			{
+				if (asset->framecount > 255)
+				{
+					dump.dump_array(asset->indices._2, asset->indexcount);
+				}
+				else
+				{
+					dump.dump_array(asset->indices._1, asset->indexcount);
+				}
+			}
+
+			if (asset->notetracks)
+			{
+				dump.dump_array(asset->notetracks, asset->notetrackCount);
+
+				for (auto i = 0; i < asset->notetrackCount; i++)
+				{
+					dump.dump_string(convertToString(asset->notetracks[i].name));
+				}
+			}
+
+			if (asset->delta)
+			{
+				dump.dump_single(asset->delta);
 
 				if (asset->delta->trans)
 				{
-					dump.Single(asset->delta->trans);
+					auto extra_size = 0;
 
 					if (asset->delta->trans->size)
 					{
 						if (asset->framecount > 255)
 						{
-							dump.Array(asset->delta->trans->u.frames.indices._2, asset->delta->trans->size + 1);
+							extra_size += (asset->delta->trans->size * 2) + 2;
 						}
 						else
 						{
-							dump.Array(asset->delta->trans->u.frames.indices._1, asset->delta->trans->size + 1);
+							extra_size += asset->delta->trans->size + 1;
 						}
+					}
 
+					dump.dump_raw(asset->delta->trans, sizeof(XAnimPartTrans) + extra_size);
+
+					if (asset->delta->trans->size)
+					{
 						if (asset->delta->trans->u.frames.frames._1)
 						{
 							if (asset->delta->trans->smallTrans)
 							{
-								dump.Array(asset->delta->trans->u.frames.frames._1, asset->delta->trans->size + 1);
+								dump.dump_raw(asset->delta->trans->u.frames.frames._1, (3 * asset->delta->trans->size) + 3);
 							}
 							else
 							{
-								dump.Array(asset->delta->trans->u.frames.frames._2, asset->delta->trans->size + 1);
+								dump.dump_raw(asset->delta->trans->u.frames.frames._2, (6 * asset->delta->trans->size) + 6);
 							}
 						}
-					}
-					else
-					{
-						dump.Array(asset->delta->trans->u.frame0, 3);
 					}
 				}
 
 				if (asset->delta->quat2)
 				{
+					auto extra_size = 0;
+					
+					if (asset->delta->quat2->size)
+					{
+						if (asset->framecount > 255)
+						{
+							extra_size += (asset->delta->quat2->size * 2) + 2;
+						}
+						else
+						{
+							extra_size += asset->delta->quat2->size + 1;
+						}
+					}
+					else
+					{
+						// no extra size required, quat2 data fits inside the frame0 buffer
+						extra_size += 0;
+					}
 
+					dump.dump_raw(asset->delta->quat2, sizeof(XAnimDeltaPartQuat2) + extra_size);
+
+					if (asset->delta->quat2->size && asset->delta->quat2->u.frames.frames)
+					{
+						dump.dump_raw(asset->delta->quat2->u.frames.frames, (asset->delta->quat2->size * 4) + 4);
+					}
 				}
 
 				if (asset->delta->quat)
 				{
+					auto extra_size = 0;
+
+					if (asset->delta->quat->size)
+					{
+						if (asset->framecount > 255)
+						{
+							extra_size += (asset->delta->quat->size * 2) + 2;
+						}
+						else
+						{
+							extra_size += asset->delta->quat->size + 1;
+						}
+					}
+					else
+					{
+						// quat data contains 4 extra bytes
+						extra_size += 4;
+					}
+
+					dump.dump_raw(asset->delta->quat, sizeof(XAnimDeltaPartQuat) + extra_size);
+
+					if (asset->delta->quat->size && asset->delta->quat->u.frames.frames)
+					{
+						dump.dump_raw(asset->delta->quat->u.frames.frames, (asset->delta->quat->size * 8) + 8);
+					}
 				}
-
-			}*/
-
-			dump.dump_int(0);
+			}
 
 			dump.close();
 		}
 
 		void IXAnimParts::dump(XAnimParts* asset, const std::function<const char*(std::uint16_t)>& convertToString)
 		{
-			IXAnimParts::dump_xae2(asset, convertToString);
+			IXAnimParts::dump_xae3(asset, convertToString);
 		}
 	}
 }

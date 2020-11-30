@@ -24,6 +24,7 @@ namespace ZoneTool
 		public:
 			static XAnimParts* parse_xae(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString);
 			static XAnimParts* parse_xae2(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString);
+			static XAnimParts* parse_xae3(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString);
 			static XAnimParts* parse(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString = SL_AllocString);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
@@ -34,6 +35,9 @@ namespace ZoneTool
 			std::int32_t type() override;
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
+
+			static void dump_xae3(XAnimParts* asset,
+				const std::function<const char* (std::uint16_t)>& convertToString = SL_ConvertToString);
 			static void dump_xae2(XAnimParts* asset,
 				const std::function<const char* (std::uint16_t)>& convertToString = SL_ConvertToString);
 			static void dump_xae(XAnimParts* asset,

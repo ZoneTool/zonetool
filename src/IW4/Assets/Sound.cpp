@@ -7,186 +7,51 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
-
-#define SOUND_DUMP_STRING(entry) \
-	if (asset->entry) sound[#entry] = std::string(asset->entry); \
-	else sound[#entry] = nullptr;
-#define SOUND_DUMP_INT(entry) \
-	sound[#entry] = (int)asset->entry;
-#define SOUND_DUMP_FLOAT(entry) \
-	sound[#entry] = (float)asset->entry;
-
-#define SOUND_STRING(entry) \
-	if (!snddata[#entry].is_null()) { \
-		asset->entry = _strdup(snddata[#entry].get<std::string>().c_str()); \
-	} else { asset->entry = nullptr; }
-#define SOUND_INT(entry) \
-	asset->entry = snddata[#entry].get<int>()
-#define SOUND_FLOAT(entry) \
-	asset->entry = snddata[#entry].get<float>()
+#include "IW5/Assets/Sound.hpp"
 
 namespace ZoneTool
 {
 	namespace IW4
 	{
-		ISound::ISound()
+		snd_alias_list_t* ISound::parse(const std::string& name, ZoneMemory* mem)
 		{
-		}
+			auto* iw5_asset = IW5::ISound::parse(name, mem);
 
-		ISound::~ISound()
-		{
-		}
-
-		void SndAlias_Parse(snd_alias_t* asset, nlohmann::json snddata, ZoneMemory* mem)
-		{
-			SOUND_STRING(aliasName);
-			SOUND_STRING(subtitle);
-			SOUND_STRING(secondaryAliasName);
-			SOUND_STRING(chainAliasName);
-			SOUND_STRING(mixerGroup);
-
-			if (!snddata["type"].is_null())
+			if (!iw5_asset)
 			{
-				asset->soundFile = mem->Alloc<SoundFile>();
-				asset->soundFile->type = snddata["type"].get<int>();
-				asset->soundFile->exists = true;
+				return nullptr;
+			}
 
-				if (asset->soundFile->type == 1)
+			auto* asset = mem->Alloc<snd_alias_list_t>();
+			memset(asset, 0, sizeof snd_alias_list_t);
+
+			asset->name = iw5_asset->name;
+			asset->count = iw5_asset->count;
+
+			asset->head = mem->Alloc<snd_alias_t>(asset->count);
+			memset(asset->head, 0, sizeof(snd_alias_t) * asset->count);
+
+			for (auto i = 0; i < asset->count; i++)
+			{
+				auto* current_iw4 = &asset->head[i];
+				auto* current_iw5 = &iw5_asset->head[i];
+
+				memcpy(current_iw4, current_iw5, 36);
+				memcpy(&current_iw4->pitchMin, &current_iw5->pitchMin, 24);
+
+				if (current_iw5->masterPercentage == 0.0f || current_iw5->slavePercentage > current_iw5->masterPercentage)
 				{
-					asset->soundFile->sound.loadSnd = mem->Alloc<LoadedSound>();
-					// (LoadedSound*)malloc(sizeof(LoadedSound*));
-					asset->soundFile->sound.loadSnd->name = mem->StrDup(snddata["soundfile"].get<std::string>().c_str());
+					current_iw4->___u15.slavePercentage = current_iw5->slavePercentage;
 				}
 				else
 				{
-					char* fullpath = mem->StrDup(snddata["soundfile"].get<std::string>().c_str());
-					asset->soundFile->sound.streamSnd.dir = fullpath;
-					for (int i = strnlen(fullpath, 255) - 1; i >= 0; i--)
-					{
-						if (fullpath[i] == '/')
-						{
-							fullpath[i] = '\0';
-							asset->soundFile->sound.streamSnd.name = &fullpath[i + 1];
-							break;
-						}
-					}
+					current_iw4->___u15.masterPercentage = current_iw5->masterPercentage;
 				}
 
-				SOUND_INT(sequence);
-				SOUND_INT(flags);
-				SOUND_INT(startDelay);
-
-				// floats
-				SOUND_FLOAT(volMin);
-				SOUND_FLOAT(volMax);
-				SOUND_FLOAT(pitchMin);
-				SOUND_FLOAT(pitchMax);
-				SOUND_FLOAT(distMin);
-				SOUND_FLOAT(distMax);
-
-				SOUND_FLOAT(slavePercentage);
-				SOUND_FLOAT(probability);
-				SOUND_FLOAT(lfePercentage);
-				SOUND_FLOAT(centerPercentage);
-				SOUND_FLOAT(envelopMin);
-				SOUND_FLOAT(envelopMax);
-				SOUND_FLOAT(envelopPercentage);
-
-				// game specific
-				//		SOUND_INT(volModIndex);
-				//		SOUND_INT(masterPriority);
-				//		SOUND_FLOAT(velocityMin);
-				//		SOUND_FLOAT(masterPercentage);
-
-				if (!snddata["volumeFalloffCurve"].is_null())
-				{
-					asset->volumeFalloffCurve = mem->Alloc<SndCurve>(); // (SndCurve*)calloc(1, sizeof(SndCurve));
-					asset->volumeFalloffCurve->filename = mem->StrDup(
-						snddata["volumeFalloffCurve"].get<std::string>().c_str());
-				}
-
-				if (!snddata["speakerMap"].is_null())
-				{
-					asset->speakerMap = mem->Alloc<SpeakerMap>(); // (SpeakerMap*)calloc(1, sizeof(SpeakerMap));
-					nlohmann::json speakerMap = snddata["speakerMap"];
-
-					asset->speakerMap->name = mem->StrDup(speakerMap["name"].get<std::string>().c_str());
-					asset->speakerMap->isDefault = speakerMap["isDefault"].get<bool>();
-
-					if (!speakerMap["channelMaps"].is_null())
-					{
-						nlohmann::json channelMaps = speakerMap["channelMaps"];
-						for (char x = 0; x < 2; x++)
-						{
-							for (char y = 0; y < 2; y++)
-							{
-								if (!channelMaps[(x & 0x01) << 1 | y & 0x01].is_null())
-								{
-									nlohmann::json channelMap = channelMaps[(x & 0x01) << 1 | y & 0x01];
-									asset->speakerMap->channelMaps[x][y].entryCount = channelMap["entryCount"].get<int
-									>();
-
-									if (!channelMap["speakers"].is_null())
-									{
-										nlohmann::json speakers = channelMap["speakers"];
-
-										for (int speaker = 0; speaker < asset->speakerMap->channelMaps[x][y].entryCount;
-										     speaker++)
-										{
-											if (!speakers[speaker].is_null())
-											{
-												nlohmann::json jspeaker = speakers[speaker];
-												asset->speakerMap->channelMaps[x][y].speakers[speaker].speaker =
-													jspeaker["speaker"].get<int>();
-												asset->speakerMap->channelMaps[x][y].speakers[speaker].numLevels =
-													jspeaker["numLevels"].get<int>();
-												asset->speakerMap->channelMaps[x][y].speakers[speaker].levels[0] =
-													jspeaker["levels0"].get<float>();
-												asset->speakerMap->channelMaps[x][y].speakers[speaker].levels[1] =
-													jspeaker["levels1"].get<float>();
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-
-		snd_alias_list_t* ISound::parse(const std::string& name, ZoneMemory* mem)
-		{
-			std::string path = "sounds/" + name;
-
-			if (FileSystem::FileExists(path))
-			{
-				ZONETOOL_INFO("Parsing sound %s...", name.c_str());
-
-				auto file = FileSystem::FileOpen(path, "rb");
-				auto size = FileSystem::FileSize(file);
-				auto bytes = FileSystem::ReadBytes(file, size);
-				FileSystem::FileClose(file);
-
-				nlohmann::json snddata = nlohmann::json::parse(bytes);
-
-				snd_alias_list_t* asset = mem->Alloc<snd_alias_list_t>();
-
-				SOUND_STRING(aliasName);
-				SOUND_INT(count);
-
-				asset->head = mem->Alloc<snd_alias_t>(asset->count);
-
-				nlohmann::json heads = snddata["head"];
-				for (int i = 0; i < asset->count; i++)
-				{
-					SndAlias_Parse(&asset->head[i], heads[i], mem);
-				}
-
-				return asset;
+				memcpy(&current_iw4->probability, &current_iw5->probability, 36);
 			}
 
-			return nullptr;
+			return asset;
 		}
 
 		void ISound::init(const std::string& name, ZoneMemory* mem)
@@ -206,11 +71,11 @@ namespace ZoneTool
 
 		void ISound::load_depending(IZone* zone)
 		{
-			auto data = this->asset_;
+			auto* data = this->asset_;
 
 			for (auto i = 0u; i < data->count; i++)
 			{
-				auto head = &data->head[i];
+				auto* head = &data->head[i];
 
 				if (head->volumeFalloffCurve)
 				{
@@ -239,7 +104,7 @@ namespace ZoneTool
 
 		void ISound::write_soundfile(IZone* zone, ZoneBuffer* buf, SoundFile* data)
 		{
-			auto dest = buf->write(data);
+			auto* dest = buf->write(data);
 
 			if (data->type == SAT_STREAMED || data->type == SAT_PRIMED)
 			{
@@ -257,7 +122,7 @@ namespace ZoneTool
 			{
 				if (data->sound.loadSnd)
 				{
-					dest->sound.loadSnd = reinterpret_cast<LoadedSound*>(zone->get_asset_pointer(
+					dest->sound.loadSnd = static_cast<LoadedSound*>(zone->get_asset_pointer(
 						loaded_sound, data->sound.loadSnd->name));
 				}
 			}
@@ -265,7 +130,7 @@ namespace ZoneTool
 
 		void ISound::write_head(IZone* zone, ZoneBuffer* buf, snd_alias_t* dest)
 		{
-			auto data = dest;
+			auto* data = dest;
 
 			if (data->aliasName)
 			{
@@ -301,18 +166,18 @@ namespace ZoneTool
 
 			if (data->volumeFalloffCurve)
 			{
-				dest->volumeFalloffCurve = reinterpret_cast<SndCurve*>(zone->get_asset_pointer(
+				dest->volumeFalloffCurve = static_cast<SndCurve*>(zone->get_asset_pointer(
 					sndcurve, data->volumeFalloffCurve->filename));
 			}
 
 			if (data->speakerMap)
 			{
 				buf->align(3);
-				auto speakerMap = buf->write(data->speakerMap);
+				auto* speaker_map = buf->write(data->speakerMap);
 
-				if (speakerMap->name)
+				if (speaker_map->name)
 				{
-					speakerMap->name = buf->write_str(speakerMap->name);
+					speaker_map->name = buf->write_str(speaker_map->name);
 				}
 
 				ZoneBuffer::ClearPointer(&dest->speakerMap);
@@ -321,8 +186,8 @@ namespace ZoneTool
 
 		void ISound::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -332,11 +197,11 @@ namespace ZoneTool
 			if (dest->head)
 			{
 				buf->align(3);
-				auto destSound = buf->write(data->head, data->count);
+				auto* dest_sound = buf->write(data->head, data->count);
 
-				for (std::int32_t i = 0; i < data->count; i++)
+				for (auto i = 0; i < data->count; i++)
 				{
-					write_head(zone, buf, &destSound[i]);
+					write_head(zone, buf, &dest_sound[i]);
 				}
 
 				ZoneBuffer::ClearPointer(&dest->head);
@@ -345,125 +210,36 @@ namespace ZoneTool
 			END_LOG_STREAM;
 			buf->pop_stream();
 		}
-
-		void Dump_SndAlias(nlohmann::json& sound, snd_alias_t* asset/*, std::vector<nlohmann::json*>* toFree*/)
-		{
-			// strings
-			SOUND_DUMP_STRING(aliasName);
-			SOUND_DUMP_STRING(subtitle);
-			SOUND_DUMP_STRING(secondaryAliasName);
-			SOUND_DUMP_STRING(chainAliasName);
-			SOUND_DUMP_STRING(mixerGroup);
-
-			// soundfile shit
-			if (asset->soundFile)
-			{
-				sound["type"] = (int)asset->soundFile->type;
-
-				if (asset->soundFile->type == 1)
-					sound["soundfile"] = asset->soundFile->sound.loadSnd->name;
-				else
-					sound["soundfile"] = std::string(asset->soundFile->sound.streamSnd.dir) + "/" + std::string(
-						asset->soundFile->sound.streamSnd.name);
-			}
-
-			// ints
-			SOUND_DUMP_INT(sequence);
-			SOUND_DUMP_INT(flags);
-			SOUND_DUMP_INT(startDelay);
-
-			// floats
-			SOUND_DUMP_FLOAT(volMin);
-			SOUND_DUMP_FLOAT(volMax);
-			SOUND_DUMP_FLOAT(pitchMin);
-			SOUND_DUMP_FLOAT(pitchMax);
-			SOUND_DUMP_FLOAT(distMin);
-			SOUND_DUMP_FLOAT(distMax);
-
-			SOUND_DUMP_FLOAT(slavePercentage);
-			SOUND_DUMP_FLOAT(probability);
-			SOUND_DUMP_FLOAT(lfePercentage);
-			SOUND_DUMP_FLOAT(centerPercentage);
-			SOUND_DUMP_FLOAT(envelopMin);
-			SOUND_DUMP_FLOAT(envelopMax);
-			SOUND_DUMP_FLOAT(envelopPercentage);
-
-			if (asset->volumeFalloffCurve && asset->volumeFalloffCurve->filename)
-				sound["volumeFalloffCurve"] = asset->volumeFalloffCurve->filename;
-
-			if (asset->speakerMap)
-			{
-				nlohmann::json speakerMap;
-				speakerMap["name"] = asset->speakerMap->name;
-				speakerMap["isDefault"] = asset->speakerMap->isDefault;
-
-				nlohmann::json channelMaps;
-				for (char x = 0; x < 2; x++)
-				{
-					for (char y = 0; y < 2; y++)
-					{
-						nlohmann::json channelMap;
-						channelMap["entryCount"] = asset->speakerMap->channelMaps[x][y].entryCount;
-
-						nlohmann::json speakers;
-
-						for (int speaker = 0; speaker < asset->speakerMap->channelMaps[x][y].entryCount; speaker++)
-						{
-							nlohmann::json jspeaker;
-
-							jspeaker["speaker"] = asset->speakerMap->channelMaps[x][y].speakers[speaker].speaker;
-							jspeaker["numLevels"] = asset->speakerMap->channelMaps[x][y].speakers[speaker].numLevels;
-							jspeaker["levels0"] = asset->speakerMap->channelMaps[x][y].speakers[speaker].levels[0];
-							jspeaker["levels1"] = asset->speakerMap->channelMaps[x][y].speakers[speaker].levels[1];
-
-							speakers[speaker] = jspeaker;
-						}
-
-						channelMap["speakers"] = speakers;
-
-						channelMaps[(x & 0x01) << 1 | y & 0x01] = channelMap;
-					}
-				}
-
-				speakerMap["channelMaps"] = channelMaps;
-
-				sound["speakerMap"] = speakerMap;
-			}
-		}
-
-		void Dump_SndAliasList(snd_alias_list_t* asset)
-		{
-			nlohmann::json sound;
-			//std::vector<nlohmann::json*> toFree;
-			//toFree.clear();
-
-			SOUND_DUMP_STRING(aliasName);
-			SOUND_DUMP_INT(count);
-
-			nlohmann::json aliases;
-
-			for (int i = 0; i < asset->count; i++)
-			{
-				nlohmann::json alias;
-				Dump_SndAlias(alias, &asset->head[i]/*, &toFree*/);
-				aliases[i] = alias;
-			}
-
-			sound["head"] = aliases;
-
-			std::string assetstr = sound.dump(4);
-			FILE* fp = FileSystem::FileOpen("sounds/"s + asset->name, "wb");
-
-			if (fp)
-			{
-				fwrite(assetstr.c_str(), assetstr.size(), 1, fp);
-				fclose(fp);
-			}
-		}
-
+		
 		void ISound::dump(snd_alias_list_t* asset)
 		{
-			Dump_SndAliasList(asset);
+			auto* iw5_asset = new IW5::snd_alias_list_t;
+			memset(iw5_asset, 0, sizeof IW5::snd_alias_list_t);
+
+			iw5_asset->name = asset->name;
+			iw5_asset->count = asset->count;
+			
+			iw5_asset->head = new IW5::snd_alias_t[iw5_asset->count];
+			memset(iw5_asset->head, 0, sizeof(IW5::snd_alias_t) * iw5_asset->count);
+
+			for (auto i = 0; i < iw5_asset->count; i++)
+			{
+				auto* current_iw4 = &asset->head[i];
+				auto* current_iw5 = &iw5_asset->head[i];
+				
+				memcpy(current_iw5, &asset->head[i], 36);
+				current_iw5->volModIndex = 0x12;
+				memcpy(&current_iw5->pitchMin, &current_iw4->pitchMin, 24);
+				current_iw5->masterPriority = 2;
+				current_iw5->masterPercentage = current_iw4->___u15.masterPercentage;
+				current_iw5->slavePercentage = current_iw4->___u15.slavePercentage;
+				memcpy(&current_iw5->probability, &current_iw4->probability, 36);
+			}
+			
+			IW5::ISound::dump(iw5_asset);
+
+			delete[] iw5_asset->head;
+			delete iw5_asset;
 		}
 	}
 }

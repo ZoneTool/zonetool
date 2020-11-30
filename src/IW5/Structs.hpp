@@ -1176,6 +1176,7 @@ namespace ZoneTool
 			SoundData sound;
 		};
 
+#pragma pack(push, 4)
 		struct snd_alias_t
 		{
 			const char* aliasName;
@@ -1187,40 +1188,27 @@ namespace ZoneTool
 			int sequence;
 			float volMin;
 			float volMax;
+			int volModIndex;
 			float pitchMin;
 			float pitchMax;
 			float distMin;
 			float distMax;
+			float velocityMin;
 			int flags;
+			char masterPriority;
+			float masterPercentage;
 			float slavePercentage;
 			float probability;
 			float lfePercentage;
 			float centerPercentage;
 			int startDelay;
-			int pad2;
-			char missingData[12]; // need to find out what this is and where its actually placed.
 			SndCurve* volumeFalloffCurve;
 			float envelopMin;
 			float envelopMax;
 			float envelopPercentage;
 			SpeakerMap* speakerMap;
-
-			Json ToJson()
-			{
-				Json data;
-
-				JSON_STRING(aliasName);
-				JSON_STRING(subtitle);
-				JSON_STRING(secondaryAliasName);
-				JSON_STRING(chainAliasName);
-				JSON_STRING(mixerGroup);
-
-				// JSON_ASSET(soundFile, SoundFile);
-				JSON_ASSET(volumeFalloffCurve, SndCurve);
-
-				return data;
-			}
 		};
+#pragma pack(pop)
 
 		struct snd_alias_list_t
 		{
@@ -1232,17 +1220,6 @@ namespace ZoneTool
 
 			snd_alias_t* head;
 			int count;
-
-			Json ToJson()
-			{
-				Json data;
-
-				JSON_STRING(name);
-				JSON_STRUCT_ARR(head, count);
-				JSON_FIELD(count);
-
-				return data;
-			}
 		};
 
 		// Tracers

@@ -15,10 +15,8 @@ namespace ZoneTool
 	{		
 		void IWeaponDef::dump(WeaponCompleteDef* weapon)
 		{
-			return;
-
 			// experimental iw5 dump code
-			auto iw5_weapon = new IW5::WeaponCompleteDef;
+			auto* iw5_weapon = new IW5::WeaponCompleteDef;
 			memset(iw5_weapon, 0, sizeof IW5::WeaponCompleteDef);
 
 			// copy weapon data
@@ -43,19 +41,29 @@ namespace ZoneTool
 
 			// alloc weapondef
 			iw5_weapon->weapDef = new IW5::WeaponDef;
-			memset(iw5_weapon->weapDef, 0, sizeof WeaponDef);
+			memset(iw5_weapon->weapDef, 0, sizeof IW5::WeaponDef);
 
+#define CALC_SIZE(__type__, __start_field__, __end_field__) \
+	((std::size_t(&(((__type__*)nullptr)->__end_field__)) - std::size_t(&(((__type__*)nullptr)->__start_field__))) + sizeof(weapon->weapDef->__end_field__))
+
+#define COPY_STRUCT_AREA(__type__, __start_field__, __end_field__) \
+	static_assert(CALC_SIZE(IW5::WeaponDef, __start_field__, __end_field__) == CALC_SIZE(IW4::WeaponDef, __start_field__, __end_field__)); \
+	memcpy(&iw5_weapon->weapDef->__start_field__, &weapon->weapDef->__start_field__, CALC_SIZE(__type__, __start_field__, __end_field__));
+			
 			// copy weapondef data
-			//memcpy(iw5_weapon->WeaponDef->_portpad0, weapon->weapDef->_portpad0, sizeof weapon->weapDef->_portpad0);
-			//memcpy(iw5_weapon->WeaponDef->_portpad1, weapon->weapDef->_portpad1, sizeof weapon->weapDef->_portpad1);
-			//memcpy(iw5_weapon->WeaponDef->_portpad2, weapon->weapDef->_portpad2, sizeof weapon->weapDef->_portpad2);
-			//memcpy(iw5_weapon->WeaponDef->_portpad3, weapon->weapDef->_portpad3, sizeof weapon->weapDef->_portpad3);
-			//memcpy(iw5_weapon->WeaponDef->_portpad4, weapon->weapDef->_portpad4, sizeof weapon->weapDef->_portpad4);
-			//memcpy(iw5_weapon->WeaponDef->_portpad5, weapon->weapDef->_portpad5, sizeof weapon->weapDef->_portpad5);
-			//memcpy(iw5_weapon->WeaponDef->_portpad6, weapon->weapDef->_portpad6, sizeof weapon->weapDef->_portpad6);
+			COPY_STRUCT_AREA(WeaponDef, gunXModel, scanSound);
+			COPY_STRUCT_AREA(WeaponDef, viewShellEjectEffect, iDamageType);
+			COPY_STRUCT_AREA(WeaponDef, autoAimRange, fAdsZoomOutFrac);
+			COPY_STRUCT_AREA(WeaponDef, fAdsBobFactor, fGunMaxYaw);
+			COPY_STRUCT_AREA(WeaponDef, swayMaxAngle, ricochetChance);
+			COPY_STRUCT_AREA(WeaponDef, parallelBounce, tracerType);
+			COPY_STRUCT_AREA(WeaponDef, turretScopeZoomRate, requireLockonToFire);
+			COPY_STRUCT_AREA(WeaponDef, bigExplosion, aimDownSight);
+			COPY_STRUCT_AREA(WeaponDef, bRechamberWhileAds, stickToPlayers);
+			COPY_STRUCT_AREA(WeaponDef, hasDetonator, offhandHoldIsCancelable);
 
 			iw5_weapon->weapDef->bounceSound = reinterpret_cast<IW5::snd_alias_list_t**>(weapon->weapDef->bounceSound);
-			iw5_weapon->weapDef->rollingSound = nullptr;
+			iw5_weapon->weapDef->stowTag = SL_AllocString("tag_stowed_back");
 			
 			// fixup weapon name
 			iw5_weapon->szInternalName = _strdup(va("iw5_%s", weapon->szInternalName).data());

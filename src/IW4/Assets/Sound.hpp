@@ -23,10 +23,7 @@ namespace ZoneTool
 			static void write_head(IZone* zone, ZoneBuffer* buf, snd_alias_t* dest);
 
 		public:
-			ISound();
-			~ISound();
-
-			snd_alias_list_t* parse(const std::string& name, ZoneMemory* mem);
+			static snd_alias_list_t* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

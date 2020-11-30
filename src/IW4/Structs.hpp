@@ -1110,6 +1110,12 @@ namespace ZoneTool
 			SoundData sound;
 		};
 #pragma pack(push, 4)
+		union $C8D87EB0090687D323381DFB7A82089C
+		{
+			float slavePercentage;
+			float masterPercentage;
+		};
+		
 		struct snd_alias_t
 		{
 			const char* aliasName;
@@ -1125,13 +1131,13 @@ namespace ZoneTool
 			float pitchMax;
 			float distMin;
 			float distMax;
+			float velocityMin;
 			int flags;
-			float slavePercentage;
+			$C8D87EB0090687D323381DFB7A82089C ___u15;
 			float probability;
 			float lfePercentage;
 			float centerPercentage;
 			int startDelay;
-			int pad2;
 			SndCurve* volumeFalloffCurve;
 			float envelopMin;
 			float envelopMax;
@@ -1193,53 +1199,60 @@ namespace ZoneTool
 			weapStance_t stance;
 			void* viewFlashEffect;
 			void* worldFlashEffect;
-			snd_alias_list_t* pickupSound;
-			snd_alias_list_t* pickupSoundPlayer;
-			snd_alias_list_t* ammoPickupSound;
-			snd_alias_list_t* ammoPickupSoundPlayer;
-			snd_alias_list_t* projectileSound;
-			snd_alias_list_t* pullbackSound;
-			snd_alias_list_t* pullbackSoundPlayer;
-			snd_alias_list_t* fireSound;
-			snd_alias_list_t* fireSoundPlayer;
-			snd_alias_list_t* fireSoundPlayerAkimbo;
-			snd_alias_list_t* fireLoopSound;
-			snd_alias_list_t* fireLoopSoundPlayer;
-			snd_alias_list_t* fireStopSound;
-			snd_alias_list_t* fireStopSoundPlayer;
-			snd_alias_list_t* fireLastSound;
-			snd_alias_list_t* fireLastSoundPlayer;
-			snd_alias_list_t* emptyFireSound;
-			snd_alias_list_t* emptyFireSoundPlayer;
-			snd_alias_list_t* meleeSwipeSound;
-			snd_alias_list_t* meleeSwipeSoundPlayer;
-			snd_alias_list_t* meleeHitSound;
-			snd_alias_list_t* meleeMissSound;
-			snd_alias_list_t* rechamberSound;
-			snd_alias_list_t* rechamberSoundPlayer;
-			snd_alias_list_t* reloadSound;
-			snd_alias_list_t* reloadSoundPlayer;
-			snd_alias_list_t* reloadEmptySound;
-			snd_alias_list_t* reloadEmptySoundPlayer;
-			snd_alias_list_t* reloadStartSound;
-			snd_alias_list_t* reloadStartSoundPlayer;
-			snd_alias_list_t* reloadEndSound;
-			snd_alias_list_t* reloadEndSoundPlayer;
-			snd_alias_list_t* detonateSound;
-			snd_alias_list_t* detonateSoundPlayer;
-			snd_alias_list_t* nightVisionWearSound;
-			snd_alias_list_t* nightVisionWearSoundPlayer;
-			snd_alias_list_t* nightVisionRemoveSound;
-			snd_alias_list_t* nightVisionRemoveSoundPlayer;
-			snd_alias_list_t* altSwitchSound;
-			snd_alias_list_t* altSwitchSoundPlayer;
-			snd_alias_list_t* raiseSound;
-			snd_alias_list_t* raiseSoundPlayer;
-			snd_alias_list_t* firstRaiseSound;
-			snd_alias_list_t* firstRaiseSoundPlayer;
-			snd_alias_list_t* putawaySound;
-			snd_alias_list_t* putawaySoundPlayer;
-			snd_alias_list_t* scanSound;
+			union
+			{
+				struct
+				{
+					snd_alias_list_t* pickupSound;
+					snd_alias_list_t* pickupSoundPlayer;
+					snd_alias_list_t* ammoPickupSound;
+					snd_alias_list_t* ammoPickupSoundPlayer;
+					snd_alias_list_t* projectileSound;
+					snd_alias_list_t* pullbackSound;
+					snd_alias_list_t* pullbackSoundPlayer;
+					snd_alias_list_t* fireSound;
+					snd_alias_list_t* fireSoundPlayer;
+					snd_alias_list_t* fireSoundPlayerAkimbo;
+					snd_alias_list_t* fireLoopSound;
+					snd_alias_list_t* fireLoopSoundPlayer;
+					snd_alias_list_t* fireStopSound;
+					snd_alias_list_t* fireStopSoundPlayer;
+					snd_alias_list_t* fireLastSound;
+					snd_alias_list_t* fireLastSoundPlayer;
+					snd_alias_list_t* emptyFireSound;
+					snd_alias_list_t* emptyFireSoundPlayer;
+					snd_alias_list_t* meleeSwipeSound;
+					snd_alias_list_t* meleeSwipeSoundPlayer;
+					snd_alias_list_t* meleeHitSound;
+					snd_alias_list_t* meleeMissSound;
+					snd_alias_list_t* rechamberSound;
+					snd_alias_list_t* rechamberSoundPlayer;
+					snd_alias_list_t* reloadSound;
+					snd_alias_list_t* reloadSoundPlayer;
+					snd_alias_list_t* reloadEmptySound;
+					snd_alias_list_t* reloadEmptySoundPlayer;
+					snd_alias_list_t* reloadStartSound;
+					snd_alias_list_t* reloadStartSoundPlayer;
+					snd_alias_list_t* reloadEndSound;
+					snd_alias_list_t* reloadEndSoundPlayer;
+					snd_alias_list_t* detonateSound;
+					snd_alias_list_t* detonateSoundPlayer;
+					snd_alias_list_t* nightVisionWearSound;
+					snd_alias_list_t* nightVisionWearSoundPlayer;
+					snd_alias_list_t* nightVisionRemoveSound;
+					snd_alias_list_t* nightVisionRemoveSoundPlayer;
+					snd_alias_list_t* altSwitchSound;
+					snd_alias_list_t* altSwitchSoundPlayer;
+					snd_alias_list_t* raiseSound;
+					snd_alias_list_t* raiseSoundPlayer;
+					snd_alias_list_t* firstRaiseSound;
+					snd_alias_list_t* firstRaiseSoundPlayer;
+					snd_alias_list_t* putawaySound;
+					snd_alias_list_t* putawaySoundPlayer;
+					snd_alias_list_t* scanSound;
+				};
+				snd_alias_list_t* sounds[47];
+			};
 			snd_alias_list_t** bounceSound;
 			void* viewShellEjectEffect;
 			void* worldShellEjectEffect;

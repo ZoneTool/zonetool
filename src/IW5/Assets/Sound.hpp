@@ -16,17 +16,13 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			snd_alias_list_t* asset_;
-			bool m_parsed;
+			snd_alias_list_t* asset_ = nullptr;
 
 			static void write_soundfile(IZone* zone, ZoneBuffer* buf, SoundFile* dest);
 			static void write_head(IZone* zone, ZoneBuffer* buf, snd_alias_t* dest);
 
 		public:
-			ISound();
-			~ISound();
-
-			snd_alias_list_t* parse(const std::string& name, ZoneMemory* mem);
+			static snd_alias_list_t* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

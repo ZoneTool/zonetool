@@ -216,6 +216,19 @@ namespace ZoneTool
 						ZONETOOL_FATAL("You dun goofed");
 					}
 
+					// test
+					model->numColSurfs = 0;
+					model->numSurfaces = 0;
+
+					for (auto i = 0; i < 4; i++)
+					{
+						model->lods[i].numSurfacesInLod = 0;
+						if (model->lods[i].surfaces)
+						{
+							model->lods[i].surfaces->xSurficiesCount = 0;
+						}
+					}
+					
 					//
 					this->is_scope_model_ = true;
 					this->asset_ = model;

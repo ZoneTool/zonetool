@@ -870,6 +870,17 @@ namespace ZoneTool
 			WEAPON_SUBASSET(viewFlashEffect, fx, FxEffectDef);
 			WEAPON_SUBASSET(worldFlashEffect, fx, FxEffectDef);
 
+			if (data->notetrackSoundMapValues)
+			{
+				for (auto i = 0; i < 24; i++)
+				{
+					if (data->notetrackSoundMapValues[i])
+					{
+						zone->add_asset_of_type(sound, SL_ConvertToString(data->notetrackSoundMapValues[i]));
+					}
+				}
+			}
+			
 			for (auto i = 0u; i < 48; i++)
 			{
 				 WEAPON_SUBASSET(sounds[i], sound, snd_alias_list_t);

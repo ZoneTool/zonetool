@@ -303,7 +303,7 @@ namespace ZoneTool
 			zone->set_target_version(zone_target_version::iw5_release);
 		}
 		
-		parse_csv_file(linker, zone.get(), fastfile);
+		parse_csv_file(linker, zone.get(), fastfile, fastfile);
 
 		// allocate zone buffer
 		auto buffer = linker->alloc_buffer();

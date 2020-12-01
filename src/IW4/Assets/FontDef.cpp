@@ -7,6 +7,7 @@
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"
+#include "IW5/Assets/FontDef.hpp"
 
 namespace ZoneTool
 {
@@ -15,7 +16,12 @@ namespace ZoneTool
 		void IFontDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;
-			this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).font;
+			this->asset_ = this->parse(name, mem);
+
+			if (!this->asset_)
+			{
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name_.data()).font;
+			}
 		}
 
 		void IFontDef::prepare(ZoneBuffer* buf, ZoneMemory* mem)
@@ -109,8 +115,14 @@ namespace ZoneTool
 			buf->pop_stream();
 		}
 
+		Font_s* IFontDef::parse(const std::string& name, ZoneMemory* mem)
+		{
+			return reinterpret_cast<Font_s*>(IW5::IFontDef::parse(name, mem));
+		}
+
 		void IFontDef::dump(Font_s* asset)
 		{
+			IW5::IFontDef::dump(reinterpret_cast<IW5::Font_s*>(asset));
 		}
 	}
 }

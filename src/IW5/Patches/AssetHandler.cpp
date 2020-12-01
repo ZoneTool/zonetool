@@ -215,6 +215,8 @@ namespace ZoneTool
 					DUMPCASE(pixelshader, IPixelShader, PixelShader);
 					DUMPCASE(vertexshader, IVertexShader, VertexShader);
 					DUMPCASE(vertexdecl, IVertexDecl, VertexDecl);
+
+					DUMPCASE(font, IFontDef, Font_s);
 				}
 			}
 			else

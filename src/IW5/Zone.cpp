@@ -114,6 +114,7 @@ namespace ZoneTool
 			DECLARE_ASSET(menu, IMenuDef);
 			DECLARE_ASSET(scriptfile, IScriptFile);
 			DECLARE_ASSET(lightdef, ILightDef);
+			DECLARE_ASSET(font, IFontDef);
 
 #ifdef USE_VMPROTECT
 			VMProtectEnd();

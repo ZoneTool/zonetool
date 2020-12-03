@@ -1347,6 +1347,7 @@ namespace ZoneTool
 			__declspec(align(2)) XAnimPartTransData u;
 		};
 
+#pragma pack(push, 4)
 		struct XAnimDeltaPartQuatDataFrames2
 		{
 			__int16(*frames)[2];
@@ -1368,21 +1369,21 @@ namespace ZoneTool
 		struct XAnimDeltaPartQuatDataFrames
 		{
 			__int16(*frames)[4];
-			XAnimDynamicIndices indices;
+			XAnimIndices indices;
 		};
 
 		union XAnimDeltaPartQuatData
 		{
 			XAnimDeltaPartQuatDataFrames frames;
-			__int16 frame0[2];
+			__int16 frame0[4];
 		};
 
 		struct XAnimDeltaPartQuat
 		{
 			unsigned __int16 size;
-			__declspec(align(4)) XAnimDeltaPartQuatData u;
+			XAnimDeltaPartQuatData u;
 		};
-
+		
 		struct XAnimDeltaPart
 		{
 			XAnimPartTrans* trans;
@@ -1390,7 +1391,6 @@ namespace ZoneTool
 			XAnimDeltaPartQuat* quat;
 		};
 
-#pragma pack(push, 4)
 		struct XAnimNotifyInfo
 		{
 			short name;

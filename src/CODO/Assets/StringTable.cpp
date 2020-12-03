@@ -196,7 +196,7 @@ namespace ZoneTool::CODO
 				}
 			}
 
-			ZoneBuffer::ClearPointer(&dest->strings);
+			ZoneBuffer::clear_pointer(&dest->strings);
 		}
 
 		END_LOG_STREAM;

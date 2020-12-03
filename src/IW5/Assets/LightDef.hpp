@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GfxLightDef* asset_;
+			GfxLightDef* asset_ = nullptr;
 
 		public:
-			ILightDef();
-			~ILightDef();
-
 			static void parseLightImage(GfxLightImage* image, nlohmann::json& data, ZoneMemory* mem);
 			static GfxLightDef* parse(const std::string& name, ZoneMemory* mem);
 

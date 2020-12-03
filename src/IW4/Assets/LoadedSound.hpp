@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			LoadedSound* asset_;
+			LoadedSound* asset_ = nullptr;
 
 		public:
 			ILoadedSound();

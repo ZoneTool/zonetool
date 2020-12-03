@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			LoadedSound* asset_;
+			LoadedSound* asset_ = nullptr;
 
 		public:
-			ILoadedSound();
-			~ILoadedSound();
-
 			LoadedSound* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;

@@ -67,7 +67,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				write_MenuData(zone, buf, data->data);
-				ZoneBuffer::ClearPointer(&dest->data);
+				ZoneBuffer::clear_pointer(&dest->data);
 			}
 
 			// write name

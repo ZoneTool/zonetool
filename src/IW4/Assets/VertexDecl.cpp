@@ -25,8 +25,12 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
 				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).vertexdecl;
+
+				if (DB_IsXAssetDefault(this->type(), this->name().data()))
+				{
+					ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
+				}
 			}
 		}
 
@@ -50,10 +54,8 @@ namespace ZoneTool
 
 		void IVertexDecl::write(IZone* zone, ZoneBuffer* buf)
 		{
-			sizeof VertexDecl;
-
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;

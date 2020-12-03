@@ -127,42 +127,42 @@ namespace ZoneTool
 			{
 				buf->align(1);
 				buf->write(data->boneNames, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->boneNames);
+				ZoneBuffer::clear_pointer(&dest->boneNames);
 			}
 
 			if (data->parentList)
 			{
 				buf->align(0);
 				buf->write(data->parentList, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->parentList);
+				ZoneBuffer::clear_pointer(&dest->parentList);
 			}
 
 			if (data->tagAngles)
 			{
 				buf->align(1);
 				buf->write(data->tagAngles, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->tagAngles);
+				ZoneBuffer::clear_pointer(&dest->tagAngles);
 			}
 
 			if (data->tagPositions)
 			{
 				buf->align(3);
 				buf->write(data->tagPositions, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->tagPositions);
+				ZoneBuffer::clear_pointer(&dest->tagPositions);
 			}
 
 			if (data->partClassification)
 			{
 				buf->align(0);
 				buf->write(data->partClassification, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->partClassification);
+				ZoneBuffer::clear_pointer(&dest->partClassification);
 			}
 
 			if (data->animMatrix)
 			{
 				buf->align(3);
 				buf->write(data->animMatrix, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->animMatrix);
+				ZoneBuffer::clear_pointer(&dest->animMatrix);
 			}
 
 			if (data->materials)
@@ -176,7 +176,7 @@ namespace ZoneTool
 						material, data->materials[i]->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->materials);
+				ZoneBuffer::clear_pointer(&dest->materials);
 			}
 
 			for (int i = 0; i < 4; i++)
@@ -192,7 +192,7 @@ namespace ZoneTool
 				//	dependingSurfaces[i]->write(zone, buf);
 				//	buf->pop_stream();
 
-				//	//ZoneBuffer::ClearPointer(&dest->lods[i].surfaces);
+				//	//ZoneBuffer::clear_pointer(&dest->lods[i].surfaces);
 				//	//delete[] dependingSurfaces[i];
 
 				//	dest->lods[i].numSurfacesInLod = data->lods[i].surfaces->xSurficiesCount;
@@ -214,14 +214,14 @@ namespace ZoneTool
 					destSurf[i].tris = buf->write_s(3, data->colSurf[i].tris, data->colSurf[i].numCollTris);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->colSurf);
+				ZoneBuffer::clear_pointer(&dest->colSurf);
 			}
 
 			if (data->boneInfo)
 			{
 				buf->align(3);
 				buf->write(data->boneInfo, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->boneInfo);
+				ZoneBuffer::clear_pointer(&dest->boneInfo);
 			}
 
 			if (data->physCollmap)
@@ -244,6 +244,7 @@ namespace ZoneTool
 #endif
 		}
 
+#ifdef GENERATE_IW5_MODELS
 		bool starts_with(const std::string& input, const std::string& str)
 		{
 			return (input.size() >= str.size() && input.substr(0, str.size()) == str);
@@ -274,11 +275,109 @@ namespace ZoneTool
 
 			return false;
 		}
+		
+		std::vector<std::string> iw5_camos =
+		{
+			"autumn",
+			"blue",
+			"choco",
+			"classic",
+			"d_urban",
+			"gold",
+			"hex",
+			"marine",
+			"multi",
+			"red",
+			"snake",
+			"snow",
+			"winter"
+		};
+		
+		XModel* IXModel::generate_iw5_camo_model(const std::string& camo, XModel* asset)
+		{
+			// allocate new model
+			auto* model = remove_attachments(asset);
+			
+			// patch xmodel name
+			const auto model_name = std::string(asset->name).substr(0, strlen(asset->name) - 10).append(camo).append("_no_attach");
+			model->name = _strdup(model_name.data());
 
+			// patch materials
+			Material* patched_material = nullptr;
+			for (auto i = 0u; i < model->numSurfaces; i++)
+			{
+				if (!model->materials[i])
+				{
+					continue;	
+				}
+				
+				if (strstr(model->materials[i]->name, "blue_tiger"))
+				{
+					if (patched_material == nullptr)
+					{
+						patched_material = new Material;
+						memcpy(patched_material, model->materials[i], sizeof Material);
+
+						const auto material_name = std::string(patched_material->name).substr(0, strlen(patched_material->name) - 10).append(camo);
+						patched_material->name = _strdup(material_name.data());
+
+						assert(patched_material->maps[patched_material->numMaps - 1].firstCharacter == 'd');
+						
+						if (camo == "gold"s)
+						{
+							patched_material->numMaps -= 1;
+							patched_material->techniqueSet = new MaterialTechniqueSet;
+							memcpy(patched_material->techniqueSet, model->materials[i]->techniqueSet, sizeof MaterialTechniqueSet);
+
+							auto technique_name = std::string(patched_material->techniqueSet->name);
+							const auto detail_pos = technique_name.find_first_of("d0");
+							technique_name.replace(detail_pos + 2, 2, "");
+
+							patched_material->techniqueSet->name = _strdup(technique_name.data());
+						}
+						
+						patched_material->maps = new MaterialImage[patched_material->numMaps];
+						memcpy(patched_material->maps, model->materials[i]->maps, sizeof MaterialImage * patched_material->numMaps);
+
+						for (auto map = 0; map < patched_material->numMaps; map++)
+						{
+							if (camo == "gold")
+							{
+								if (patched_material->maps[map].firstCharacter == 'c')
+								{
+									patched_material->maps[map].image = new GfxImage;
+									memcpy(patched_material->maps[map].image, model->materials[i]->maps[map].image, sizeof GfxImage);
+									patched_material->maps[map].image->name = "detail_gold_col";
+								}
+								else if (patched_material->maps[map].firstCharacter == 's')
+								{
+									patched_material->maps[map].image = new GfxImage;
+									memcpy(patched_material->maps[map].image, model->materials[i]->maps[map].image, sizeof GfxImage);
+									patched_material->maps[map].image->name = "~detail_gold_spc-r-42g-42b-42~cf35b1a3";
+								}
+							}
+							else if (patched_material->maps[map].firstCharacter == 'd' && camo != "gold")
+							{
+								patched_material->maps[map].image = new GfxImage;
+								memcpy(patched_material->maps[map].image, model->materials[i]->maps[map].image, sizeof GfxImage);
+								patched_material->maps[map].image->name = _strdup(&va("weapon_camo_%s", camo.data())[0]);
+							}
+						}
+						
+						IMaterial::dump(patched_material);
+					}
+
+					model->materials[i] = patched_material;
+				}
+			}
+			
+			return model;
+		}
+		
 		XModel* IXModel::remove_attachments(XModel* asset)
 		{
 			// allocate new model
-			auto model = new XModel;
+			auto* model = new XModel;
 			memcpy(model, asset, sizeof XModel);
 
 			// 
@@ -347,7 +446,7 @@ namespace ZoneTool
 				model->lods[lod].surfIndex = surface_start_index;
 
 				// alloc new XModelSurfs asset
-				const auto new_model_surface = new XModelSurfs;
+				auto* new_model_surface = new XModelSurfs;
 				memcpy(new_model_surface, model->lods[lod].surfaces, sizeof XModelSurfs);
 
 				new_model_surface->name = _strdup(va("%s_no_attach", new_model_surface->name).data());
@@ -362,6 +461,9 @@ namespace ZoneTool
 
 				// increment surface_start_index for next lod
 				surface_start_index += model_surfaces_for_lod.size();
+
+				// dump lod
+				IXSurface::dump(model->lods[lod].surfaces);
 			}
 
 			// some logging
@@ -381,38 +483,48 @@ size(), asset->numSurfaces, asset->name);
 			// return asset
 			return model;
 		}
-
+#endif
+		
 		void IXModel::dump(XModel* asset, const std::function<const char*(uint16_t)>& convertToString)
 		{
 			const auto name = static_cast<std::string>(asset->name);
 
+#ifdef GENERATE_IW5_MODELS
 			// generate attachment-less xmodels
 			if (starts_with(name, "viewmodel_") || starts_with(name, "weapon_"))
 			{
-				const auto new_model = remove_attachments(asset);
+				if (name.find("blue_tiger") != std::string::npos)
+				{
+					for (auto& iw5_camo : iw5_camos)
+					{
+						auto* new_model = generate_iw5_camo_model(iw5_camo, asset);
 
+						auto* iw5_model = new IW5::XModel;
+						memcpy(iw5_model, new_model, sizeof XModel);
+						iw5_model->unk = 0;
+
+						IW5::IXModel::dump(iw5_model, convertToString);
+
+						delete iw5_model;
+					}
+				}
+				
+				auto* new_model = remove_attachments(asset);
+				
 				if (new_model)
 				{
-					const auto iw5_model = new IW5::XModel;
+					auto* iw5_model = new IW5::XModel;
 					memcpy(iw5_model, new_model, sizeof XModel);
 					iw5_model->unk = 0;
 					
 					IW5::IXModel::dump(iw5_model, convertToString);
 
 					delete iw5_model;
-					
-					// dump the XSurfaces
-					for (auto lod = 0; lod < 4; lod++)
-					{
-						if (new_model->lods[lod].surfaces)
-						{
-							IXSurface::dump(new_model->lods[lod].surfaces);
-						}
-					}
 				}
 			}
+#endif
 
-			const auto iw5_model = new IW5::XModel;
+			auto* iw5_model = new IW5::XModel;
 			memcpy(iw5_model, asset, sizeof XModel);
 			iw5_model->unk = 0;
 			

@@ -228,15 +228,15 @@ namespace ZoneTool
 									if (entries[k].name)
 									{
 										buf->write_str(entries[k].name);
-										ZoneBuffer::ClearPointer(&entries[k].name);
+										ZoneBuffer::clear_pointer(&entries[k].name);
 									}
 								}
 
-								ZoneBuffer::ClearPointer(&enums[j].entries);
+								ZoneBuffer::clear_pointer(&enums[j].entries);
 							}
 						}
 
-						ZoneBuffer::ClearPointer(&defs[i].enums);
+						ZoneBuffer::clear_pointer(&defs[i].enums);
 					}
 
 					if (curdef->structs)
@@ -256,29 +256,29 @@ namespace ZoneTool
 									if (props[k].name)
 									{
 										buf->write_str(props[k].name);
-										ZoneBuffer::ClearPointer(&props[k].name);
+										ZoneBuffer::clear_pointer(&props[k].name);
 									}
 								}
 
-								ZoneBuffer::ClearPointer(&structs[j].properties);
+								ZoneBuffer::clear_pointer(&structs[j].properties);
 							}
 						}
 
-						ZoneBuffer::ClearPointer(&defs[i].structs);
+						ZoneBuffer::clear_pointer(&defs[i].structs);
 					}
 
 					if (curdef->indexedArrays)
 					{
 						buf->align(3);
 						buf->write(curdef->indexedArrays, curdef->indexedArrayCount);
-						ZoneBuffer::ClearPointer(&defs[i].indexedArrays);
+						ZoneBuffer::clear_pointer(&defs[i].indexedArrays);
 					}
 
 					if (curdef->enumedArrays)
 					{
 						buf->align(3);
 						buf->write(curdef->enumedArrays, curdef->enumedArrayCount);
-						ZoneBuffer::ClearPointer(&defs[i].enumedArrays);
+						ZoneBuffer::clear_pointer(&defs[i].enumedArrays);
 					}
 				}
 			}

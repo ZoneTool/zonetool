@@ -16,15 +16,11 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			AttachmentDef* asset_;
-			bool m_parsed;
+			AttachmentDef* asset_ = nullptr;
 
 			AttachmentDef* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IAttachmentDef();
-			~IAttachmentDef();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

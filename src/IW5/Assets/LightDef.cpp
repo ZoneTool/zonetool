@@ -12,24 +12,16 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		ILightDef::ILightDef()
-		{
-		}
-
-		ILightDef::~ILightDef()
-		{
-		}
-
 		void ILightDef::parseLightImage(GfxLightImage* image, nlohmann::json& data, ZoneMemory* mem)
 		{
 			if (data["image"].is_string())
 			{
-				auto imageName = data["image"].get<std::string>();
+				const auto image_name = data["image"].get<std::string>();
 
-				if (imageName.size())
+				if (image_name.size())
 				{
 					image->image = mem->Alloc<GfxImage>();
-					image->image->name = mem->StrDup(imageName);
+					image->image->name = mem->StrDup(image_name);
 				}
 			}
 
@@ -38,19 +30,19 @@ namespace ZoneTool
 
 		GfxLightDef* ILightDef::parse(const std::string& name, ZoneMemory* mem)
 		{
-			auto path = "lights/"s + name + ".lightdef"s;
+			const auto path = "lights/"s + name + ".lightdef"s;
 			if (FileSystem::FileExists(path))
 			{
 				ZONETOOL_INFO("Parsing lightdef \"%s\"...", name.c_str());
 
 				auto asset = mem->Alloc<GfxLightDef>();
 
-				auto file = FileSystem::FileOpen(path, "rb");
-				auto size = FileSystem::FileSize(file);
+				auto* file = FileSystem::FileOpen(path, "rb");
+				const auto size = FileSystem::FileSize(file);
 				auto bytes = FileSystem::ReadBytes(file, size);
 				FileSystem::FileClose(file);
 
-				nlohmann::json data = nlohmann::json::parse(bytes);
+				auto data = nlohmann::json::parse(bytes);
 
 				asset->name = mem->StrDup(data["name"].get<std::string>());
 
@@ -83,7 +75,7 @@ namespace ZoneTool
 
 		void ILightDef::load_depending(IZone* zone)
 		{
-			auto asset = this->asset_;
+			auto* asset = this->asset_;
 
 			if (asset->attenuation.image)
 			{
@@ -109,8 +101,8 @@ namespace ZoneTool
 		{
 			assert(sizeof(GfxLightDef), 24);
 
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -136,10 +128,10 @@ namespace ZoneTool
 		{
 			const auto data = asset->ToJson();
 
-			std::string path = "lights/"s + asset->name + ".lightdef"s;
-			std::string json = data.dump(4);
+			const auto path = "lights/"s + asset->name + ".lightdef"s;
+			const auto json = data.dump(4);
 
-			auto file = FileSystem::FileOpen(path, "w"s);
+			auto* file = FileSystem::FileOpen(path, "w"s);
 			fwrite(json.data(), json.size(), 1, file);
 			FileSystem::FileClose(file);
 		}

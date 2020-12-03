@@ -99,10 +99,6 @@ namespace ZoneTool
 
 			ZONETOOL_INFO("Parsing colmap \"%s\"...", name.c_str());
 
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW5::IClipMap::parse");
-#endif
-
 			auto* colmap = mem->Alloc<clipMap_t>();
 
 			colmap->name = read.read_string();
@@ -300,19 +296,10 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			return colmap;
 		}
 
-		IClipMap::IClipMap()
-		{
-		}
-
-		IClipMap::~IClipMap()
-		{
-		}
-
 		void IClipMap::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
 			this->asset_ = this->parse(name, mem);
-			this->m_filename = name;
 
 			if (!this->asset_)
 			{
@@ -453,7 +440,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			if (data->cBrushEdges)
 			{
 				/*buf->write_p(data->cBrushEdges, data->numCBrushEdges);
-				ZoneBuffer::ClearPointer(&);*/
+				ZoneBuffer::clear_pointer(&);*/
 				dest->cBrushEdges = buf->write_s(0, data->cBrushEdges, data->numCBrushEdges);
 				ZONETOOL_INFO("cBrushEdges pointer is 0x%08X", dest->cBrushEdges);
 			}
@@ -482,7 +469,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			{
 				/*buf->align(1);
 				buf->write(data->leafBrushes, data->numLeafBrushes);
-				ZoneBuffer::ClearPointer(&dest->leafBrushes);*/
+				ZoneBuffer::clear_pointer(&dest->leafBrushes);*/
 				dest->leafBrushes = buf->write_s(1, data->leafBrushes, data->numLeafBrushes);
 				ZONETOOL_INFO("leafBrushes pointer is 0x%08X", dest->leafBrushes);
 			}
@@ -525,7 +512,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			{
 				/*buf->align(127);
 				buf->write(data->brushBounds, data->numBrushes);
-				ZoneBuffer::ClearPointer(&dest->brushBounds);*/
+				ZoneBuffer::clear_pointer(&dest->brushBounds);*/
 				dest->brushBounds = buf->write_s(127, data->brushBounds, data->numBrushes);
 				ZONETOOL_INFO("brushBounds pointer is 0x%08X", dest->brushBounds);
 			}
@@ -535,7 +522,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			{
 				/*buf->align(3);
 				buf->write(data->brushContents, data->numBrushes);
-				ZoneBuffer::ClearPointer(&dest->brushContents);*/
+				ZoneBuffer::clear_pointer(&dest->brushContents);*/
 				dest->brushContents = buf->write_s(3, data->brushContents, data->numBrushes);
 				ZONETOOL_INFO("brushContents pointer is 0x%08X", dest->brushContents);
 			}
@@ -571,7 +558,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 				buf->align(3);
 				auto destInfo = buf->write(data->pInfo);
 				this->write_info(zone, buf, data->pInfo, destInfo);
-				ZoneBuffer::ClearPointer(&dest->pInfo);
+				ZoneBuffer::clear_pointer(&dest->pInfo);
 			}
 
 			if (data->staticModelList)
@@ -588,7 +575,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&data->staticModelList);
+				ZoneBuffer::clear_pointer(&data->staticModelList);
 			}
 
 			if (data->cNodes)
@@ -604,42 +591,42 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->cNodes);
+				ZoneBuffer::clear_pointer(&dest->cNodes);
 			}
 
 			if (data->cLeaf)
 			{
 				buf->align(3);
 				buf->write(data->cLeaf, data->numCLeaf);
-				ZoneBuffer::ClearPointer(&dest->cLeaf);
+				ZoneBuffer::clear_pointer(&dest->cLeaf);
 			}
 
 			if (data->verts)
 			{
 				buf->align(3);
 				buf->write(data->verts, data->numVerts);
-				ZoneBuffer::ClearPointer(&dest->verts);
+				ZoneBuffer::clear_pointer(&dest->verts);
 			}
 
 			if (data->triIndices)
 			{
 				buf->align(1);
 				buf->write(data->triIndices, data->numTriIndices * 3);
-				ZoneBuffer::ClearPointer(&dest->triIndices);
+				ZoneBuffer::clear_pointer(&dest->triIndices);
 			}
 
 			if (data->triEdgeIsWalkable)
 			{
 				buf->align(0);
 				buf->write(data->triEdgeIsWalkable, 4 * ((3 * data->numTriIndices + 31) >> 5));
-				ZoneBuffer::ClearPointer(&dest->triEdgeIsWalkable);
+				ZoneBuffer::clear_pointer(&dest->triEdgeIsWalkable);
 			}
 
 			if (data->collisionBorders)
 			{
 				buf->align(3);
 				buf->write_p(data->collisionBorders, data->numCollisionBorders);
-				ZoneBuffer::ClearPointer(&dest->collisionBorders);
+				ZoneBuffer::clear_pointer(&dest->collisionBorders);
 			}
 
 			if (data->collisionPartitions)
@@ -655,14 +642,14 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->collisionPartitions);
+				ZoneBuffer::clear_pointer(&dest->collisionPartitions);
 			}
 
 			if (data->collisionAABBTrees)
 			{
 				buf->align(15);
 				buf->write(data->collisionAABBTrees, data->numCollisionAABBTrees);
-				ZoneBuffer::ClearPointer(&dest->collisionAABBTrees);
+				ZoneBuffer::clear_pointer(&dest->collisionAABBTrees);
 			}
 
 			if (data->cModels)
@@ -688,14 +675,14 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					buf->pop_stream();
 				}
 
-				ZoneBuffer::ClearPointer(&dest->cModels);
+				ZoneBuffer::clear_pointer(&dest->cModels);
 			}
 
 			if (data->smodelNodes)
 			{
 				buf->align(3);
 				buf->write(data->smodelNodes, data->smodelNodeCount);
-				ZoneBuffer::ClearPointer(&dest->smodelNodes);
+				ZoneBuffer::clear_pointer(&dest->smodelNodes);
 			}
 
 			if (data->mapEnts)
@@ -713,11 +700,11 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					if (data->stages[i].name)
 					{
 						buf->write_str(data->stages[i].name);
-						ZoneBuffer::ClearPointer(&destStages[i].name);
+						ZoneBuffer::clear_pointer(&destStages[i].name);
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->stages);
+				ZoneBuffer::clear_pointer(&dest->stages);
 			}
 
 			// copy trigger data from mapents
@@ -755,7 +742,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->dynEntDefList[0]);
+				ZoneBuffer::clear_pointer(&dest->dynEntDefList[0]);
 			}
 
 			if (data->dynEntDefList[1])
@@ -787,7 +774,7 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->dynEntDefList[1]);
+				ZoneBuffer::clear_pointer(&dest->dynEntDefList[1]);
 			}
 
 			buf->push_stream(2);
@@ -796,42 +783,42 @@ colmap->dynEntDefList[_num1][_num2]._item = newEntDef[_num2]._item;
 			{
 				buf->align(3);
 				buf->write(data->dynEntPoseList[0], data->dynEntCount[0]);
-				ZoneBuffer::ClearPointer(&dest->dynEntPoseList[0]);
+				ZoneBuffer::clear_pointer(&dest->dynEntPoseList[0]);
 			}
 
 			if (data->dynEntPoseList[1])
 			{
 				buf->align(3);
 				buf->write(data->dynEntPoseList[1], data->dynEntCount[1]);
-				ZoneBuffer::ClearPointer(&dest->dynEntPoseList[1]);
+				ZoneBuffer::clear_pointer(&dest->dynEntPoseList[1]);
 			}
 
 			if (data->dynEntClientList[0])
 			{
 				buf->align(3);
 				buf->write(data->dynEntClientList[0], data->dynEntCount[0]);
-				ZoneBuffer::ClearPointer(&dest->dynEntClientList[0]);
+				ZoneBuffer::clear_pointer(&dest->dynEntClientList[0]);
 			}
 
 			if (data->dynEntClientList[1])
 			{
 				buf->align(3);
 				buf->write(data->dynEntClientList[1], data->dynEntCount[1]);
-				ZoneBuffer::ClearPointer(&dest->dynEntClientList[1]);
+				ZoneBuffer::clear_pointer(&dest->dynEntClientList[1]);
 			}
 
 			if (data->dynEntCollList[0])
 			{
 				buf->align(3);
 				buf->write(data->dynEntCollList[0], data->dynEntCount[0]);
-				ZoneBuffer::ClearPointer(&dest->dynEntCollList[0]);
+				ZoneBuffer::clear_pointer(&dest->dynEntCollList[0]);
 			}
 
 			if (data->dynEntCollList[1])
 			{
 				buf->align(3);
 				buf->write(data->dynEntCollList[1], data->dynEntCount[1]);
-				ZoneBuffer::ClearPointer(&dest->dynEntCollList[1]);
+				ZoneBuffer::clear_pointer(&dest->dynEntCollList[1]);
 			}
 
 			buf->pop_stream();

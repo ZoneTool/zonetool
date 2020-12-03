@@ -16,8 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			snd_alias_list_t* asset_;
-			bool m_parsed;
+			snd_alias_list_t* asset_ = nullptr;
 
 			static void write_soundfile(IZone* zone, ZoneBuffer* buf, SoundFile* dest);
 			static void write_head(IZone* zone, ZoneBuffer* buf, snd_alias_t* dest);

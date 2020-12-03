@@ -16,8 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			MaterialTechniqueSet* asset_;
-			bool m_parsed;
+			MaterialTechniqueSet* asset_ = nullptr;
 			
 		public:
 			static MaterialTechniqueSet* parse(const std::string& name, ZoneMemory* mem);

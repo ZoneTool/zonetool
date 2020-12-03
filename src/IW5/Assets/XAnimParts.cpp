@@ -12,91 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		void fwritestr(FILE* file, const char* str);
-		void fwriteint(FILE* file, int value);
-
-		XAnimParts* IXAnimParts::parse_xae(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
-		{
-			const auto path = "XAnim\\"s + name + ".xae"s;
-
-			auto* file = FileSystem::FileOpen(path, "rb");
-			if (!file)
-			{
-				return nullptr;
-			}
-
-			ZONETOOL_INFO("Parsing XAE file \"%s\"...", name.c_str());
-			ZONETOOL_WARNING("You are using an outdated animation! Redump the animations using a newer version of zonetool!");
-
-			auto* anim = mem->Alloc<XAnimParts>(); // new XAnimParts;
-			fread(anim, sizeof(XAnimParts), 1, file);
-
-			anim->name = FileSystem::ReadString(file, mem);
-			anim->tagnames = mem->Alloc<unsigned short>(anim->boneCount[9]); // new unsigned short[anim->boneCount[9]];
-
-			for (auto i = 0; i < anim->boneCount[9]; i++)
-			{
-				anim->tagnames[i] = allocString(FileSystem::ReadString(file, mem));
-			}
-
-			if (FileSystem::ReadInt(file))
-			{
-				anim->notetracks = mem->Alloc<XAnimNotifyInfo>(anim->notetrackCount);
-
-				for (auto i = 0; i < (anim->notetrackCount); i++)
-				{
-					fread(&anim->notetracks[i], sizeof(XAnimNotifyInfo), 1, file);
-
-					const char* str = FileSystem::ReadString(file, mem);
-					anim->notetracks[i].name = allocString(str);
-				}
-			}
-
-			if (anim->dataByte)
-			{
-				anim->dataByte = mem->Alloc<char>(anim->dataByteCount); // new char[anim->dataByteCount];
-				fread(anim->dataByte, 1, anim->dataByteCount, file);
-			}
-			if (anim->dataShort)
-			{
-				anim->dataShort = mem->Alloc<short>(anim->dataShortCount);
-				fread(anim->dataShort, 2, anim->dataShortCount, file);
-			}
-			if (anim->dataInt)
-			{
-				anim->dataInt = mem->Alloc<int>(anim->dataIntCount);
-				fread(anim->dataInt, 4, anim->dataIntCount, file);
-			}
-			if (anim->randomDataShort)
-			{
-				anim->randomDataShort = mem->Alloc<short>(anim->randomDataShortCount);
-				fread(anim->randomDataShort, 2, anim->randomDataShortCount, file);
-			}
-			if (anim->randomDataByte)
-			{
-				anim->randomDataByte = mem->Alloc<char>(anim->randomDataByteCount);
-				fread(anim->randomDataByte, 1, anim->randomDataByteCount, file);
-			}
-			if (anim->randomDataInt)
-			{
-				anim->randomDataInt = mem->Alloc<int>(anim->randomDataIntCount);
-				fread(anim->randomDataInt, 4, anim->randomDataIntCount, file);
-			}
-
-			if (anim->delta)
-			{
-				anim->delta = nullptr;
-			}
-			if (anim->indices.data)
-			{
-				anim->indices.data = nullptr;
-			}
-
-			FileSystem::FileClose(file);
-
-			return anim;
-		}
-
 		XAnimParts* IXAnimParts::parse_xae2(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
 			const auto path = "XAnim\\"s + name + ".xae2";
@@ -284,15 +199,11 @@ namespace ZoneTool
 
 		XAnimParts* IXAnimParts::parse(const std::string& name, ZoneMemory* mem, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
-			auto parsed = IXAnimParts::parse_xae3(name, mem, allocString);
+			auto* parsed = IXAnimParts::parse_xae3(name, mem, allocString);
 
 			if (!parsed)
 			{
 				parsed = IXAnimParts::parse_xae2(name, mem, allocString);
-			}
-			if (!parsed)
-			{
-				parsed = IXAnimParts::parse_xae(name, mem, allocString);
 			}
 
 			return parsed;
@@ -550,138 +461,6 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
-		}
-
-		void IXAnimParts::dump_xae(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)
-		{
-			const auto path = "XAnim\\"s + asset->name + ".xae";
-
-			if (FileSystem::FileExists(path))
-			{
-				return;
-			}
-
-			auto* file = FileSystem::FileOpen(path, "wb");
-
-			// Write XAE file
-			fwrite(asset, sizeof XAnimParts, 1, file);
-			fwritestr(file, asset->name);
-
-			// Write tag names
-			for (auto i = 0; i < asset->boneCount[9]; i++)
-			{
-				fwritestr(file, convertToString(asset->tagnames[i]));
-			}
-
-			// Write notetracks
-			if (asset->notetracks)
-			{
-				fwriteint(file, 1);
-
-				for (auto i = 0; i < asset->notetrackCount; i++)
-				{
-					fwrite(&asset->notetracks[i], sizeof(XAnimNotifyInfo), 1, file);
-					fwritestr(file, convertToString(asset->notetracks[i].name));
-				}
-			}
-			else fwriteint(file, 0);
-
-			// Bytes/Shorts/Ints
-			if (asset->dataByte)
-			{
-				fwrite(asset->dataByte, 1, asset->dataByteCount, file);
-			}
-			if (asset->dataShort)
-			{
-				fwrite(asset->dataShort, 2, asset->dataShortCount, file);
-			}
-			if (asset->dataInt)
-			{
-				fwrite(asset->dataInt, 4, asset->dataIntCount, file);
-			}
-			if (asset->randomDataShort)
-			{
-				fwrite(asset->randomDataShort, 2, asset->randomDataShortCount, file);
-			}
-			if (asset->randomDataByte)
-			{
-				fwrite(asset->randomDataByte, 1, asset->randomDataByteCount, file);
-			}
-			if (asset->randomDataInt)
-			{
-				fwrite(asset->randomDataInt, 4, asset->randomDataIntCount, file);
-			}
-
-			FileSystem::FileClose(file);
-		}
-
-		void IXAnimParts::dump_xae2(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)
-		{
-			const auto path = "XAnim\\"s + asset->name + ".xae2";
-
-			AssetDumper dump;
-			if (!dump.open(path))
-			{
-				return;
-			}
-
-			dump.dump_single(asset);
-			dump.dump_string(asset->name);
-
-			for (auto bone = 0; bone < asset->boneCount[9]; bone++)
-			{
-				dump.dump_string(convertToString(asset->tagnames[bone]));
-			}
-
-			if (asset->dataByte)
-			{
-				dump.dump_array(asset->dataByte, asset->dataByteCount);
-			}
-			if (asset->dataShort)
-			{
-				dump.dump_array(asset->dataShort, asset->dataShortCount);
-			}
-			if (asset->dataInt)
-			{
-				dump.dump_array(asset->dataInt, asset->dataIntCount);
-			}
-			if (asset->randomDataShort)
-			{
-				dump.dump_array(asset->randomDataShort, asset->randomDataShortCount);
-			}
-			if (asset->randomDataByte)
-			{
-				dump.dump_array(asset->randomDataByte, asset->randomDataByteCount);
-			}
-			if (asset->randomDataInt)
-			{
-				dump.dump_array(asset->randomDataInt, asset->randomDataIntCount);
-			}
-
-			if (asset->indices.data)
-			{
-				if (asset->framecount > 255)
-				{
-					dump.dump_array(asset->indices._2, asset->indexcount);
-				}
-				else
-				{
-					dump.dump_array(asset->indices._1, asset->indexcount);
-				}
-			}
-
-			if (asset->notetracks)
-			{
-				dump.dump_array(asset->notetracks, asset->notetrackCount);
-
-				for (auto i = 0; i < asset->notetrackCount; i++)
-				{
-					dump.dump_string(convertToString(asset->notetracks[i].name));
-				}
-			}
-
-			dump.dump_int(0);
-			dump.close();
 		}
 
 		void IXAnimParts::dump_xae3(XAnimParts* asset, const std::function<const char* (std::uint16_t)>& convertToString)

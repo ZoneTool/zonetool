@@ -35,10 +35,12 @@ namespace ZoneTool
 			ents->entityString = mem->Alloc<char>(ents->numEntityChars);
 			memset((char*)ents->entityString, 0, ents->numEntityChars);
 			fread((char*)ents->entityString, ents->numEntityChars - 1, 1, file);
-			
-			// convert the mapents!
-			IMapEnts::ConvertEnts(reinterpret_cast<MapEnts*>(ents), mem);
 
+#ifdef CONVERT_IW5_MAPENTS
+			// convert the mapents!
+			IMapEnts::convert_ents(reinterpret_cast<MapEnts*>(ents), mem);
+#endif
+			
 			// close filepointer
 			FileSystem::FileClose(file);
 
@@ -107,17 +109,10 @@ namespace ZoneTool
 			{
 				buf->align(0);
 				buf->write(data->entityString, data->numEntityChars);
-				ZoneBuffer::ClearPointer(&dest->entityString);
+				ZoneBuffer::clear_pointer(&dest->entityString);
 			}
 
 			IMapEnts::write_triggers(zone, buf, &dest->trigger);
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->entityString);
-				endian_convert(&dest->numEntityChars);
-			}
 
 			END_LOG_STREAM;
 			buf->pop_stream();
@@ -125,7 +120,7 @@ namespace ZoneTool
 
 		void IAddonMapEnts::dump(AddonMapEnts* asset)
 		{
-			auto file = FileSystem::FileOpen(asset->name, "wb");
+			auto* file = FileSystem::FileOpen(asset->name, "wb");
 
 			if (file)
 			{
@@ -133,19 +128,19 @@ namespace ZoneTool
 				FileSystem::FileClose(file);
 			}
 
-			AssetDumper triggerDumper;
-			if (triggerDumper.open(asset->name + ".triggers"s))
+			AssetDumper trigger_dumper;
+			if (trigger_dumper.open(asset->name + ".triggers"s))
 			{
-				triggerDumper.dump_int(asset->trigger.modelCount);
-				triggerDumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
+				trigger_dumper.dump_int(asset->trigger.modelCount);
+				trigger_dumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
 
-				triggerDumper.dump_int(asset->trigger.hullCount);
-				triggerDumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
+				trigger_dumper.dump_int(asset->trigger.hullCount);
+				trigger_dumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
 
-				triggerDumper.dump_int(asset->trigger.slabCount);
-				triggerDumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
+				trigger_dumper.dump_int(asset->trigger.slabCount);
+				trigger_dumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
 
-				triggerDumper.close();
+				trigger_dumper.close();
 			}
 		}
 	}

@@ -203,7 +203,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				this->write_xsurfices(zone, buf, data->xSurficies, data->xSurficiesCount);
-				ZoneBuffer::ClearPointer(&dest->xSurficies);
+				ZoneBuffer::clear_pointer(&dest->xSurficies);
 			}
 
 			END_LOG_STREAM;
@@ -269,14 +269,6 @@ namespace ZoneTool
 			}
 
 			dump.close();
-		}
-
-		IXSurface::IXSurface()
-		{
-		}
-
-		IXSurface::~IXSurface()
-		{
 		}
 	}
 }

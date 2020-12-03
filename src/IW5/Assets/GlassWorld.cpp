@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IGlassWorld::IGlassWorld()
-		{
-		}
-
-		IGlassWorld::~IGlassWorld()
-		{
-		}
-
 		GlassWorld* IGlassWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto path = name + ".glassmap";
@@ -97,8 +89,8 @@ namespace ZoneTool
 
 		void IGlassWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			assert(sizeof GlassWorld, 8);
 			assert(sizeof G_GlassData, 128);
@@ -121,7 +113,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(glassdata->glassPieces, glassdata->pieceCount);
-					ZoneBuffer::ClearPointer(&destdata->glassPieces);
+					ZoneBuffer::clear_pointer(&destdata->glassPieces);
 				}
 				if (glassdata->glassNames)
 				{
@@ -136,7 +128,7 @@ namespace ZoneTool
 						{
 							buf->align(1);
 							buf->write(glassdata->glassNames[i].pieceIndices, glassdata->glassNames[i].pieceCount);
-							ZoneBuffer::ClearPointer(&glassdata->glassNames[i].pieceIndices);
+							ZoneBuffer::clear_pointer(&glassdata->glassNames[i].pieceIndices);
 						}
 
 						if (zone->get_target() != zone_target::pc)
@@ -148,10 +140,10 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&destdata->glassNames);
+					ZoneBuffer::clear_pointer(&destdata->glassNames);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->g_glassData);
+				ZoneBuffer::clear_pointer(&dest->g_glassData);
 
 				if (zone->get_target() != zone_target::pc)
 				{

@@ -11,6 +11,10 @@
 #define WIN32_LEAN_AND_MEAN
 #define _CRT_SECURE_NO_WARNINGS
 
+// IW4-SPECIFIC OPTIONS
+// #define GENERATE_IW5_MODELS
+// #define GENERATE_IW5_WEAPONS
+
 #include <windows.h>
 
 #undef min

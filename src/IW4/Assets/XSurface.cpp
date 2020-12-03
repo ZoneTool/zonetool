@@ -330,7 +330,7 @@ namespace ZoneTool
 					buf->align(3);
 					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
 					write_xsurfaces<XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, false);
-					ZoneBuffer::ClearPointer(&dest->surfs);
+					ZoneBuffer::clear_pointer(&dest->surfs);
 				}
 
 				END_LOG_STREAM;
@@ -379,7 +379,7 @@ namespace ZoneTool
 					buf->align(3);
 					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
 					write_xsurfaces<alpha::XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, true);
-					ZoneBuffer::ClearPointer(&dest->surfs);
+					ZoneBuffer::clear_pointer(&dest->surfs);
 				}
 
 				END_LOG_STREAM;

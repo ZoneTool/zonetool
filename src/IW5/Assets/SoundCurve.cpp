@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		ISoundCurve::ISoundCurve()
-		{
-		}
-
-		ISoundCurve::~ISoundCurve()
-		{
-		}
-
 		void ISoundCurve::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;

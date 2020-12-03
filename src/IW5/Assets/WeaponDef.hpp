@@ -18,7 +18,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			WeaponCompleteDef* asset_;
+			WeaponCompleteDef* asset_ = nullptr;
 
 		public:
 			WeaponCompleteDef* parse(const std::string& name, ZoneMemory* mem);

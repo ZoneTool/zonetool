@@ -17,13 +17,13 @@ namespace ZoneTool
 		{
 			if (FileSystem::FileExists(name + ".cgsc") && FileSystem::FileExists(name + ".cgsc.stack"))
 			{
-				auto scriptfile = mem->Alloc<ScriptFile>();
+				auto* scriptfile = mem->Alloc<ScriptFile>();
 				scriptfile->name = mem->StrDup(name);
 
 				ZONETOOL_INFO("Parsing scriptfile \"%s\"...", name.data());
 
 				// parse bytecode
-				auto file = FileSystem::FileOpen(name + ".cgsc", "rb"s);
+				auto* file = FileSystem::FileOpen(name + ".cgsc", "rb"s);
 				if (file)
 				{
 					ZONETOOL_INFO("Parsing scriptfile bytecode for script \"%s\"...", name.data());
@@ -44,7 +44,7 @@ namespace ZoneTool
 				{
 					ZONETOOL_INFO("Parsing scriptfile heap for script \"%s\"...", name.data());
 
-					auto size = FileSystem::FileSize(file);
+					const auto size = FileSystem::FileSize(file);
 					auto data = FileSystem::ReadBytes(file, size);
 
 					ZoneBuffer buf(data);
@@ -98,8 +98,8 @@ namespace ZoneTool
 
 		void IScriptFile::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write<ScriptFile>(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write<ScriptFile>(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -110,24 +110,20 @@ namespace ZoneTool
 
 			if (data->buffer)
 			{
-				auto destbuffer = buf->write(data->buffer, data->compressedLen);
-				// encrypt_data(const_cast<char*>(destbuffer), data->compressedLen);
-				ZoneBuffer::ClearPointer(&dest->buffer);
+				buf->write(data->buffer, data->compressedLen);
+				ZoneBuffer::clear_pointer(&dest->buffer);
 			}
 
 			if (data->bytecode)
 			{
-				auto destbytecode = buf->write(data->bytecode, data->bytecodeLen);
-				// encrypt_data(destbytecode, data->bytecodeLen);
-				ZoneBuffer::ClearPointer(&dest->bytecode);
+				buf->write(data->bytecode, data->bytecodeLen);
+				ZoneBuffer::clear_pointer(&dest->bytecode);
 			}
 
 			buf->pop_stream();
 
 			END_LOG_STREAM;
 			buf->pop_stream();
-
-			// encrypt_data(dest, sizeof ScriptFile);
 		}
 
 		void IScriptFile::dump(ScriptFile* asset)
@@ -137,8 +133,8 @@ namespace ZoneTool
 				return;
 			}
 
-			auto fp1 = FileSystem::FileOpen(va("%s.cgsc", asset->name), "wb");
-			auto fp2 = FileSystem::FileOpen(va("%s.cgsc.stack", asset->name), "wb");
+			auto* fp1 = FileSystem::FileOpen(va("%s.cgsc", asset->name), "wb");
+			auto* fp2 = FileSystem::FileOpen(va("%s.cgsc.stack", asset->name), "wb");
 
 			if (fp1 && asset->bytecode)
 			{
@@ -157,14 +153,6 @@ namespace ZoneTool
 
 			FileSystem::FileClose(fp1);
 			FileSystem::FileClose(fp2);
-		}
-
-		IScriptFile::IScriptFile()
-		{
-		}
-
-		IScriptFile::~IScriptFile()
-		{
 		}
 	}
 }

@@ -16,14 +16,11 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			ModelSurface* asset_;
+			ModelSurface* asset_ = nullptr;
 
 			void write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data, std::int16_t count);
 
 		public:
-			IXSurface();
-			~IXSurface();
-
 			static ModelSurface* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;

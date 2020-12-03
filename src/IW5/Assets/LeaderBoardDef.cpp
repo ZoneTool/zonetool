@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		ILeaderBoardDef::ILeaderBoardDef()
-		{
-		}
-
-		ILeaderBoardDef::~ILeaderBoardDef()
-		{
-		}
-
 		void ILeaderBoardDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;
@@ -46,31 +38,29 @@ namespace ZoneTool
 
 		void ILeaderBoardDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto varLeaderboardDef = this->asset_;
-			auto dest = buf->write(varLeaderboardDef);
-
-			LeaderBoardDef;
-
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
+			
 			buf->push_stream(3);
 			START_LOG_STREAM;
 
 			dest->name = buf->write_str(this->name());
 
-			if (varLeaderboardDef->columns)
+			if (data->columns)
 			{
 				buf->align(3);
-				auto destColumns = buf->write(varLeaderboardDef->columns, varLeaderboardDef->columnCount);
+				auto* dest_columns = buf->write(data->columns, data->columnCount);
 
-				if (varLeaderboardDef->columnCount > 0)
+				if (data->columnCount > 0)
 				{
-					for (int i = 0; i < varLeaderboardDef->columnCount; i++)
+					for (auto i = 0; i < data->columnCount; i++)
 					{
-						destColumns[i].title = buf->write_str(varLeaderboardDef->columns[i].title);
-						destColumns[i].statName = buf->write_str(varLeaderboardDef->columns[i].statName);
+						dest_columns[i].title = buf->write_str(data->columns[i].title);
+						dest_columns[i].statName = buf->write_str(data->columns[i].statName);
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->columns);
+				ZoneBuffer::clear_pointer(&dest->columns);
 			}
 
 			END_LOG_STREAM;
@@ -81,10 +71,10 @@ namespace ZoneTool
 		{
 			const auto data = asset->ToJson();
 
-			std::string path = "leaderboards\\"s + asset->name;
-			std::string json = data.dump(4);
+			const auto path = "leaderboards\\"s + asset->name;
+			const auto json = data.dump(4);
 
-			auto file = FileSystem::FileOpen(path, "w"s);
+			auto* file = FileSystem::FileOpen(path, "w"s);
 			fwrite(json.data(), json.size(), 1, file);
 			FileSystem::FileClose(file);
 		}

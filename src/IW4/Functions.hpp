@@ -15,6 +15,7 @@ namespace ZoneTool
 		union XAssetHeader;
 
 		static Function<XAssetHeader(std::int32_t, const char*)> DB_FindXAssetHeader = 0x407930;
+		static Function<bool(std::int32_t, const char*)> DB_IsXAssetDefault = 0x48E6A0;
 		static Function<void(XZoneInfo*, std::uint32_t, std::uint32_t)> DB_LoadXAssets = 0x4E5930;
 
 		typedef int (__cdecl * DB_GetXAssetSizeHandler_t)();

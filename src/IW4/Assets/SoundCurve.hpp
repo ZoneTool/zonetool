@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			SndCurve* asset_;
+			SndCurve* asset_ = nullptr;
 
 		public:
-			ISoundCurve();
-			~ISoundCurve();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

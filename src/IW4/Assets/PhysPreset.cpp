@@ -38,8 +38,8 @@ namespace ZoneTool
 
 		void IPhysPreset::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 			
 			buf->push_stream(3);
 
@@ -51,21 +51,6 @@ namespace ZoneTool
 			}
 
 			buf->pop_stream();
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->bounce);
-				endian_convert(&dest->bulletForceScale);
-				endian_convert(&dest->explosiveForceScale);
-				endian_convert(&dest->friction);
-				endian_convert(&dest->mass);
-				endian_convert(&dest->piecesSpreadFraction);
-				endian_convert(&dest->piecesUpwardVelocity);
-				endian_convert(&dest->sndAliasPrefix);
-				endian_convert(&dest->tempDefaultToCylinder);
-				endian_convert(&dest->type);
-			}
 		}
 
 		void IPhysPreset::dump(PhysPreset* asset)

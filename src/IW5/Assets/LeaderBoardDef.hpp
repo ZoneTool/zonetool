@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			LeaderBoardDef* asset_;
+			LeaderBoardDef* asset_ = nullptr;
 
 		public:
-			ILeaderBoardDef();
-			~ILeaderBoardDef();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

@@ -16,12 +16,10 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			ComWorld* asset_;
+			ComWorld* asset_ = nullptr;
 
 		public:
 			static ComWorld* parse(const std::string& name, ZoneMemory* mem);
-			IComWorld();
-			~IComWorld();
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

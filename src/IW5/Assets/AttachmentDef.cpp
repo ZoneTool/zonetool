@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IAttachmentDef::IAttachmentDef()
-		{
-		}
-
-		IAttachmentDef::~IAttachmentDef()
-		{
-		}
-
 		AttachmentDef* IAttachmentDef::parse(const std::string& name, ZoneMemory* mem)
 		{
 			if (name == "cheytacscope")
@@ -233,7 +225,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->worldModels);
+				ZoneBuffer::clear_pointer(&dest->worldModels);
 			}
 
 			if (data->viewModels)
@@ -249,7 +241,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->viewModels);
+				ZoneBuffer::clear_pointer(&dest->viewModels);
 			}
 
 			if (data->reticleViewModels)
@@ -265,7 +257,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->reticleViewModels);
+				ZoneBuffer::clear_pointer(&dest->reticleViewModels);
 			}
 
 			if (data->ammogeneral)
@@ -279,28 +271,28 @@ namespace ZoneTool
 						tracer, ammo->tracerType->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->ammogeneral);
+				ZoneBuffer::clear_pointer(&dest->ammogeneral);
 			}
 
 			if (data->sight)
 			{
 				buf->align(3);
 				buf->write(data->sight);
-				ZoneBuffer::ClearPointer(&dest->sight);
+				ZoneBuffer::clear_pointer(&dest->sight);
 			}
 
 			if (data->reload)
 			{
 				buf->align(1);
 				buf->write(data->reload);
-				ZoneBuffer::ClearPointer(&dest->reload);
+				ZoneBuffer::clear_pointer(&dest->reload);
 			}
 
 			if (data->addOns)
 			{
 				buf->align(1);
 				buf->write(data->addOns);
-				ZoneBuffer::ClearPointer(&dest->addOns);
+				ZoneBuffer::clear_pointer(&dest->addOns);
 			}
 
 			if (data->general)
@@ -320,77 +312,77 @@ namespace ZoneTool
 						material, general->reticleSide->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->general);
+				ZoneBuffer::clear_pointer(&dest->general);
 			}
 
 			if (data->ammunition)
 			{
 				buf->align(3);
 				buf->write(data->ammunition);
-				ZoneBuffer::ClearPointer(&dest->ammunition);
+				ZoneBuffer::clear_pointer(&dest->ammunition);
 			}
 
 			if (data->idleSettings)
 			{
 				buf->align(3);
 				buf->write(data->idleSettings);
-				ZoneBuffer::ClearPointer(&dest->idleSettings);
+				ZoneBuffer::clear_pointer(&dest->idleSettings);
 			}
 
 			if (data->damage)
 			{
 				buf->align(3);
 				buf->write(data->damage);
-				ZoneBuffer::ClearPointer(&dest->damage);
+				ZoneBuffer::clear_pointer(&dest->damage);
 			}
 
 			if (data->locationDamage)
 			{
 				buf->align(3);
 				buf->write(data->damage);
-				ZoneBuffer::ClearPointer(&dest->damage);
+				ZoneBuffer::clear_pointer(&dest->damage);
 			}
 
 			if (data->scopeDriftSettings)
 			{
 				buf->align(3);
 				buf->write(data->scopeDriftSettings);
-				ZoneBuffer::ClearPointer(&dest->scopeDriftSettings);
+				ZoneBuffer::clear_pointer(&dest->scopeDriftSettings);
 			}
 
 			if (data->adsSettings)
 			{
 				buf->align(3);
 				buf->write(data->adsSettings);
-				ZoneBuffer::ClearPointer(&dest->adsSettings);
+				ZoneBuffer::clear_pointer(&dest->adsSettings);
 			}
 
 			if (data->adsSettingsMain)
 			{
 				buf->align(3);
 				buf->write(data->adsSettingsMain);
-				ZoneBuffer::ClearPointer(&dest->adsSettingsMain);
+				ZoneBuffer::clear_pointer(&dest->adsSettingsMain);
 			}
 
 			if (data->hipSpread)
 			{
 				buf->align(3);
 				buf->write(data->hipSpread);
-				ZoneBuffer::ClearPointer(&dest->hipSpread);
+				ZoneBuffer::clear_pointer(&dest->hipSpread);
 			}
 
 			if (data->gunKick)
 			{
 				buf->align(3);
 				buf->write(data->gunKick);
-				ZoneBuffer::ClearPointer(&dest->gunKick);
+				ZoneBuffer::clear_pointer(&dest->gunKick);
 			}
 
 			if (data->viewKick)
 			{
 				buf->align(3);
 				buf->write(data->viewKick);
-				ZoneBuffer::ClearPointer(&dest->viewKick);
+				ZoneBuffer::clear_pointer(&dest->viewKick);
 			}
 
 			if (data->adsOverlay)
@@ -422,7 +414,7 @@ namespace ZoneTool
 						material, overlay->overlay.shaderLowRes->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->adsOverlay);
+				ZoneBuffer::clear_pointer(&dest->adsOverlay);
 			}
 
 			if (data->ui)
@@ -441,7 +433,7 @@ namespace ZoneTool
 					ui->dpadIcon = reinterpret_cast<Material*>(zone->get_asset_pointer(material, ui->dpadIcon->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->ui);
+				ZoneBuffer::clear_pointer(&dest->ui);
 			}
 
 			if (data->rumbles)
@@ -459,7 +451,7 @@ namespace ZoneTool
 					rumbles->meleeImpactRumble = buf->write_str(rumbles->meleeImpactRumble);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->rumbles);
+				ZoneBuffer::clear_pointer(&dest->rumbles);
 			}
 
 			/*if (data->projectile)
@@ -507,7 +499,7 @@ namespace ZoneTool
 					projectile->projIgnitionSound = reinterpret_cast<snd_alias_list_t*>(zone->GetAssetPointer(sound, projectile->projIgnitionSound->aliasName));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->projectile);
+				ZoneBuffer::clear_pointer(&dest->projectile);
 			}*/
 			dest->projectile = nullptr;
 

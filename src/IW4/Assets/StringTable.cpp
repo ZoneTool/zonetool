@@ -133,14 +133,6 @@ namespace ZoneTool
 			return stringtable;
 		}
 
-		IStringTable::IStringTable()
-		{
-		}
-
-		IStringTable::~IStringTable()
-		{
-		}
-
 		void IStringTable::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;
@@ -173,8 +165,8 @@ namespace ZoneTool
 
 		void IStringTable::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -184,49 +176,34 @@ namespace ZoneTool
 			if (data->strings)
 			{
 				buf->align(3);
-				auto destStrings = buf->write(data->strings, data->columns * data->rows);
+				auto* dest_strings = buf->write(data->strings, data->columns * data->rows);
 
 				if (data->columns * data->rows > 0)
 				{
-					for (int i = 0; i < data->columns * data->rows; i++)
+					for (auto i = 0; i < data->columns * data->rows; i++)
 					{
 						if (data->strings[i].string)
 						{
-							destStrings[i].string = buf->write_str(data->strings[i].string);
-						}
-
-						if (zone->get_target() != zone_target::pc)
-						{
-							endian_convert(&destStrings[i].string);
-							endian_convert(&destStrings[i].hash);
+							dest_strings[i].string = buf->write_str(data->strings[i].string);
 						}
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->strings);
+				ZoneBuffer::clear_pointer(&dest->strings);
 			}
 
 			END_LOG_STREAM;
 			buf->pop_stream();
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->strings);
-				endian_convert(&dest->rows);
-				endian_convert(&dest->columns);
-			}
 		}
 
 		void IStringTable::dump(StringTable* asset)
 		{
-			std::string path = asset->name;
+			const std::string path = asset->name;
+			auto* file = FileSystem::FileOpen(path, "w"s);
 
-			auto file = FileSystem::FileOpen(path, "w"s);
-
-			for (int row = 0; row < asset->rows; row++)
+			for (auto row = 0; row < asset->rows; row++)
 			{
-				for (int column = 0; column < asset->columns; column++)
+				for (auto column = 0; column < asset->columns; column++)
 				{
 					fprintf(
 						file,

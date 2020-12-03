@@ -32,7 +32,7 @@ namespace ZoneTool
 
 		void IFontDef::load_depending(IZone* zone)
 		{
-			auto data = this->asset_;
+			auto* data = this->asset_;
 
 			if (data->material)
 			{
@@ -57,8 +57,8 @@ namespace ZoneTool
 
 		void IFontDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -83,7 +83,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->glyphs, data->glyphCount);
-				ZoneBuffer::ClearPointer(&dest->glyphs);
+				ZoneBuffer::clear_pointer(&dest->glyphs);
 			}
 
 			END_LOG_STREAM;

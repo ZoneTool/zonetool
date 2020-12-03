@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IVertexShader::IVertexShader()
-		{
-		}
-
-		IVertexShader::~IVertexShader()
-		{
-		}
-
 		VertexShader* IVertexShader::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "vertexshader\\" + name;
@@ -72,8 +64,12 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL("VertexShader %s not found.", &name[0]);
-				// this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).vertexshader;
+				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).vertexshader;
+
+				if (DB_IsXAssetDefault(this->type(), this->name().data()))
+				{
+					ZONETOOL_FATAL("VertexShader %s not found.", &name[0]);
+				}
 			}
 		}
 
@@ -109,7 +105,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->bytecode, data->codeLen);
-				ZoneBuffer::ClearPointer(&dest->bytecode);
+				ZoneBuffer::clear_pointer(&dest->bytecode);
 			}
 
 			END_LOG_STREAM;

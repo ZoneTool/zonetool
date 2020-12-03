@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		IPhysCollmap::IPhysCollmap()
-		{
-		}
-
-		IPhysCollmap::~IPhysCollmap()
-		{
-		}
-
 		PhysCollmap* IPhysCollmap::parse(const std::string& name, ZoneMemory* mem)
 		{
 			auto version = 4;
@@ -45,57 +37,57 @@ namespace ZoneTool
 
 			ZONETOOL_INFO("Parsing phys_collmap \"%s\"...", name.c_str());
 
-			auto physcollmap = read.read_array<PhysCollmap>(); // mem->Alloc<PhysCollmap>();
-			physcollmap->name = mem->StrDup(name);
+			auto* phys_collmap = read.read_array<PhysCollmap>();
+			phys_collmap->name = mem->StrDup(name);
 
 			if (read.read_int())
 			{
-				physcollmap->info = read.read_array<PhysGeomInfo>();
+				phys_collmap->info = read.read_array<PhysGeomInfo>();
 
-				for (int i = 0; i < physcollmap->numInfo; i++)
+				for (auto i = 0u; i < phys_collmap->numInfo; i++)
 				{
 					if (read.read_int())
 					{
-						physcollmap->info[i].brush = read.read_array<BrushWrapper>();
+						phys_collmap->info[i].brush = read.read_array<BrushWrapper>();
 
 						if (version == 4)
 						{
 							if (read.read_int())
 							{
-								physcollmap->info[i].brush->plane = read.read_array<cplane_s>();
+								phys_collmap->info[i].brush->plane = read.read_array<cplane_s>();
 							}
 						}
 
 						if (read.read_int())
 						{
-							physcollmap->info[i].brush->side = read.read_array<cbrushside_t>();
+							phys_collmap->info[i].brush->side = read.read_array<cbrushside_t>();
 
-							for (int j = 0; j < physcollmap->info[i].brush->numPlaneSide; j++)
+							for (auto j = 0u; j < phys_collmap->info[i].brush->numPlaneSide; j++)
 							{
 								if (read.read_int())
 								{
-									physcollmap->info[i].brush->side[j].plane = read.read_array<cplane_s>();
+									phys_collmap->info[i].brush->side[j].plane = read.read_array<cplane_s>();
 								}
 							}
 						}
 
 						if (read.read_int())
 						{
-							physcollmap->info[i].brush->edge = read.read_array<char>();
+							phys_collmap->info[i].brush->edge = read.read_array<char>();
 						}
 
 						if (version == 3)
 						{
 							if (read.read_int())
 							{
-								physcollmap->info[i].brush->plane = read.read_array<cplane_s>();
+								phys_collmap->info[i].brush->plane = read.read_array<cplane_s>();
 							}
 						}
 					}
 				}
 			}
 
-			return physcollmap;
+			return phys_collmap;
 		}
 
 		void IPhysCollmap::init(const std::string& name, ZoneMemory* mem)
@@ -127,28 +119,28 @@ namespace ZoneTool
 			return phys_collmap;
 		}
 
-		void IPhysCollmap::write_BrushWrapper(IZone* zone, ZoneBuffer* buf, BrushWrapper* data)
+		void IPhysCollmap::write_brush_wrapper(IZone* zone, ZoneBuffer* buf, BrushWrapper* data)
 		{
-			auto dest = buf->write(data);
+			auto* dest = buf->write(data);
 
 			if (data->side)
 			{
 				buf->align(3);
-				auto destsides = buf->write(data->side, data->numPlaneSide);
+				auto* cbrushside = buf->write(data->side, data->numPlaneSide);
 
 				for (auto i = 0; i < data->numPlaneSide; i++)
 				{
-					destsides[i].plane = buf->write_s(3, data->side[i].plane);
+					cbrushside[i].plane = buf->write_s(3, data->side[i].plane);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->side);
+				ZoneBuffer::clear_pointer(&dest->side);
 			}
 
 			if (data->edge)
 			{
 				buf->align(0);
 				buf->write(data->edge, data->numEdge);
-				ZoneBuffer::ClearPointer(&dest->edge);
+				ZoneBuffer::clear_pointer(&dest->edge);
 			}
 
 			if (data->plane)
@@ -157,22 +149,22 @@ namespace ZoneTool
 			}
 		}
 
-		void IPhysCollmap::write_PhysGeomInfo(IZone* zone, ZoneBuffer* buf, PhysGeomInfo* dest)
+		void IPhysCollmap::write_phys_geom_info(IZone* zone, ZoneBuffer* buf, PhysGeomInfo* dest)
 		{
-			auto data = dest;
+			auto* data = dest;
 
 			if (data->brush)
 			{
 				buf->align(3);
-				this->write_BrushWrapper(zone, buf, data->brush);
-				ZoneBuffer::ClearPointer(&dest->brush);
+				this->write_brush_wrapper(zone, buf, data->brush);
+				ZoneBuffer::clear_pointer(&dest->brush);
 			}
 		}
 
 		void IPhysCollmap::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 
@@ -181,11 +173,11 @@ namespace ZoneTool
 			if (data->info)
 			{
 				buf->align(3);
-				auto destinfo = buf->write(data->info, data->numInfo);
+				auto* phys_geom_info = buf->write(data->info, data->numInfo);
 
 				for (int i = 0; i < data->numInfo; i++)
 				{
-					this->write_PhysGeomInfo(zone, buf, &destinfo[i]);
+					this->write_phys_geom_info(zone, buf, &phys_geom_info[i]);
 				}
 			}
 
@@ -194,7 +186,7 @@ namespace ZoneTool
 
 		void IPhysCollmap::dump(PhysCollmap* asset)
 		{
-			std::string path = "physcollmap/" + std::string(asset->name) + ".cme4";
+			const auto path = "physcollmap/" + std::string(asset->name) + ".cme4";
 
 			AssetDumper dump;
 			dump.open(path.data());

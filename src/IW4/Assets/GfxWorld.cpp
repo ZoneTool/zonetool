@@ -241,7 +241,7 @@ namespace ZoneTool
 						{
 							buf->align(3);
 							buf->write_p(data->skies[i].skyStartSurfs, data->skies[i].skySurfCount);
-							ZoneBuffer::ClearPointer(&skiesArray[i].skyStartSurfs);
+							ZoneBuffer::clear_pointer(&skiesArray[i].skyStartSurfs);
 						}
 
 						if (data->skies[i].skyImage)
@@ -251,7 +251,7 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->skies);
+					ZoneBuffer::clear_pointer(&dest->skies);
 				}
 
 				if (dest->dpvsPlanes.planes)
@@ -263,7 +263,7 @@ namespace ZoneTool
 				{
 					buf->align(1);
 					buf->write_p(data->dpvsPlanes.nodes, data->nodeCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsPlanes.nodes);
+					ZoneBuffer::clear_pointer(&dest->dpvsPlanes.nodes);
 				}
 
 				buf->push_stream(2);
@@ -271,7 +271,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->dpvsPlanes.sceneEntCellBits, data->dpvsPlanes.cellCount << 11);
-					ZoneBuffer::ClearPointer(&dest->dpvsPlanes.sceneEntCellBits);
+					ZoneBuffer::clear_pointer(&dest->dpvsPlanes.sceneEntCellBits);
 				}
 				buf->pop_stream();
 
@@ -279,7 +279,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write_p(data->aabbTreeCounts, data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->aabbTreeCounts);
+					ZoneBuffer::clear_pointer(&dest->aabbTreeCounts);
 				}
 
 				if (data->aabbTree)
@@ -305,11 +305,11 @@ namespace ZoneTool
 								}
 							}
 
-							ZoneBuffer::ClearPointer(&cell_tree[i].aabbtree);
+							ZoneBuffer::clear_pointer(&cell_tree[i].aabbtree);
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->aabbTree);
+					ZoneBuffer::clear_pointer(&dest->aabbTree);
 				}
 
 				if (data->cells)
@@ -330,21 +330,21 @@ namespace ZoneTool
 								{
 									buf->align(3);
 									buf->write(data->cells[i].portals[i2].vertices, data->cells[i].portals[i2].vertexCount);
-									ZoneBuffer::ClearPointer(&gfx_portal[i2].vertices);
+									ZoneBuffer::clear_pointer(&gfx_portal[i2].vertices);
 								}
 							}
 
-							ZoneBuffer::ClearPointer(&gfx_cell[i].portals);
+							ZoneBuffer::clear_pointer(&gfx_cell[i].portals);
 						}
 
 						if (data->cells[i].reflectionProbes)
 						{
 							buf->align(0);
 							buf->write(data->cells[i].reflectionProbes, data->cells[i].reflectionProbeCount);
-							ZoneBuffer::ClearPointer(&gfx_cell[i].reflectionProbes);
+							ZoneBuffer::clear_pointer(&gfx_cell[i].reflectionProbes);
 						}
 
-						ZoneBuffer::ClearPointer(&dest->cells);
+						ZoneBuffer::clear_pointer(&dest->cells);
 					}
 				}
 
@@ -363,14 +363,14 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->worldDraw.reflectionImages);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.reflectionImages);
 				}
 
 				if (data->worldDraw.reflectionProbes)
 				{
 					buf->align(3);
 					buf->write(data->worldDraw.reflectionProbes, data->worldDraw.reflectionProbeCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.reflectionProbes);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.reflectionProbes);
 				}
 
 				buf->push_stream(2);
@@ -378,7 +378,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->worldDraw.reflectionProbeTextures, data->worldDraw.reflectionProbeCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.reflectionProbeTextures);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.reflectionProbeTextures);
 				}
 				buf->pop_stream();
 
@@ -402,7 +402,7 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->worldDraw.lightmaps);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.lightmaps);
 				}
 
 				buf->push_stream(2);
@@ -410,14 +410,14 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write_p(data->worldDraw.lightmapPrimaryTextures, data->worldDraw.lightmapCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.lightmapPrimaryTextures);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.lightmapPrimaryTextures);
 				}
 
 				if (data->worldDraw.lightmapSecondaryTextures)
 				{
 					buf->align(3);
 					buf->write_p(data->worldDraw.lightmapSecondaryTextures, data->worldDraw.lightmapCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.lightmapSecondaryTextures);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.lightmapSecondaryTextures);
 				}
 				buf->pop_stream();
 
@@ -437,21 +437,21 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write_p(data->worldDraw.vd.vertices, data->worldDraw.vertexCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.vd.vertices);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.vd.vertices);
 				}
 
 				if (data->worldDraw.vld.data)
 				{
 					buf->align(0);
 					buf->write_p(data->worldDraw.vld.data, data->worldDraw.vertexLayerDataSize);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.vld.data);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.vld.data);
 				}
 
 				if (data->worldDraw.indices)
 				{
 					buf->align(1);
 					buf->write_p(data->worldDraw.indices, data->worldDraw.indexCount);
-					ZoneBuffer::ClearPointer(&dest->worldDraw.indices);
+					ZoneBuffer::clear_pointer(&dest->worldDraw.indices);
 				}
 
 				if (data->lightGrid.rowDataStart)
@@ -461,35 +461,35 @@ namespace ZoneTool
 						data->lightGrid.maxs[data->lightGrid.rowAxis] - data->lightGrid.mins[data
 						->lightGrid.rowAxis] +
 						1);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.rowDataStart);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.rowDataStart);
 				}
 
 				if (data->lightGrid.rawRowData)
 				{
 					buf->align(0);
 					buf->write_p(data->lightGrid.rawRowData, data->lightGrid.rawRowDataSize);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.rawRowData);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.rawRowData);
 				}
 
 				if (data->lightGrid.entries)
 				{
 					buf->align(3);
 					buf->write(data->lightGrid.entries, data->lightGrid.entryCount);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.entries);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.entries);
 				}
 
 				if (data->lightGrid.colors)
 				{
 					buf->align(3);
 					buf->write(data->lightGrid.colors, data->lightGrid.colorCount);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.colors);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.colors);
 				}
 
 				if (data->models)
 				{
 					buf->align(3);
 					buf->write(data->models, data->modelCount);
-					ZoneBuffer::ClearPointer(&dest->models);
+					ZoneBuffer::clear_pointer(&dest->models);
 				}
 
 				if (data->materialMemory)
@@ -503,7 +503,7 @@ namespace ZoneTool
 							material, data->materialMemory[i].material->name));
 					}
 
-					ZoneBuffer::ClearPointer(&dest->materialMemory);
+					ZoneBuffer::clear_pointer(&dest->materialMemory);
 				}
 
 				if (data->sun.spriteMaterial)
@@ -529,28 +529,28 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->cellCasterBits[0],
 						data->dpvsPlanes.cellCount * ((data->dpvsPlanes.cellCount + 31) >> 5));
-					ZoneBuffer::ClearPointer(&dest->cellCasterBits[0]);
+					ZoneBuffer::clear_pointer(&dest->cellCasterBits[0]);
 				}
 
 				if (data->cellCasterBits[1])
 				{
 					buf->align(3);
 					buf->write(data->cellCasterBits[1], (data->dpvsPlanes.cellCount + 31) >> 5);
-					ZoneBuffer::ClearPointer(&dest->cellCasterBits[1]);
+					ZoneBuffer::clear_pointer(&dest->cellCasterBits[1]);
 				}
 
 				if (data->sceneDynModel)
 				{
 					buf->align(3);
 					buf->write(data->sceneDynModel, data->dpvsDyn.dynEntClientCount[0]);
-					ZoneBuffer::ClearPointer(&dest->sceneDynModel);
+					ZoneBuffer::clear_pointer(&dest->sceneDynModel);
 				}
 
 				if (data->sceneDynBrush)
 				{
 					buf->align(3);
 					buf->write(data->sceneDynBrush, data->dpvsDyn.dynEntClientCount[1]);
-					ZoneBuffer::ClearPointer(&dest->sceneDynBrush);
+					ZoneBuffer::clear_pointer(&dest->sceneDynBrush);
 				}
 
 				if (data->primaryLightEntityShadowVis)
@@ -558,7 +558,7 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->primaryLightEntityShadowVis,
 						(data->primaryLightCount - data->sunPrimaryLightIndex - 1) << 15);
-					ZoneBuffer::ClearPointer(&dest->primaryLightEntityShadowVis);
+					ZoneBuffer::clear_pointer(&dest->primaryLightEntityShadowVis);
 				}
 
 				if (data->primaryLightDynEntShadowVis[0])
@@ -567,7 +567,7 @@ namespace ZoneTool
 					buf->write(data->primaryLightDynEntShadowVis[0],
 						data->dpvsDyn.dynEntClientCount[0] * (data->primaryLightCount - data->sunPrimaryLightIndex -
 							1));
-					ZoneBuffer::ClearPointer(&dest->primaryLightDynEntShadowVis[0]);
+					ZoneBuffer::clear_pointer(&dest->primaryLightDynEntShadowVis[0]);
 				}
 
 				if (data->primaryLightDynEntShadowVis[1])
@@ -576,14 +576,14 @@ namespace ZoneTool
 					buf->write(data->primaryLightDynEntShadowVis[1],
 						data->dpvsDyn.dynEntClientCount[1] * (data->primaryLightCount - data->sunPrimaryLightIndex -
 							1));
-					ZoneBuffer::ClearPointer(&dest->primaryLightDynEntShadowVis[1]);
+					ZoneBuffer::clear_pointer(&dest->primaryLightDynEntShadowVis[1]);
 				}
 
 				if (data->primaryLightForModelDynEnt)
 				{
 					buf->align(0);
 					buf->write(data->primaryLightForModelDynEnt, data->dpvsDyn.dynEntClientCount[0]);
-					ZoneBuffer::ClearPointer(&dest->primaryLightForModelDynEnt);
+					ZoneBuffer::clear_pointer(&dest->primaryLightForModelDynEnt);
 				}
 				buf->pop_stream();
 
@@ -598,17 +598,17 @@ namespace ZoneTool
 						{
 							buf->align(1);
 							buf->write_p(data->shadowGeom[i].sortedSurfIndex, data->shadowGeom[i].surfaceCount);
-							ZoneBuffer::ClearPointer(&shadow_geometry[i].sortedSurfIndex);
+							ZoneBuffer::clear_pointer(&shadow_geometry[i].sortedSurfIndex);
 						}
 						if (data->shadowGeom[i].smodelIndex)
 						{
 							buf->align(1);
 							buf->write_p(data->shadowGeom[i].smodelIndex, data->shadowGeom[i].smodelCount);
-							ZoneBuffer::ClearPointer(&shadow_geometry[i].smodelIndex);
+							ZoneBuffer::clear_pointer(&shadow_geometry[i].smodelIndex);
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->shadowGeom);
+					ZoneBuffer::clear_pointer(&dest->shadowGeom);
 				}
 
 				if (data->lightRegion)
@@ -630,15 +630,15 @@ namespace ZoneTool
 									buf->align(3);
 									buf->write(data->lightRegion[i].hulls[i2].axis,
 										data->lightRegion[i].hulls[i2].axisCount);
-									ZoneBuffer::ClearPointer(&light_region_hull[i2].axis);
+									ZoneBuffer::clear_pointer(&light_region_hull[i2].axis);
 								}
 							}
 
-							ZoneBuffer::ClearPointer(&light_region[i].hulls);
+							ZoneBuffer::clear_pointer(&light_region[i].hulls);
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->lightRegion);
+					ZoneBuffer::clear_pointer(&dest->lightRegion);
 				}
 
 				buf->push_stream(2);
@@ -646,42 +646,42 @@ namespace ZoneTool
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[0], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[0]);
 				}
 
 				if (data->dpvs.smodelVisData[1])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[1], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[1]);
 				}
 
 				if (data->dpvs.smodelVisData[2])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[2], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[2]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[2]);
 				}
 
 				if (data->dpvs.surfaceVisData[0])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[0], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[0]);
 				}
 
 				if (data->dpvs.surfaceVisData[1])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[1], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[1]);
 				}
 
 				if (data->dpvs.surfaceVisData[2])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[2], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[2]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[2]);
 				}
 				buf->pop_stream();
 
@@ -690,14 +690,14 @@ namespace ZoneTool
 					buf->align(1);
 					buf->write_p(data->dpvs.sortedSurfIndex,
 						data->dpvs.staticSurfaceCount + data->dpvs.staticSurfaceCountNoDecal);
-					ZoneBuffer::ClearPointer(&dest->dpvs.sortedSurfIndex);
+					ZoneBuffer::clear_pointer(&dest->dpvs.sortedSurfIndex);
 				}
 
 				if (data->dpvs.smodelInsts)
 				{
 					buf->align(3);
 					buf->write(data->dpvs.smodelInsts, data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelInsts);
 				}
 
 				if (data->dpvs.surfaces)
@@ -714,14 +714,14 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaces);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaces);
 				}
 
 				if (data->dpvs.cullGroups)
 				{
 					buf->align(3);
 					buf->write(data->dpvs.cullGroups, data->indexCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.cullGroups);
+					ZoneBuffer::clear_pointer(&dest->dpvs.cullGroups);
 				}
 
 				if (data->dpvs.smodelDrawInsts)
@@ -738,7 +738,7 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelDrawInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelDrawInsts);
 				}
 
 				buf->push_stream(2);
@@ -746,14 +746,14 @@ namespace ZoneTool
 				{
 					buf->align(7);
 					buf->write(data->dpvs.surfaceMaterials, data->indexCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelDrawInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelDrawInsts);
 				}
 
 				if (data->dpvs.surfaceCastsSunShadow)
 				{
 					buf->align(127);
 					buf->write(data->dpvs.surfaceCastsSunShadow, data->dpvs.surfaceVisDataCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceCastsSunShadow);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceCastsSunShadow);
 				}
 
 				if (data->dpvsDyn.dynEntCellBits[0])
@@ -761,7 +761,7 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->dpvsDyn.dynEntCellBits[0],
 						data->dpvsDyn.dynEntClientWordCount[0] * data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntCellBits[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntCellBits[0]);
 				}
 
 				if (data->dpvsDyn.dynEntCellBits[1])
@@ -769,49 +769,49 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->dpvsDyn.dynEntCellBits[1],
 						data->dpvsDyn.dynEntClientWordCount[1] * data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntCellBits[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntCellBits[1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][0])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][0], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][0]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][0])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][0], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][0]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][1])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][1], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][1])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][1], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][2])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][2], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][2]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][2]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][2])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][2], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][2]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][2]);
 				}
 				buf->pop_stream();
 
@@ -819,7 +819,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->heroLights, data->heroLightCount);
-					ZoneBuffer::ClearPointer(&dest->heroLights);
+					ZoneBuffer::clear_pointer(&dest->heroLights);
 				}
 
 				END_LOG_STREAM;
@@ -889,7 +889,7 @@ namespace ZoneTool
 						{
 							buf->align(3);
 							auto destSkyStartSurfs = buf->write_p(data->skies[i].skyStartSurfs, data->skies[i].skySurfCount);
-							ZoneBuffer::ClearPointer(&skiesArray[i].skyStartSurfs);
+							ZoneBuffer::clear_pointer(&skiesArray[i].skyStartSurfs);
 
 							for (auto i2 = 0; i2 < data->skies[i].skySurfCount; i2++)
 							{
@@ -908,7 +908,7 @@ namespace ZoneTool
 						endian_convert(&skiesArray[i].skyImage);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->skies);
+					ZoneBuffer::clear_pointer(&dest->skies);
 				}
 
 				if (dest->dpvsPlanes.planes)
@@ -932,7 +932,7 @@ namespace ZoneTool
 				{
 					buf->align(1);
 					auto destNodes = buf->write_p(data->dpvsPlanes.nodes, data->nodeCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsPlanes.nodes);
+					ZoneBuffer::clear_pointer(&dest->dpvsPlanes.nodes);
 
 					for (int i = 0; i < data->nodeCount; i++)
 					{
@@ -945,7 +945,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->dpvsPlanes.sceneEntCellBits, data->dpvsPlanes.cellCount << 11);
-					ZoneBuffer::ClearPointer(&dest->dpvsPlanes.sceneEntCellBits);
+					ZoneBuffer::clear_pointer(&dest->dpvsPlanes.sceneEntCellBits);
 				}
 				buf->pop_stream();
 
@@ -953,7 +953,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					auto destTrees = buf->write_p(data->aabbTreeCounts, data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->aabbTreeCounts);
+					ZoneBuffer::clear_pointer(&dest->aabbTreeCounts);
 
 					for (int i = 0; i < data->dpvsPlanes.cellCount; i++)
 					{
@@ -1008,13 +1008,13 @@ namespace ZoneTool
 								endian_convert(&gfx_aabb_tree[i2].childrenOffset);
 							}
 
-							ZoneBuffer::ClearPointer(&cell_tree[i].aabbtree);
+							ZoneBuffer::clear_pointer(&cell_tree[i].aabbtree);
 						}
 
 						endian_convert(&cell_tree[i].aabbtree);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->aabbTrees);
+					ZoneBuffer::clear_pointer(&dest->aabbTrees);
 				}
 
 				if (data->cells)
@@ -1039,7 +1039,7 @@ namespace ZoneTool
 								{
 									buf->align(3);
 									auto destVertices = buf->write(data->cells[i].portals[i2].vertices, data->cells[i].portals[i2].vertexCount);
-									ZoneBuffer::ClearPointer(&gfx_portal[i2].vertices);
+									ZoneBuffer::clear_pointer(&gfx_portal[i2].vertices);
 
 									for (auto i3 = 0; i3 < data->cells[i].portals[i2].vertexCount; i3++)
 									{
@@ -1065,17 +1065,17 @@ namespace ZoneTool
 								}
 							}
 
-							ZoneBuffer::ClearPointer(&gfx_cell[i].portals);
+							ZoneBuffer::clear_pointer(&gfx_cell[i].portals);
 						}
 
 						if (data->cells[i].reflectionProbes)
 						{
 							buf->align(0);
 							buf->write(data->cells[i].reflectionProbes, data->cells[i].reflectionProbeCount);
-							ZoneBuffer::ClearPointer(&gfx_cell[i].reflectionProbes);
+							ZoneBuffer::clear_pointer(&gfx_cell[i].reflectionProbes);
 						}
 						
-						ZoneBuffer::ClearPointer(&dest->cells);
+						ZoneBuffer::clear_pointer(&dest->cells);
 
 						endian_convert(&gfx_cell[i].bounds.halfSize[0]);
 						endian_convert(&gfx_cell[i].bounds.halfSize[1]);
@@ -1104,14 +1104,14 @@ namespace ZoneTool
 						endian_convert(&reflectionProbes[i]);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->draw.reflectionProbes);
+					ZoneBuffer::clear_pointer(&dest->draw.reflectionProbes);
 				}
 
 				if (data->draw.reflectionProbeOrigins)
 				{
 					buf->align(3);
 					auto destReflectionProbes = buf->write(data->draw.reflectionProbeOrigins, data->draw.reflectionProbeCount);
-					ZoneBuffer::ClearPointer(&dest->draw.reflectionProbeOrigins);
+					ZoneBuffer::clear_pointer(&dest->draw.reflectionProbeOrigins);
 
 					for (auto i = 0; i < data->draw.reflectionProbeCount; i++)
 					{
@@ -1126,7 +1126,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->draw.reflectionProbeTextures, data->draw.reflectionProbeCount);
-					ZoneBuffer::ClearPointer(&dest->draw.reflectionProbeTextures);
+					ZoneBuffer::clear_pointer(&dest->draw.reflectionProbeTextures);
 				}
 				buf->pop_stream();
 
@@ -1153,7 +1153,7 @@ namespace ZoneTool
 						endian_convert(&gfx_lightmap_array[i].secondary);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->draw.lightmaps);
+					ZoneBuffer::clear_pointer(&dest->draw.lightmaps);
 				}
 
 				buf->push_stream(2);
@@ -1161,14 +1161,14 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write_p(data->draw.lightmapPrimaryTextures, data->draw.lightmapCount);
-					ZoneBuffer::ClearPointer(&dest->draw.lightmapPrimaryTextures);
+					ZoneBuffer::clear_pointer(&dest->draw.lightmapPrimaryTextures);
 				}
 
 				if (data->draw.lightmapSecondaryTextures)
 				{
 					buf->align(3);
 					buf->write_p(data->draw.lightmapSecondaryTextures, data->draw.lightmapCount);
-					ZoneBuffer::ClearPointer(&dest->draw.lightmapSecondaryTextures);
+					ZoneBuffer::clear_pointer(&dest->draw.lightmapSecondaryTextures);
 				}
 				buf->pop_stream();
 
@@ -1188,7 +1188,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					auto destVertices = buf->write_p(data->draw.vd.vertices, data->draw.vertexCount);
-					ZoneBuffer::ClearPointer(&dest->draw.vd.vertices);
+					ZoneBuffer::clear_pointer(&dest->draw.vd.vertices);
 
 					for (auto i = 0u; i < data->draw.vertexCount; i++)
 					{
@@ -1210,14 +1210,14 @@ namespace ZoneTool
 				{
 					buf->align(0);
 					buf->write_p(data->draw.vld.data, data->draw.vertexLayerDataSize);
-					ZoneBuffer::ClearPointer(&dest->draw.vld.data);
+					ZoneBuffer::clear_pointer(&dest->draw.vld.data);
 				}
 
 				if (data->draw.indices)
 				{
 					buf->align(1);
 					auto destIndices = buf->write_p(data->draw.indices, data->draw.indexCount);
-					ZoneBuffer::ClearPointer(&dest->draw.indices);
+					ZoneBuffer::clear_pointer(&dest->draw.indices);
 
 					for (auto i = 0; i < data->draw.indexCount; i++)
 					{
@@ -1232,7 +1232,7 @@ namespace ZoneTool
 						data->lightGrid.maxs[data->lightGrid.rowAxis] - data->lightGrid.mins[data
 						->lightGrid.rowAxis] +
 						1);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.rowDataStart);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.rowDataStart);
 
 					for (auto i = 0u; i < data->lightGrid.maxs[data->lightGrid.rowAxis] - data->lightGrid.mins[data->lightGrid.rowAxis] + 1; i++)
 					{
@@ -1244,14 +1244,14 @@ namespace ZoneTool
 				{
 					buf->align(0);
 					buf->write_p(data->lightGrid.rawRowData, data->lightGrid.rawRowDataSize);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.rawRowData);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.rawRowData);
 				}
 
 				if (data->lightGrid.entries)
 				{
 					buf->align(3);
 					auto destEntries = buf->write(data->lightGrid.entries, data->lightGrid.entryCount);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.entries);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.entries);
 
 					for (auto i = 0u; i < data->lightGrid.entryCount; i++)
 					{
@@ -1263,14 +1263,14 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->lightGrid.colors, data->lightGrid.colorCount);
-					ZoneBuffer::ClearPointer(&dest->lightGrid.colors);
+					ZoneBuffer::clear_pointer(&dest->lightGrid.colors);
 				}
 
 				if (data->models)
 				{
 					buf->align(3);
 					buf->write(data->models, data->modelCount);
-					ZoneBuffer::ClearPointer(&dest->models);
+					ZoneBuffer::clear_pointer(&dest->models);
 				}
 
 				if (data->materialMemory)
@@ -1287,7 +1287,7 @@ namespace ZoneTool
 						endian_convert(&memory[i].memory);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->materialMemory);
+					ZoneBuffer::clear_pointer(&dest->materialMemory);
 				}
 
 				if (data->sun.spriteMaterial)
@@ -1313,7 +1313,7 @@ namespace ZoneTool
 					buf->align(3);
 					auto destCellCasterBits = buf->write(data->cellCasterBits,
 						data->dpvsPlanes.cellCount * ((data->dpvsPlanes.cellCount + 31) >> 5));
-					ZoneBuffer::ClearPointer(&dest->cellCasterBits);
+					ZoneBuffer::clear_pointer(&dest->cellCasterBits);
 
 					for (auto i = 0; i < data->dpvsPlanes.cellCount * ((data->dpvsPlanes.cellCount + 31) >> 5); i++)
 					{
@@ -1325,7 +1325,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					auto destCellHasSunLitSurfsBits = buf->write(data->cellHasSunLitSurfsBits, (data->dpvsPlanes.cellCount + 31) >> 5);
-					ZoneBuffer::ClearPointer(&dest->cellHasSunLitSurfsBits);
+					ZoneBuffer::clear_pointer(&dest->cellHasSunLitSurfsBits);
 
 					for (auto i = 0; i < (data->dpvsPlanes.cellCount + 31) >> 5; i++)
 					{
@@ -1337,14 +1337,14 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->sceneDynModel, data->dpvsDyn.dynEntClientCount[0]);
-					ZoneBuffer::ClearPointer(&dest->sceneDynModel);
+					ZoneBuffer::clear_pointer(&dest->sceneDynModel);
 				}
 
 				if (data->sceneDynBrush)
 				{
 					buf->align(3);
 					buf->write(data->sceneDynBrush, data->dpvsDyn.dynEntClientCount[1]);
-					ZoneBuffer::ClearPointer(&dest->sceneDynBrush);
+					ZoneBuffer::clear_pointer(&dest->sceneDynBrush);
 				}
 
 				if (data->primaryLightEntityShadowVis)
@@ -1352,7 +1352,7 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->primaryLightEntityShadowVis,
 						(data->primaryLightCount - data->lastSunPrimaryLightIndex - 1) << 15);
-					ZoneBuffer::ClearPointer(&dest->primaryLightEntityShadowVis);
+					ZoneBuffer::clear_pointer(&dest->primaryLightEntityShadowVis);
 				}
 
 				if (data->primaryLightDynEntShadowVis[0])
@@ -1361,7 +1361,7 @@ namespace ZoneTool
 					buf->write(data->primaryLightDynEntShadowVis[0],
 						data->dpvsDyn.dynEntClientCount[0] * (data->primaryLightCount - data->lastSunPrimaryLightIndex -
 							1));
-					ZoneBuffer::ClearPointer(&dest->primaryLightDynEntShadowVis[0]);
+					ZoneBuffer::clear_pointer(&dest->primaryLightDynEntShadowVis[0]);
 				}
 
 				if (data->primaryLightDynEntShadowVis[1])
@@ -1370,14 +1370,14 @@ namespace ZoneTool
 					buf->write(data->primaryLightDynEntShadowVis[1],
 						data->dpvsDyn.dynEntClientCount[1] * (data->primaryLightCount - data->lastSunPrimaryLightIndex -
 							1));
-					ZoneBuffer::ClearPointer(&dest->primaryLightDynEntShadowVis[1]);
+					ZoneBuffer::clear_pointer(&dest->primaryLightDynEntShadowVis[1]);
 				}
 
 				if (data->nonSunPrimaryLightForModelDynEnt)
 				{
 					buf->align(0);
 					buf->write(data->nonSunPrimaryLightForModelDynEnt, data->dpvsDyn.dynEntClientCount[0]);
-					ZoneBuffer::ClearPointer(&dest->nonSunPrimaryLightForModelDynEnt);
+					ZoneBuffer::clear_pointer(&dest->nonSunPrimaryLightForModelDynEnt);
 				}
 				buf->pop_stream();
 
@@ -1392,7 +1392,7 @@ namespace ZoneTool
 						{
 							buf->align(1);
 							auto destSurf = buf->write_p(data->shadowGeom[i].sortedSurfIndex, data->shadowGeom[i].surfaceCount);
-							ZoneBuffer::ClearPointer(&shadow_geometry[i].sortedSurfIndex);
+							ZoneBuffer::clear_pointer(&shadow_geometry[i].sortedSurfIndex);
 
 							for (auto i2 = 0; i2 < data->shadowGeom[i].surfaceCount; i2++)
 							{
@@ -1403,7 +1403,7 @@ namespace ZoneTool
 						{
 							buf->align(1);
 							auto destIndex = buf->write_p(data->shadowGeom[i].smodelIndex, data->shadowGeom[i].smodelCount);
-							ZoneBuffer::ClearPointer(&shadow_geometry[i].smodelIndex);
+							ZoneBuffer::clear_pointer(&shadow_geometry[i].smodelIndex);
 
 							for (auto i2 = 0; i2 < data->shadowGeom[i].smodelCount; i2++)
 							{
@@ -1417,7 +1417,7 @@ namespace ZoneTool
 						endian_convert(&shadow_geometry[i].smodelIndex);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->shadowGeom);
+					ZoneBuffer::clear_pointer(&dest->shadowGeom);
 				}
 
 				if (data->lightRegion)
@@ -1449,7 +1449,7 @@ namespace ZoneTool
 										endian_convert(&destAxis[i3].midPoint);
 									}
 									
-									ZoneBuffer::ClearPointer(&light_region_hull[i2].axis);
+									ZoneBuffer::clear_pointer(&light_region_hull[i2].axis);
 								}
 
 								endian_convert(&light_region_hull[i2].axis);
@@ -1461,14 +1461,14 @@ namespace ZoneTool
 								}
 							}
 							
-							ZoneBuffer::ClearPointer(&light_region[i].hulls);
+							ZoneBuffer::clear_pointer(&light_region[i].hulls);
 						}
 
 						endian_convert(&light_region[i].hullCount);
 						endian_convert(&light_region[i].hulls);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->lightRegion);
+					ZoneBuffer::clear_pointer(&dest->lightRegion);
 				}
 
 				buf->push_stream(2);
@@ -1476,42 +1476,42 @@ namespace ZoneTool
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[0], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[0]);
 				}
 
 				if (data->dpvs.smodelVisData[1])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[1], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[1]);
 				}
 
 				if (data->dpvs.smodelVisData[2])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.smodelVisData[2], data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelVisData[2]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelVisData[2]);
 				}
 
 				if (data->dpvs.surfaceVisData[0])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[0], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[0]);
 				}
 
 				if (data->dpvs.surfaceVisData[1])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[1], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[1]);
 				}
 
 				if (data->dpvs.surfaceVisData[2])
 				{
 					buf->align(0);
 					buf->write(data->dpvs.surfaceVisData[2], data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceVisData[2]);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceVisData[2]);
 				}
 				buf->pop_stream();
 
@@ -1520,14 +1520,14 @@ namespace ZoneTool
 					buf->align(1);
 					buf->write_p(data->dpvs.sortedSurfIndex,
 						data->dpvs.staticSurfaceCount + data->dpvs.staticSurfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.sortedSurfIndex);
+					ZoneBuffer::clear_pointer(&dest->dpvs.sortedSurfIndex);
 				}
 
 				if (data->dpvs.smodelInsts)
 				{
 					buf->align(3);
 					buf->write(data->dpvs.smodelInsts, data->dpvs.smodelCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelInsts);
 				}
 
 				if (data->dpvs.surfaces)
@@ -1551,14 +1551,14 @@ namespace ZoneTool
 						endian_convert(&surface[i].material);
 					}
 
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaces);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaces);
 				}
 
 				if (data->dpvs.surfacesBounds)
 				{
 					buf->align(3);
 					buf->write(data->dpvs.surfacesBounds, data->surfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfacesBounds);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfacesBounds);
 				}
 
 				if (data->dpvs.smodelDrawInsts)
@@ -1594,7 +1594,7 @@ namespace ZoneTool
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelDrawInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelDrawInsts);
 				}
 
 				buf->push_stream(2);
@@ -1602,7 +1602,7 @@ namespace ZoneTool
 				{
 					buf->align(7);
 					auto destmaterials = buf->write(data->dpvs.surfaceMaterials, data->surfaceCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.smodelDrawInsts);
+					ZoneBuffer::clear_pointer(&dest->dpvs.smodelDrawInsts);
 
 					for (int i = 0; i < data->surfaceCount; i++)
 					{
@@ -1614,7 +1614,7 @@ namespace ZoneTool
 				{
 					buf->align(127);
 					buf->write(data->dpvs.surfaceCastsSunShadow, data->dpvs.surfaceVisDataCount);
-					ZoneBuffer::ClearPointer(&dest->dpvs.surfaceCastsSunShadow);
+					ZoneBuffer::clear_pointer(&dest->dpvs.surfaceCastsSunShadow);
 				}
 
 				if (data->dpvsDyn.dynEntCellBits[0])
@@ -1622,7 +1622,7 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->dpvsDyn.dynEntCellBits[0],
 						data->dpvsDyn.dynEntClientWordCount[0] * data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntCellBits[0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntCellBits[0]);
 				}
 
 				if (data->dpvsDyn.dynEntCellBits[1])
@@ -1630,49 +1630,49 @@ namespace ZoneTool
 					buf->align(3);
 					buf->write(data->dpvsDyn.dynEntCellBits[1],
 						data->dpvsDyn.dynEntClientWordCount[1] * data->dpvsPlanes.cellCount);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntCellBits[1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntCellBits[1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][0])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][0], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][0]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][0])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][0], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][0]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][0]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][1])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][1], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][1])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][1], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][1]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][1]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[0][2])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[0][2], 32 * data->dpvsDyn.dynEntClientWordCount[0]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[0][2]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[0][2]);
 				}
 
 				if (data->dpvsDyn.dynEntVisData[1][2])
 				{
 					buf->align(15);
 					buf->write(data->dpvsDyn.dynEntVisData[1][2], 32 * data->dpvsDyn.dynEntClientWordCount[1]);
-					ZoneBuffer::ClearPointer(&dest->dpvsDyn.dynEntVisData[1][2]);
+					ZoneBuffer::clear_pointer(&dest->dpvsDyn.dynEntVisData[1][2]);
 				}
 				buf->pop_stream();
 
@@ -1680,7 +1680,7 @@ namespace ZoneTool
 				{
 					buf->align(3);
 					buf->write(data->heroOnlyLights, data->heroOnlyLightCount);
-					ZoneBuffer::ClearPointer(&dest->heroOnlyLights);
+					ZoneBuffer::clear_pointer(&dest->heroOnlyLights);
 				}
 
 				END_LOG_STREAM;

@@ -161,7 +161,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				write_soundfile(zone, buf, data->soundFile);
-				ZoneBuffer::ClearPointer(&dest->soundFile);
+				ZoneBuffer::clear_pointer(&dest->soundFile);
 			}
 
 			if (data->volumeFalloffCurve)
@@ -180,7 +180,7 @@ namespace ZoneTool
 					speaker_map->name = buf->write_str(speaker_map->name);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->speakerMap);
+				ZoneBuffer::clear_pointer(&dest->speakerMap);
 			}
 		}
 
@@ -204,7 +204,7 @@ namespace ZoneTool
 					write_head(zone, buf, &dest_sound[i]);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->head);
+				ZoneBuffer::clear_pointer(&dest->head);
 			}
 
 			END_LOG_STREAM;

@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		ILocalizeEntry::ILocalizeEntry()
-		{
-		}
-
-		ILocalizeEntry::~ILocalizeEntry()
-		{
-		}
-
 		void ILocalizeEntry::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;

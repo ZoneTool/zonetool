@@ -97,7 +97,7 @@ namespace ZoneTool
 			{
 				buf->align(0);
 				buf->write(data->buffer, data->compressedLen);
-				ZoneBuffer::ClearPointer(&dest->buffer);
+				ZoneBuffer::clear_pointer(&dest->buffer);
 			}
 
 			END_LOG_STREAM;
@@ -127,14 +127,6 @@ namespace ZoneTool
 			}
 
 			FileSystem::FileClose(fp);
-		}
-
-		IRawFile::IRawFile()
-		{
-		}
-
-		IRawFile::~IRawFile()
-		{
 		}
 	}
 }

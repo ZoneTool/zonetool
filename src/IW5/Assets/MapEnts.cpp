@@ -12,9 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		char* freadstr(FILE* file);
-		int freadint(FILE* file);
-
 		/*legacy zonetool code, refactor me!*/
 		MapEnts* IMapEnts::parse(std::string name, ZoneMemory* mem)
 		{
@@ -24,7 +21,7 @@ namespace ZoneTool
 				return nullptr;
 			}
 
-			auto file = FileSystem::FileOpen(name + ".ents", "rb");
+			auto* file = FileSystem::FileOpen(name + ".ents", "rb");
 
 			// let them know that we're parsing a custom mapents file
 			ZONETOOL_INFO("Parsing mapents \"%s\"...", name.c_str());
@@ -49,31 +46,23 @@ namespace ZoneTool
 				return ents;
 			}*/
 
-			AssetReader triggerReader(mem);
-			if (triggerReader.open(name + ".ents.triggers"))
+			AssetReader trigger_reader(mem);
+			if (trigger_reader.open(name + ".ents.triggers"))
 			{
-				ents->trigger.modelCount = triggerReader.read_int();
-				ents->trigger.models = triggerReader.read_array<TriggerModel>();
+				ents->trigger.modelCount = trigger_reader.read_int();
+				ents->trigger.models = trigger_reader.read_array<TriggerModel>();
 
-				ents->trigger.hullCount = triggerReader.read_int();
-				ents->trigger.hulls = triggerReader.read_array<TriggerHull>();
+				ents->trigger.hullCount = trigger_reader.read_int();
+				ents->trigger.hulls = trigger_reader.read_array<TriggerHull>();
 
-				ents->trigger.slabCount = triggerReader.read_int();
-				ents->trigger.slabs = triggerReader.read_array<TriggerSlab>();
+				ents->trigger.slabCount = trigger_reader.read_int();
+				ents->trigger.slabs = trigger_reader.read_array<TriggerSlab>();
 
-				triggerReader.close();
+				trigger_reader.close();
 			}
 
 			// return mapents
 			return ents;
-		}
-
-		IMapEnts::IMapEnts()
-		{
-		}
-
-		IMapEnts::~IMapEnts()
-		{
 		}
 
 		void IMapEnts::init(const std::string& name, ZoneMemory* mem)
@@ -175,29 +164,31 @@ namespace ZoneTool
 			{
 				/*buf->align(3);
 				buf->write(dest->models, dest->modelCount);
-				ZoneBuffer::ClearPointer(&dest->models);*/
+				ZoneBuffer::clear_pointer(&dest->models);*/
 				dest->models = buf->write_s(3, dest->models, dest->modelCount);
 			}
+			
 			if (dest->hulls)
 			{
 				/*buf->align(3);
 				buf->write(dest->hulls, dest->hullCount);
-				ZoneBuffer::ClearPointer(&dest->hulls);*/
+				ZoneBuffer::clear_pointer(&dest->hulls);*/
 				dest->hulls = buf->write_s(3, dest->hulls, dest->hullCount);
 			}
+			
 			if (dest->slabs)
 			{
 				/*buf->align(3);
 				buf->write(dest->slabs, dest->slabCount);
-				ZoneBuffer::ClearPointer(&dest->slabs);*/
+				ZoneBuffer::clear_pointer(&dest->slabs);*/
 				dest->slabs = buf->write_s(3, dest->slabs, dest->slabCount);
 			}
 		}
 
 		void IMapEnts::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -208,7 +199,7 @@ namespace ZoneTool
 			{
 				buf->align(0);
 				buf->write(data->entityString, data->numEntityChars);
-				ZoneBuffer::ClearPointer(&dest->entityString);
+				ZoneBuffer::clear_pointer(&dest->entityString);
 			}
 
 			write_triggers(zone, buf, &dest->trigger);
@@ -218,43 +209,43 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->clientTrigger.clientTriggerAabbTree, data->clientTrigger.numClientTriggerNodes);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.clientTriggerAabbTree);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.clientTriggerAabbTree);
 			}
 			if (data->clientTrigger.triggerString)
 			{
 				buf->align(0);
 				buf->write(data->clientTrigger.triggerString, data->clientTrigger.triggerStringLength);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.triggerString);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.triggerString);
 			}
 			if (data->clientTrigger.visionSetTriggers)
 			{
 				buf->align(1);
 				buf->write(data->clientTrigger.visionSetTriggers, data->clientTrigger.trigger.modelCount);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.visionSetTriggers);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.visionSetTriggers);
 			}
 			if (data->clientTrigger.triggerType)
 			{
 				buf->align(0);
 				buf->write(data->clientTrigger.triggerType, data->clientTrigger.trigger.modelCount);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.triggerType);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.triggerType);
 			}
 			if (data->clientTrigger.origins)
 			{
 				buf->align(3);
 				buf->write(data->clientTrigger.origins, 3 * data->clientTrigger.trigger.modelCount);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.origins);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.origins);
 			}
 			if (data->clientTrigger.scriptDelay)
 			{
 				buf->align(3);
 				buf->write(data->clientTrigger.scriptDelay, data->clientTrigger.trigger.modelCount);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.scriptDelay);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.scriptDelay);
 			}
 			if (data->clientTrigger.audioTriggers)
 			{
 				buf->align(1);
 				buf->write(data->clientTrigger.audioTriggers, data->clientTrigger.trigger.modelCount);
-				ZoneBuffer::ClearPointer(&dest->clientTrigger.audioTriggers);
+				ZoneBuffer::clear_pointer(&dest->clientTrigger.audioTriggers);
 			}
 
 			END_LOG_STREAM;
@@ -267,26 +258,26 @@ namespace ZoneTool
 		{
 			if (asset)
 			{
-				auto file = FileSystem::FileOpen(asset->name + ".ents"s, "wb");
+				auto* file = FileSystem::FileOpen(asset->name + ".ents"s, "wb");
 				if (file)
 				{
 					fwrite(asset->entityString, asset->numEntityChars, 1, file);
 					FileSystem::FileClose(file);
 				}
 
-				AssetDumper triggerDumper;
-				if (triggerDumper.open(asset->name + ".ents.triggers"s))
+				AssetDumper trigger_dumper;
+				if (trigger_dumper.open(asset->name + ".ents.triggers"s))
 				{
-					triggerDumper.dump_int(asset->trigger.modelCount);
-					triggerDumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
+					trigger_dumper.dump_int(asset->trigger.modelCount);
+					trigger_dumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
 
-					triggerDumper.dump_int(asset->trigger.hullCount);
-					triggerDumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
+					trigger_dumper.dump_int(asset->trigger.hullCount);
+					trigger_dumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
 
-					triggerDumper.dump_int(asset->trigger.slabCount);
-					triggerDumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
+					trigger_dumper.dump_int(asset->trigger.slabCount);
+					trigger_dumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
 
-					triggerDumper.close();
+					trigger_dumper.close();
 				}
 			}
 		}

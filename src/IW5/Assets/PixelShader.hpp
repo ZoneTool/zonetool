@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			PixelShader* asset_;
+			PixelShader* asset_ = nullptr;
 
 		public:
 			static PixelShader* parse(const std::string& name, ZoneMemory* mem, bool preferLocal = false);

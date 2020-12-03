@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			AddonMapEnts* asset_;
+			AddonMapEnts* asset_ = nullptr;
 
 		public:
 			AddonMapEnts* parse(std::string name, ZoneMemory* mem);

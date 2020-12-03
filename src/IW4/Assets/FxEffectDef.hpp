@@ -16,12 +16,12 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			FxEffectDef* asset_;
+			FxEffectDef* asset_ = nullptr;
 
-			static void write_FxElemDefVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+			static void write_fx_elem_def_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 			                                   FxElemDefVisuals* dest);
-			static void write_FxElemDef(IZone* zone, ZoneBuffer* buf, FxElemDef* dest);
-			static void write_FxElemVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+			static void write_fx_elem_def(IZone* zone, ZoneBuffer* buf, FxElemDef* dest);
+			static void write_fx_elem_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 			                                FxElemVisuals* dest);
 
 			FxEffectDef* parse(const std::string& name, ZoneMemory* mem);

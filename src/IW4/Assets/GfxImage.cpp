@@ -183,7 +183,7 @@ namespace ZoneTool
 						desttext->dataSize = 0;
 					}
 
-					ZoneBuffer::ClearPointer(&dest->texture);
+					ZoneBuffer::clear_pointer(&dest->texture);
 				}
 				buf->pop_stream();
 
@@ -299,7 +299,7 @@ namespace ZoneTool
 				{
 					buf->align(4095);
 					buf->write(pixels.data(), pixels.size());
-					ZoneBuffer::ClearPointer(&dest->pixels);
+					ZoneBuffer::clear_pointer(&dest->pixels);
 				}
 				else
 				{

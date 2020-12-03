@@ -44,7 +44,7 @@ namespace ZoneTool
 			std::map<int, newEnumEntry*> newEntries[enum_type::count];
 
 			std::string name_;
-			StructuredDataDefSet* asset_;
+			StructuredDataDefSet* asset_ = nullptr;
 
 			void add_entry(enum_type type, int stat_index_offset, const std::string& entry_name, ZoneMemory* mem);
 			void patch_enum_with_map(StructuredDataDefSet* data, enum_type enumIndex, std::map<int, newEnumEntry*> map, ZoneMemory* mem);

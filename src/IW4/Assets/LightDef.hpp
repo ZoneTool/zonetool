@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GfxLightDef* asset_;
+			GfxLightDef* asset_ = nullptr;
 
 		public:
 			ILightDef();

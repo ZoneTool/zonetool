@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			VertexShader* asset_;
+			VertexShader* asset_ = nullptr;
 
 		public:
-			IVertexShader();
-			~IVertexShader();
-
 			static VertexShader* parse(const std::string& name, ZoneMemory* mem,
 			                           bool preferLocal = false);
 

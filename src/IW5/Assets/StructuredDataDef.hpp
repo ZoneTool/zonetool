@@ -48,18 +48,15 @@ namespace ZoneTool
 			std::map<int, newEnumEntry*> newEntries[ENUM_COUNT];
 
 			std::string name_;
-			StructuredDataDefSet* asset_;
+			StructuredDataDefSet* asset_ = nullptr;
 
-			void addEntry(enumType_s type, int statIndexOffset, char* entryName);
+			void add_entry(enumType_s type, int statIndexOffset, char* entryName);
 
-			void patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex, std::map<int, newEnumEntry*> map);
+			void patch_enum_with_map(StructuredDataDefSet* data, enumType_s enumIndex, std::map<int, newEnumEntry*> map);
 
 			void manipulate(StructuredDataDefSet* data);
 
 		public:
-			IStructuredDataDef();
-			~IStructuredDataDef();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

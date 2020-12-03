@@ -79,14 +79,6 @@ namespace ZoneTool
 			return nullptr;
 		}
 
-		IComWorld::IComWorld()
-		{
-		}
-
-		IComWorld::~IComWorld()
-		{
-		}
-
 		void IComWorld::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp"; // name;
@@ -137,13 +129,13 @@ namespace ZoneTool
 			if (data->primaryLights)
 			{
 				buf->align(3);
-				auto destlight = buf->write(data->primaryLights, data->primaryLightCount);
+				auto* primary_light = buf->write(data->primaryLights, data->primaryLightCount);
 
-				for (std::uint32_t i = 0; i < data->primaryLightCount; i++)
+				for (auto i = 0u; i < data->primaryLightCount; i++)
 				{
 					if (data->primaryLights[i].defName)
 					{
-						destlight[i].defName = buf->write_str(data->primaryLights[i].defName);
+						primary_light[i].defName = buf->write_str(data->primaryLights[i].defName);
 					}
 				}
 			}
@@ -157,10 +149,10 @@ namespace ZoneTool
 		{
 			const auto data = asset->ToJson(fromIW5);
 
-			std::string path = asset->name + ".comworld"s;
-			std::string json = data.dump(4);
+			const auto path = asset->name + ".comworld"s;
+			const auto json = data.dump(4);
 
-			auto file = FileSystem::FileOpen(path, "w"s);
+			auto* file = FileSystem::FileOpen(path, "w"s);
 			fwrite(json.data(), json.size(), 1, file);
 			FileSystem::FileClose(file);
 		}

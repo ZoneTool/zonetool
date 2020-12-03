@@ -16,14 +16,10 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			std::string m_filename;
-
-			clipMap_t* asset_;
+			clipMap_t* asset_ = nullptr;
 
 		public:
 			clipMap_t* parse(const std::string& name, ZoneMemory* mem);
-			IClipMap();
-			~IClipMap();
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

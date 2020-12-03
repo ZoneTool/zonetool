@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		ITracerDef::ITracerDef()
-		{
-		}
-
-		ITracerDef::~ITracerDef()
-		{
-		}
-
 		void ITracerDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;

@@ -21,7 +21,7 @@ namespace ZoneTool
 			return ret;
 		}
 
-		void IStructuredDataDef::addEntry(enumType_s type, int statIndexOffset, char* entryName)
+		void IStructuredDataDef::add_entry(enumType_s type, int statIndexOffset, char* entryName)
 		{
 			newEnumEntry* newEntry = (newEnumEntry*)malloc_n(sizeof(newEnumEntry));
 			newEntry->name = entryName;
@@ -60,7 +60,7 @@ namespace ZoneTool
 			return (strlen(e1_l) <= strlen(e2_l));
 		}
 
-		void IStructuredDataDef::patchEnumWithMap(StructuredDataDefSet* data, enumType_s enumIndex,
+		void IStructuredDataDef::patch_enum_with_map(StructuredDataDefSet* data, enumType_s enumIndex,
 		                                          std::map<int, newEnumEntry*> map)
 		{
 			StructuredDataDef* current_def = nullptr;
@@ -171,24 +171,24 @@ namespace ZoneTool
 			if (data->name == "mp/playerdata.def"s)
 			{
 				// Weapons
-				addEntry(ENUM_WEAPONS, 1, "iw5_ak74u");
-				addEntry(ENUM_WEAPONS2, 1, "iw5_ak74u");
-				addEntry(ENUM_WEAPONS, 2, "iw5_cheytac");
-				addEntry(ENUM_WEAPONS2, 2, "iw5_cheytac");
+				add_entry(ENUM_WEAPONS, 1, "iw5_ak74u");
+				add_entry(ENUM_WEAPONS2, 1, "iw5_ak74u");
+				add_entry(ENUM_WEAPONS, 2, "iw5_cheytac");
+				add_entry(ENUM_WEAPONS2, 2, "iw5_cheytac");
 
 				// Gametypes
-				// addEntry(ENUM_GAMETYPES, 1, "oneflag");
-				// addEntry(ENUM_GAMETYPES, 2, "vip");
-				// addEntry(ENUM_GAMETYPES, 3, "gtnw");
+				// add_entry(ENUM_GAMETYPES, 1, "oneflag");
+				// add_entry(ENUM_GAMETYPES, 2, "vip");
+				// add_entry(ENUM_GAMETYPES, 3, "gtnw");
 
 				// Custom camos
-				//addEntry(ENUM_CAMOS, 1, "plutonium");
+				//add_entry(ENUM_CAMOS, 1, "plutonium");
 
 				// Reticles
-				//addEntry(ENUM_RETICLES, 1, "ret7");
-				//addEntry(ENUM_RETICLES, 2, "ret8");
-				//addEntry(ENUM_RETICLES, 3, "ret9");
-				//addEntry(ENUM_RETICLES, 4, "ret10");
+				//add_entry(ENUM_RETICLES, 1, "ret7");
+				//add_entry(ENUM_RETICLES, 2, "ret8");
+				//add_entry(ENUM_RETICLES, 3, "ret9");
+				//add_entry(ENUM_RETICLES, 4, "ret10");
 
 				// Attachments
 				// 
@@ -198,55 +198,55 @@ namespace ZoneTool
 			else if (data->name == "mp/recipes.def"s)
 			{
 				// Weapons
-				addEntry((enumType_s)0, 1, "iw5_ak74u");
-				addEntry((enumType_s)6, 1, "iw5_ak74u");
-				addEntry((enumType_s)0, 2, "iw5_cheytac");
-				addEntry((enumType_s)6, 2, "iw5_cheytac");
+				add_entry((enumType_s)0, 1, "iw5_ak74u");
+				add_entry((enumType_s)6, 1, "iw5_ak74u");
+				add_entry((enumType_s)0, 2, "iw5_cheytac");
+				add_entry((enumType_s)6, 2, "iw5_cheytac");
 
 				//// Custom camos
-				//addEntry((enumType_s)2, 1, "plutonium");
+				//add_entry((enumType_s)2, 1, "plutonium");
 
 				//// Reticles
-				//addEntry((enumType_s)5, 1, "ret7");
-				//addEntry((enumType_s)5, 2, "ret8");
-				//addEntry((enumType_s)5, 3, "ret9");
-				//addEntry((enumType_s)5, 4, "ret10");
+				//add_entry((enumType_s)5, 1, "ret7");
+				//add_entry((enumType_s)5, 2, "ret8");
+				//add_entry((enumType_s)5, 3, "ret9");
+				//add_entry((enumType_s)5, 4, "ret10");
 
 				// Gametypes
-				// addEntry((enum_type)9, 1, "oneflag");
-				// addEntry((enum_type)9, 2, "vip");
-				// addEntry((enum_type)9, 3, "gtnw");
+				// add_entry((enum_type)9, 1, "oneflag");
+				// add_entry((enum_type)9, 2, "vip");
+				// add_entry((enum_type)9, 3, "gtnw");
 
 				ZONETOOL_INFO("Recipes patched.");
 			}
 			else if (data->name == "mp/prestigedata.def"s)
 			{
-				addEntry((enumType_s)5, 1, "iw5_ak74u");
-				addEntry((enumType_s)7, 1, "iw5_ak74u");
-				addEntry((enumType_s)5, 2, "iw5_cheytac");
-				addEntry((enumType_s)7, 2, "iw5_cheytac");
+				add_entry((enumType_s)5, 1, "iw5_ak74u");
+				add_entry((enumType_s)7, 1, "iw5_ak74u");
+				add_entry((enumType_s)5, 2, "iw5_cheytac");
+				add_entry((enumType_s)7, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/resetdata.def"s)
 			{
-				addEntry((enumType_s)0, 1, "iw5_ak74u");
-				addEntry((enumType_s)0, 2, "iw5_cheytac");
+				add_entry((enumType_s)0, 1, "iw5_ak74u");
+				add_entry((enumType_s)0, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/elitecreateaclass.def"s)
 			{
-				addEntry((enumType_s)1, 1, "iw5_ak74u");
-				addEntry((enumType_s)1, 2, "iw5_cheytac");
+				add_entry((enumType_s)1, 1, "iw5_ak74u");
+				add_entry((enumType_s)1, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/clientmatchdata.def"s)
 			{
-				addEntry((enumType_s)0, 1, "iw5_ak74u");
-				addEntry((enumType_s)0, 2, "iw5_cheytac");
+				add_entry((enumType_s)0, 1, "iw5_ak74u");
+				add_entry((enumType_s)0, 2, "iw5_cheytac");
 			}
 			else if (data->name == "mp/matchdata.def"s)
 			{
-				addEntry((enumType_s)3, 1, "iw5_ak74u");
-				addEntry((enumType_s)4, 1, "iw5_ak74u");
-				addEntry((enumType_s)3, 2, "iw5_cheytac");
-				addEntry((enumType_s)4, 2, "iw5_cheytac");
+				add_entry((enumType_s)3, 1, "iw5_ak74u");
+				add_entry((enumType_s)4, 1, "iw5_ak74u");
+				add_entry((enumType_s)3, 2, "iw5_cheytac");
+				add_entry((enumType_s)4, 2, "iw5_cheytac");
 			}
 
 			// Increment version
@@ -257,17 +257,9 @@ namespace ZoneTool
 			{
 				if (newEntries[i].size() > 0)
 				{
-					patchEnumWithMap(data, static_cast<enumType_s>(i), newEntries[i]);
+					patch_enum_with_map(data, static_cast<enumType_s>(i), newEntries[i]);
 				}
 			}
-		}
-
-		IStructuredDataDef::IStructuredDataDef()
-		{
-		}
-
-		IStructuredDataDef::~IStructuredDataDef()
-		{
 		}
 
 		void IStructuredDataDef::init(const std::string& name, ZoneMemory* mem)
@@ -307,8 +299,8 @@ namespace ZoneTool
 
 		void IStructuredDataDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -318,18 +310,18 @@ namespace ZoneTool
 			if (data->defs)
 			{
 				buf->align(3);
-				auto defs = buf->write(data->defs, data->defCount);
+				auto* defs = buf->write(data->defs, data->defCount);
 
-				for (unsigned int i = 0; i < data->defCount; i++)
+				for (auto i = 0u; i < data->defCount; i++)
 				{
-					auto curdef = &data->defs[i];
+					auto* curdef = &data->defs[i];
 
 					if (curdef->enums)
 					{
 						buf->align(3);
-						auto enums = buf->write(curdef->enums, curdef->enumCount);
+						auto* enums = buf->write(curdef->enums, curdef->enumCount);
 
-						for (int j = 0; j < curdef->enumCount; j++)
+						for (auto j = 0; j < curdef->enumCount; j++)
 						{
 							if (enums[j].entries)
 							{
@@ -341,57 +333,57 @@ namespace ZoneTool
 									if (entries[k].name)
 									{
 										buf->write_str(entries[k].name);
-										ZoneBuffer::ClearPointer(&entries[k].name);
+										ZoneBuffer::clear_pointer(&entries[k].name);
 									}
 								}
 
-								ZoneBuffer::ClearPointer(&enums[j].entries);
+								ZoneBuffer::clear_pointer(&enums[j].entries);
 							}
 						}
 
-						ZoneBuffer::ClearPointer(&defs[i].enums);
+						ZoneBuffer::clear_pointer(&defs[i].enums);
 					}
 
 					if (curdef->structs)
 					{
 						buf->align(3);
-						auto structs = buf->write(curdef->structs, curdef->structCount);
+						auto* structs = buf->write(curdef->structs, curdef->structCount);
 
 						for (int j = 0; j < curdef->structCount; j++)
 						{
 							if (structs[j].properties)
 							{
 								buf->align(3);
-								auto props = buf->write(structs[j].properties, structs[j].propertyCount);
+								auto* props = buf->write(structs[j].properties, structs[j].propertyCount);
 
-								for (int k = 0; k < structs[j].propertyCount; k++)
+								for (auto k = 0; k < structs[j].propertyCount; k++)
 								{
 									if (props[k].name)
 									{
 										buf->write_str(props[k].name);
-										ZoneBuffer::ClearPointer(&props[k].name);
+										ZoneBuffer::clear_pointer(&props[k].name);
 									}
 								}
 
-								ZoneBuffer::ClearPointer(&structs[j].properties);
+								ZoneBuffer::clear_pointer(&structs[j].properties);
 							}
 						}
 
-						ZoneBuffer::ClearPointer(&defs[i].structs);
+						ZoneBuffer::clear_pointer(&defs[i].structs);
 					}
 
 					if (curdef->indexedArrays)
 					{
 						buf->align(3);
 						buf->write(curdef->indexedArrays, curdef->indexedArrayCount);
-						ZoneBuffer::ClearPointer(&defs[i].indexedArrays);
+						ZoneBuffer::clear_pointer(&defs[i].indexedArrays);
 					}
 
 					if (curdef->enumedArrays)
 					{
 						buf->align(3);
 						buf->write(curdef->enumedArrays, curdef->enumedArrayCount);
-						ZoneBuffer::ClearPointer(&defs[i].enumedArrays);
+						ZoneBuffer::clear_pointer(&defs[i].enumedArrays);
 					}
 				}
 			}

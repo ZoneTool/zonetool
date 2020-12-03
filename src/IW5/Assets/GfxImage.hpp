@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GfxImage* asset_;
+			GfxImage* asset_ = nullptr;
 			bool isMapImage;
 
 			std::string clean_name(const std::string& name);

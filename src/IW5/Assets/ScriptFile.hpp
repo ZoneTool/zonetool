@@ -16,14 +16,11 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			ScriptFile* asset_;
+			ScriptFile* asset_ = nullptr;
 
 			ScriptFile* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IScriptFile();
-			~IScriptFile();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

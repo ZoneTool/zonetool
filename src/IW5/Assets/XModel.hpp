@@ -19,7 +19,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			XModel* asset_;
+			XModel* asset_ = nullptr;
 			bool is_scope_model_;
 
 		public:

@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			menuDef_t* asset_;
+			menuDef_t* asset_ = nullptr;
 
 		public:
 			IMenuDef();

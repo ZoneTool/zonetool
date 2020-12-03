@@ -16,14 +16,11 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			RawFile* asset_;
+			RawFile* asset_ = nullptr;
 
 			RawFile* parse(const std::string& name, ZoneMemory* mem);
 
 		public:
-			IRawFile();
-			~IRawFile();
-
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

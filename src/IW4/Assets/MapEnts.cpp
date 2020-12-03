@@ -14,7 +14,8 @@ namespace ZoneTool
 {
 	namespace IW4
 	{
-		std::unordered_map<std::string, std::string> keyConversion =
+#ifdef CONVERT_IW5_MAPENTS
+		std::unordered_map<std::string, std::string> key_conversion =
 		{
 			{"1", "pl#"},
 			{"1668", "classname"},
@@ -71,25 +72,25 @@ namespace ZoneTool
 			{"11848", "script_gameobjectname"},
 			{"11996", "script_label"},
 		};
-		std::unordered_map<std::string, std::string> keyConversionReversed;
+		std::unordered_map<std::string, std::string> key_conversion_reversed;
 
-		void IMapEnts::ConvertEnts(MapEnts* ents, ZoneMemory* mem)
+		void IMapEnts::convert_ents(MapEnts* ents, ZoneMemory* mem)
 		{
 			ZONETOOL_INFO("Converting mapents!");
 
-			std::string newEntsString;
-			std::string currentEntity;
-			std::string lastKey;
-			bool isValidEntity;
-			bool isParsingKey;
+			std::string new_ents_string;
+			std::string current_entity;
+			std::string last_key;
+			bool is_valid_entity;
+			bool is_parsing_key;
 
-			// make sure keyConversionReversed is prepared
-			keyConversionReversed.clear();
+			// make sure key_conversion_reversed is prepared
+			key_conversion_reversed.clear();
 
-			// prepare keyConversionReversed
-			for (auto& key : keyConversion)
+			// prepare key_conversion_reversed
+			for (auto& key : key_conversion)
 			{
-				keyConversionReversed[key.second] = key.first;
+				key_conversion_reversed[key.second] = key.first;
 			}
 
 			// parse expressions
@@ -106,80 +107,79 @@ namespace ZoneTool
 				if (expression == "{"s)
 				{
 					// clear data from previous entity
-					currentEntity.clear();
-					isValidEntity = true;
-					isParsingKey = true;
+					current_entity.clear();
+					is_valid_entity = true;
+					is_parsing_key = true;
 
 					// add expression to current expression buffer
-					currentEntity += expression + "\n";
+					current_entity += expression + "\n";
 				}
 					// finalize current entity
 				else if (expression == "}"s)
 				{
 					// add expression to current expression buffer
-					currentEntity += expression + "\n";
+					current_entity += expression + "\n";
 
 					// check if the entity we're about to add to the mapents is valid
-					if (isValidEntity)
+					if (is_valid_entity)
 					{
 						// add current expression to entity buffer
-						newEntsString += currentEntity;
+						new_ents_string += current_entity;
 					}
 					else
 					{
-						ZONETOOL_INFO("Not adding entity because it contains invalid keys! Data was %s", &currentEntity[
-0]);
+						ZONETOOL_INFO("Not adding entity because it contains invalid keys! Data was %s", &current_entity[0]);
 					}
 				}
 					// check key values
 				else
 				{
-					if (isParsingKey)
+					if (is_parsing_key)
 					{
-						auto itr1 = keyConversion.find(expression);
-						auto itr2 = keyConversionReversed.find(expression);
+						auto itr1 = key_conversion.find(expression);
+						auto itr2 = key_conversion_reversed.find(expression);
 
 						// checks if the key is unknown to both iw4 and iw5
-						if (itr1 == keyConversion.end() && itr2 == keyConversionReversed.end())
+						if (itr1 == key_conversion.end() && itr2 == key_conversion_reversed.end())
 						{
 							ZONETOOL_INFO("Unknown mapents key \"%s\". Removing entity from mapents...", &expression[0]
 );
 
 							// remove current entity from mapents file
-							isValidEntity = false;
+							is_valid_entity = false;
 						}
 							// when converting the key
-						else if (itr1 != keyConversion.end())
+						else if (itr1 != key_conversion.end())
 						{
-							currentEntity += "\"" + itr1->second + "\"";
-							lastKey = itr1->second;
+							current_entity += "\"" + itr1->second + "\"";
+							last_key = itr1->second;
 						}
 							// when the key is already in iw4 format
 						else
 						{
-							currentEntity += "\"" + expression + "\"";
-							lastKey = expression;
+							current_entity += "\"" + expression + "\"";
+							last_key = expression;
 						}
 					}
 					else
 					{
 						// check if we actually need the current key/value combo
 						if (
-							(lastKey == "classname"s && expression.length() >= 5 && expression.substr(0, 5) == "node_"s)
+							(last_key == "classname"s && expression.length() >= 5 && expression.substr(0, 5) == "node_"s)
 							||
-							(lastKey == "targetname"s && expression == "delete_on_load"s)
+							(last_key == "targetname"s && expression == "delete_on_load"s)
 						)
 						{
 							// remove current entity from mapents file
-							isValidEntity = false;
+							is_valid_entity = false;
 						}
 
 						// add expression to current expression buffer
-						currentEntity += " \"" + expression + "\"\n";
+						current_entity += " \"" + expression + "\"\n";
 					}
 
 					// invert parsing key state
-					isParsingKey = !isParsingKey;
+					is_parsing_key = !is_parsing_key;
 				}
 
 				// parse next expression
@@ -189,16 +189,16 @@ namespace ZoneTool
 			// ZONETOOL_INFO("Entity string is %s", newEntsString.data());
 
 			// replace mapents if needed
-			if (!newEntsString.empty())
+			if (!new_ents_string.empty())
 			{
-				ents->numEntityChars = newEntsString.size() + 1;
+				ents->numEntityChars = new_ents_string.size() + 1;
 				ents->entityString = mem->Alloc<char>(ents->numEntityChars);
 				memset((void*)ents->entityString, 0, ents->numEntityChars);
-				memcpy((void*)ents->entityString, &newEntsString[0], ents->numEntityChars - 1);
+				memcpy((void*)ents->entityString, &new_ents_string[0], ents->numEntityChars - 1);
 			}
 		}
+#endif
 
-		/*legacy zonetool code, refactor me!*/
 		MapEnts* IMapEnts::parse(std::string name, ZoneMemory* mem)
 		{
 			// check if we can open a filepointer
@@ -207,13 +207,13 @@ namespace ZoneTool
 				return nullptr;
 			}
 
-			auto file = FileSystem::FileOpen(name + ".ents", "rb");
+			auto* file = FileSystem::FileOpen(name + ".ents", "rb");
 
 			// let them know that we're parsing a custom mapents file
 			ZONETOOL_INFO("Parsing mapents \"%s\"...", name.c_str());
 
 			// alloc mapents
-			auto ents = mem->Alloc<MapEnts>();
+			auto* ents = mem->Alloc<MapEnts>();
 
 			ents->name = mem->StrDup(name);
 			ents->numEntityChars = FileSystem::FileSize(file);
@@ -224,56 +224,50 @@ namespace ZoneTool
 			fread((char*)ents->entityString, ents->numEntityChars, 1, file);
 			((char*)ents->entityString)[ents->numEntityChars] = '\0';
 
+#ifdef CONVERT_IW5_MAPENTS
 			// convert the mapents!
-			// this->ConvertEnts(ents, mem);
-
+			this->convert_ents(ents, mem);
+#endif
+			
 			// close filepointer
 			FileSystem::FileClose(file);
 
-			AssetReader triggerReader(mem);
-			AssetReader stageReader(mem);
+			AssetReader trigger_reader(mem);
+			AssetReader stage_reader(mem);
 
-			if (triggerReader.open(name + ".ents.triggers"))
+			if (trigger_reader.open(name + ".ents.triggers"))
 			{
-				ents->trigger.modelCount = triggerReader.read_int();
-				ents->trigger.models = triggerReader.read_array<TriggerModel>();
+				ents->trigger.modelCount = trigger_reader.read_int();
+				ents->trigger.models = trigger_reader.read_array<TriggerModel>();
 
-				ents->trigger.hullCount = triggerReader.read_int();
-				ents->trigger.hulls = triggerReader.read_array<TriggerHull>();
+				ents->trigger.hullCount = trigger_reader.read_int();
+				ents->trigger.hulls = trigger_reader.read_array<TriggerHull>();
 
-				ents->trigger.slabCount = triggerReader.read_int();
-				ents->trigger.slabs = triggerReader.read_array<TriggerSlab>();
+				ents->trigger.slabCount = trigger_reader.read_int();
+				ents->trigger.slabs = trigger_reader.read_array<TriggerSlab>();
 			}
 
-			if (stageReader.open(name + ".ents.stages"))
+			if (stage_reader.open(name + ".ents.stages"))
 			{
 				ZONETOOL_INFO("Parsing entity stages...");
 
-				ents->stageCount = stageReader.read_int();
+				ents->stageCount = stage_reader.read_int();
 				if (ents->stageCount)
 				{
-					ents->stageNames = stageReader.read_array<Stage>();
+					ents->stageNames = stage_reader.read_array<Stage>();
 
-					for (int i = 0; i < ents->stageCount; i++)
+					for (auto i = 0; i < ents->stageCount; i++)
 					{
-						ents->stageNames[i].stageName = stageReader.read_string();
+						ents->stageNames[i].stageName = stage_reader.read_string();
 					}
 				}
 			}
 
-			stageReader.close();
-			triggerReader.close();
+			stage_reader.close();
+			trigger_reader.close();
 
 			// return mapents
 			return ents;
-		}
-
-		IMapEnts::IMapEnts()
-		{
-		}
-
-		IMapEnts::~IMapEnts()
-		{
 		}
 
 		void IMapEnts::init(const std::string& name, ZoneMemory* mem)
@@ -312,30 +306,22 @@ namespace ZoneTool
 			{
 				dest->models = buf->write_s(3, dest->models, dest->modelCount);
 			}
+			
 			if (dest->hulls)
 			{
 				dest->hulls = buf->write_s(3, dest->hulls, dest->hullCount);
 			}
+			
 			if (dest->slabs)
 			{
 				dest->slabs = buf->write_s(3, dest->slabs, dest->slabCount);
-			}
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->models);
-				endian_convert(&dest->modelCount);
-				endian_convert(&dest->hulls);
-				endian_convert(&dest->hullCount);
-				endian_convert(&dest->slabs);
-				endian_convert(&dest->slabCount);
 			}
 		}
 
 		void IMapEnts::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -346,7 +332,7 @@ namespace ZoneTool
 			{
 				buf->align(0);
 				buf->write(data->entityString, data->numEntityChars);
-				ZoneBuffer::ClearPointer(&dest->entityString);
+				ZoneBuffer::clear_pointer(&dest->entityString);
 			}
 
 			write_triggers(zone, buf, &dest->trigger);
@@ -354,47 +340,27 @@ namespace ZoneTool
 			if (data->stageNames)
 			{
 				buf->align(3);
-				auto stage = buf->write(data->stageNames, data->stageCount);
+				auto* stage = buf->write(data->stageNames, data->stageCount);
 
-				for (int i = 0; i < data->stageCount; i++)
+				for (auto i = 0; i < data->stageCount; i++)
 				{
 					if (data->stageNames[i].stageName)
 					{
 						buf->write_str(data->stageNames[i].stageName);
-						ZoneBuffer::ClearPointer(&stage[i].stageName);
-					}
-					
-					if (zone->get_target() != zone_target::pc)
-					{
-						endian_convert(&stage[i].stageName);
-						endian_convert(&stage[i].triggerIndex);
-						endian_convert(&stage[i].offset[0]);
-						endian_convert(&stage[i].offset[1]);
-						endian_convert(&stage[i].offset[2]);
-						// endian_convert(&stage[i].sunPrimaryLightIndex);
-						// endian_convert(&dest->stageNames);
+						ZoneBuffer::clear_pointer(&stage[i].stageName);
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->stageNames);
+				ZoneBuffer::clear_pointer(&dest->stageNames);
 			}
 
 			END_LOG_STREAM;
 			buf->pop_stream();
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->entityString);
-				endian_convert(&dest->numEntityChars);
-				endian_convert(&dest->stageCount);
-				endian_convert(&dest->stageNames);
-			}
 		}
 
 		void IMapEnts::dump(MapEnts* asset)
 		{
-			auto file = FileSystem::FileOpen(asset->name + ".ents"s, "wb");
+			auto* file = FileSystem::FileOpen(asset->name + ".ents"s, "wb");
 
 			if (file)
 			{
@@ -402,36 +368,36 @@ namespace ZoneTool
 				FileSystem::FileClose(file);
 			}
 
-			AssetDumper triggerDumper;
-			if (triggerDumper.open(asset->name + ".ents.triggers"s))
+			AssetDumper trigger_dumper;
+			if (trigger_dumper.open(asset->name + ".ents.triggers"s))
 			{
-				triggerDumper.dump_int(asset->trigger.modelCount);
-				triggerDumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
+				trigger_dumper.dump_int(asset->trigger.modelCount);
+				trigger_dumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
 
-				triggerDumper.dump_int(asset->trigger.hullCount);
-				triggerDumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
+				trigger_dumper.dump_int(asset->trigger.hullCount);
+				trigger_dumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
 
-				triggerDumper.dump_int(asset->trigger.slabCount);
-				triggerDumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
+				trigger_dumper.dump_int(asset->trigger.slabCount);
+				trigger_dumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
 
-				triggerDumper.close();
+				trigger_dumper.close();
 			}
 
-			AssetDumper stageDumper;
-			if (stageDumper.open(asset->name + ".ents.stages"s))
+			AssetDumper stage_dumper;
+			if (stage_dumper.open(asset->name + ".ents.stages"s))
 			{
-				stageDumper.dump_int(asset->stageCount);
+				stage_dumper.dump_int(asset->stageCount);
 				if (asset->stageCount)
 				{
-					stageDumper.dump_array(asset->stageNames, asset->stageCount);
+					stage_dumper.dump_array(asset->stageNames, asset->stageCount);
 
-					for (int i = 0; i < asset->stageCount; i++)
+					for (auto i = 0; i < asset->stageCount; i++)
 					{
-						stageDumper.dump_string(asset->stageNames[i].stageName);
+						stage_dumper.dump_string(asset->stageNames[i].stageName);
 					}
 				}
 			}
-			stageDumper.close();
+			stage_dumper.close();
 		}
 	}
 }

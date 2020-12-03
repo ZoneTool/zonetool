@@ -240,7 +240,7 @@ namespace ZoneTool
 			return fx;
 		}
 
-		void IFxEffectDef::write_FxElemVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+		void IFxEffectDef::write_fx_elem_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                       FxElemVisuals* dest)
 		{
 			auto data = dest;
@@ -250,7 +250,7 @@ namespace ZoneTool
 			case FX_ELEM_TYPE_RUNNER:
 				{
 					buf->write_str(data->effectDef->name);
-					ZoneBuffer::ClearPointer(&dest->effectDef);
+					ZoneBuffer::clear_pointer(&dest->effectDef);
 					break;
 				}
 			case FX_ELEM_TYPE_SOUND:
@@ -258,7 +258,7 @@ namespace ZoneTool
 					if (data->soundName)
 					{
 						buf->write_str(data->soundName);
-						ZoneBuffer::ClearPointer(&dest->soundName);
+						ZoneBuffer::clear_pointer(&dest->soundName);
 					}
 					break;
 				}
@@ -288,7 +288,7 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDefVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+		void IFxEffectDef::write_fx_elem_def_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                          FxElemDefVisuals* dest)
 		{
 			auto data = dest;
@@ -318,16 +318,16 @@ namespace ZoneTool
 
 				for (int i = 0; i < def->visualCount; i++)
 				{
-					write_FxElemVisuals(zone, buf, def, &vis[i]);
+					write_fx_elem_visuals(zone, buf, def, &vis[i]);
 				}
 			}
 			else
 			{
-				write_FxElemVisuals(zone, buf, def, &dest->instance);
+				write_fx_elem_visuals(zone, buf, def, &dest->instance);
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDef(IZone* zone, ZoneBuffer* buf, FxElemDef* dest)
+		void IFxEffectDef::write_fx_elem_def(IZone* zone, ZoneBuffer* buf, FxElemDef* dest)
 		{
 			auto data = dest;
 
@@ -335,34 +335,34 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->velSamples, data->velIntervalCount + 1);
-				ZoneBuffer::ClearPointer(&dest->velSamples);
+				ZoneBuffer::clear_pointer(&dest->velSamples);
 			}
 
 			if (data->visSamples)
 			{
 				buf->align(3);
 				buf->write(data->visSamples, data->visStateIntervalCount + 1);
-				ZoneBuffer::ClearPointer(&dest->visSamples);
+				ZoneBuffer::clear_pointer(&dest->visSamples);
 			}
 
-			write_FxElemDefVisuals(zone, buf, data, &dest->visuals);
+			write_fx_elem_def_visuals(zone, buf, data, &dest->visuals);
 
 			if (data->effectOnImpact)
 			{
 				buf->write_str_raw(data->effectOnImpact->name);
-				ZoneBuffer::ClearPointer(&dest->effectOnImpact);
+				ZoneBuffer::clear_pointer(&dest->effectOnImpact);
 			}
 
 			if (data->effectOnDeath)
 			{
 				buf->write_str_raw(data->effectOnDeath->name);
-				ZoneBuffer::ClearPointer(&dest->effectOnDeath);
+				ZoneBuffer::clear_pointer(&dest->effectOnDeath);
 			}
 
 			if (data->effectEmitted)
 			{
 				buf->write_str_raw(data->effectEmitted->name);
-				ZoneBuffer::ClearPointer(&dest->effectEmitted);
+				ZoneBuffer::clear_pointer(&dest->effectEmitted);
 			}
 
 			if (data->extended.trailDef)
@@ -386,7 +386,7 @@ namespace ZoneTool
 							buf->write(data->extended.trailDef->inds, data->extended.trailDef->indCount);
 						}
 
-						ZoneBuffer::ClearPointer(&dest->extended.trailDef);
+						ZoneBuffer::clear_pointer(&dest->extended.trailDef);
 					}
 				}
 				else if (data->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
@@ -395,7 +395,7 @@ namespace ZoneTool
 					{
 						buf->align(3);
 						buf->write(data->extended.sparkFountain);
-						ZoneBuffer::ClearPointer(&dest->extended.sparkFountain);
+						ZoneBuffer::clear_pointer(&dest->extended.sparkFountain);
 					}
 				}
 				else if (data->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
@@ -404,7 +404,7 @@ namespace ZoneTool
 					{
 						buf->align(3);
 						buf->write_stream(data->extended.unknownDef, 24);
-						ZoneBuffer::ClearPointer(&dest->extended.unknownDef);
+						ZoneBuffer::clear_pointer(&dest->extended.unknownDef);
 					}
 				}
 				else
@@ -413,7 +413,7 @@ namespace ZoneTool
 					{
 						buf->align(1);
 						buf->write_stream(data->extended.unknownDef, sizeof(BYTE));
-						ZoneBuffer::ClearPointer(&dest->extended.unknownDef);
+						ZoneBuffer::clear_pointer(&dest->extended.unknownDef);
 					}
 				}
 			}
@@ -439,10 +439,10 @@ namespace ZoneTool
 				for (std::int32_t i = 0; i < (data->elemDefCountEmission + data->elemDefCountLooping + data->
 					     elemDefCountOneShot); i++)
 				{
-					write_FxElemDef(zone, buf, &destdef[i]);
+					write_fx_elem_def(zone, buf, &destdef[i]);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->elemDefs);
+				ZoneBuffer::clear_pointer(&dest->elemDefs);
 			}
 
 			END_LOG_STREAM;

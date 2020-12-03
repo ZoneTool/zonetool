@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			Material* asset_;
+			Material* asset_ = nullptr;
 
 			Material* parse(std::string name, ZoneMemory* mem);
 

@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IVertexDecl::IVertexDecl()
-		{
-		}
-
-		IVertexDecl::~IVertexDecl()
-		{
-		}
-
 		VertexDecl* IVertexDecl::parse(const std::string& name, ZoneMemory* mem, bool preferLocal)
 		{
 			auto path = "techsets\\" + name + ".vertexdecl";
@@ -46,8 +38,12 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
 				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).vertexdecl;
+
+				if (DB_IsXAssetDefault(this->type(), this->name().data()))
+				{
+					ZONETOOL_FATAL("VertexDecl %s not found.", &name[0]);
+				}
 			}
 		}
 

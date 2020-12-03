@@ -446,14 +446,14 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->maps);
+				ZoneBuffer::clear_pointer(&dest->maps);
 			}
 
 			if (data->constantTable)
 			{
 				/*buf->align(15);
 				buf->write(
-				ZoneBuffer::ClearPointer(&dest->constantTable);*/
+				ZoneBuffer::clear_pointer(&dest->constantTable);*/
 				dest->constantTable = buf->write_s(15, data->constantTable, data->constantCount);
 			}
 
@@ -461,7 +461,7 @@ namespace ZoneTool
 			{
 				/*buf->align(3);
 				buf->write(
-				ZoneBuffer::ClearPointer(&dest->stateMap);*/
+				ZoneBuffer::clear_pointer(&dest->stateMap);*/
 				dest->stateMap = buf->write_s(3, data->stateMap, data->stateBitsCount);
 			}
 

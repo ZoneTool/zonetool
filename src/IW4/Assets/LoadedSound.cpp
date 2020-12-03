@@ -179,7 +179,7 @@ namespace ZoneTool
 			{
 				buf->align(0);
 				buf->write(data->sound.data, data->sound.info.data_len);
-				ZoneBuffer::ClearPointer(&dest->sound.data);
+				ZoneBuffer::clear_pointer(&dest->sound.data);
 			}
 
 			buf->pop_stream();

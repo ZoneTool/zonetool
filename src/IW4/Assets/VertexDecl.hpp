@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			VertexDecl* asset_;
+			VertexDecl* asset_ = nullptr;
 
 		public:
 			static VertexDecl* parse(const std::string& name, ZoneMemory* mem,

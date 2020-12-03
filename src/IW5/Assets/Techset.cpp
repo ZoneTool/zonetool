@@ -119,15 +119,14 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL(
-"Current zone is depending on missing techset \"%s\", zone may not work correctly!", name.data());
-				// std::getchar();
-
-				this->m_parsed = false;
 				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data(), 1).
 					techset;
+
+				if (DB_IsXAssetDefault(this->type(), this->name().data()))
+				{
+					ZONETOOL_FATAL("Techset %s not found.", &name[0]);
+				}
 			}
-			this->m_parsed = true;
 		}
 
 		void ITechset::prepare(ZoneBuffer* buf,
@@ -256,14 +255,14 @@ namespace ZoneTool
 							}
 						}
 
-						ZoneBuffer::ClearPointer(&techniquePasses[pass].argumentDef);
+						ZoneBuffer::clear_pointer(&techniquePasses[pass].argumentDef);
 					}
 				}
 
 				buf->write_str(techniqueHeader->name);
-				ZoneBuffer::ClearPointer(&techniqueHeader->name);
+				ZoneBuffer::clear_pointer(&techniqueHeader->name);
 
-				ZoneBuffer::ClearPointer(&dest->techniques[technique]);
+				ZoneBuffer::clear_pointer(&dest->techniques[technique]);
 			}
 
 			END_LOG_STREAM;

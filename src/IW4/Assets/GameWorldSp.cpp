@@ -15,7 +15,7 @@ namespace ZoneTool
 		void IGameWorldSp::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".d3dbsp";
-			const auto mp_asset = IGameWorldMp::parse(name, mem);
+			auto* mp_asset = IGameWorldMp::parse(name, mem);
 
 			if (!mp_asset)
 			{
@@ -45,8 +45,8 @@ namespace ZoneTool
 
 		void IGameWorldSp::write(IZone* zone, ZoneBuffer* buf)
 		{
-			const auto data = this->asset_;
-			const auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			assert(sizeof GameWorldSp, 56);
 			assert(sizeof G_GlassData, 128);
@@ -62,36 +62,36 @@ namespace ZoneTool
 			{
 				buf->align(3);
 
-				const auto glassdata = data->g_glassData;
-				const auto destdata = buf->write(glassdata);
+				auto* glass_data = data->g_glassData;
+				auto* dest_glass_data = buf->write(glass_data);
 
-				if (glassdata->glassPieces)
+				if (glass_data->glassPieces)
 				{
 					buf->align(3);
-					buf->write(glassdata->glassPieces, glassdata->pieceCount);
-					ZoneBuffer::ClearPointer(&destdata->glassPieces);
+					buf->write(glass_data->glassPieces, glass_data->pieceCount);
+					ZoneBuffer::clear_pointer(&dest_glass_data->glassPieces);
 				}
-				if (glassdata->glassNames)
+				if (glass_data->glassNames)
 				{
 					buf->align(3);
-					const auto namedest = buf->write(glassdata->glassNames, glassdata->glassNameCount);
+					const auto namedest = buf->write(glass_data->glassNames, glass_data->glassNameCount);
 
-					for (unsigned int i = 0; i < glassdata->glassNameCount; i++)
+					for (unsigned int i = 0; i < glass_data->glassNameCount; i++)
 					{
-						namedest[i].nameStr = buf->write_str(glassdata->glassNames[i].nameStr);
+						namedest[i].nameStr = buf->write_str(glass_data->glassNames[i].nameStr);
 
-						if (glassdata->glassNames[i].pieceCount)
+						if (glass_data->glassNames[i].pieceCount)
 						{
 							buf->align(1);
-							buf->write(glassdata->glassNames[i].pieceIndices, glassdata->glassNames[i].pieceCount);
-							ZoneBuffer::ClearPointer(&glassdata->glassNames[i].pieceIndices);
+							buf->write(glass_data->glassNames[i].pieceIndices, glass_data->glassNames[i].pieceCount);
+							ZoneBuffer::clear_pointer(&glass_data->glassNames[i].pieceIndices);
 						}
 					}
 
-					ZoneBuffer::ClearPointer(&destdata->glassNames);
+					ZoneBuffer::clear_pointer(&dest_glass_data->glassNames);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->g_glassData);
+				ZoneBuffer::clear_pointer(&dest->g_glassData);
 			}
 
 			END_LOG_STREAM;
@@ -105,7 +105,7 @@ namespace ZoneTool
 
 		void IGameWorldSp::dump(GameWorldSp* asset)
 		{
-			const auto mp_asset = new GameWorldMp;
+			auto* mp_asset = new GameWorldMp;
 			memset(mp_asset, 0, sizeof GameWorldMp);
 
 			mp_asset->name = asset->name;

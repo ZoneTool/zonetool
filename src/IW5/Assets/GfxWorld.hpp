@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GfxWorld* asset_;
+			GfxWorld* asset_ = nullptr;
 
 		public:
 			static GfxWorld* parse(const std::string& name, ZoneMemory* mem);

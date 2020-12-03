@@ -18,7 +18,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GameWorldSp* asset_;
+			GameWorldSp* asset_ = nullptr;
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

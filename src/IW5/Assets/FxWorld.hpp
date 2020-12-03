@@ -16,13 +16,10 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			FxWorld* asset_;
+			FxWorld* asset_ = nullptr;
 			GlassWorld* glassmap;
 
 		public:
-			IFxWorld();
-			~IFxWorld();
-
 			static FxWorld* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;

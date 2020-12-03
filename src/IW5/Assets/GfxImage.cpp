@@ -329,7 +329,7 @@ namespace ZoneTool
 					desttext->dataSize = 0;
 				}
 
-				ZoneBuffer::ClearPointer(&dest->texture);
+				ZoneBuffer::clear_pointer(&dest->texture);
 			}
 			buf->pop_stream();
 

@@ -133,14 +133,6 @@ namespace ZoneTool
 			return stringtable;
 		}
 
-		IStringTable::IStringTable()
-		{
-		}
-
-		IStringTable::~IStringTable()
-		{
-		}
-
 		void IStringTable::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;
@@ -197,7 +189,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->strings);
+				ZoneBuffer::clear_pointer(&dest->strings);
 			}
 
 			END_LOG_STREAM;

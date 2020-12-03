@@ -85,8 +85,8 @@ namespace ZoneTool
 
 		void IRawFile::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write<RawFile>(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write<RawFile>(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -101,15 +101,7 @@ namespace ZoneTool
 			else if (data->buffer)
 			{
 				buf->write(data->buffer, data->compressedLen);
-				ZoneBuffer::ClearPointer(&dest->buffer);
-			}
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->compressedLen);
-				endian_convert(&dest->len);
-				endian_convert(&dest->buffer);
+				ZoneBuffer::clear_pointer(&dest->buffer);
 			}
 
 			END_LOG_STREAM;
@@ -118,7 +110,7 @@ namespace ZoneTool
 
 		void IRawFile::dump(RawFile* asset)
 		{
-			auto fp = FileSystem::FileOpen(asset->name, "wb");
+			auto* fp = FileSystem::FileOpen(asset->name, "wb");
 
 			if (fp)
 			{
@@ -139,14 +131,6 @@ namespace ZoneTool
 			}
 
 			FileSystem::FileClose(fp);
-		}
-
-		IRawFile::IRawFile()
-		{
-		}
-
-		IRawFile::~IRawFile()
-		{
 		}
 	}
 }

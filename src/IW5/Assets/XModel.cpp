@@ -12,38 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		char* freadstr(FILE* file)
-		{
-			char tempBuf[1024];
-			char ch = 0;
-			int i = 0;
-
-			do
-			{
-				fread(&ch, 1, 1, file);
-
-				tempBuf[i++] = ch;
-
-				if (i >= sizeof(tempBuf))
-				{
-					throw std::exception("this is wrong");
-				}
-			}
-			while (ch);
-
-			char* retval = new char[i];
-			strcpy(retval, tempBuf);
-
-			return retval;
-		}
-
-		int freadint(FILE* file)
-		{
-			int value;
-			fread(&value, sizeof(int), 1, file);
-			return value;
-		}
-
 		XModel* IXModel::parse_new(const std::string& name, ZoneMemory* mem,
 		                           const std::string& filename, const std::function<std::uint16_t(const std::string&)>& allocString)
 		{
@@ -53,10 +21,6 @@ namespace ZoneTool
 			{
 				return nullptr;
 			}
-
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW5::IXModel::parse_new");
-#endif
 
 			ZONETOOL_INFO("Parsing xmodel \"%s\"...", name.c_str());
 
@@ -99,10 +63,6 @@ namespace ZoneTool
 			// subassets
 			asset->physPreset = read.read_asset<PhysPreset>();
 			asset->physCollmap = read.read_asset<PhysCollmap>();
-
-#ifdef USE_VMPROTECT
-			VMProtectEnd();
-#endif
 
 			return asset;
 		}
@@ -176,30 +136,32 @@ namespace ZoneTool
 					memcpy(model->lods[0].surfaces->xSurficies, allocated_surfaces.data(), sizeof XSurface * allocated_surfaces.size());
 
 					// remove all bones besides for tag_scope
-					XBoneInfo scope_info = {};
-					auto found_bone = false;
-					
-					for (auto i = 0u; i < model->numBones; i++)
-					{
-						if (SL_ConvertToString(model->boneNames[i]) == "tag_scope"s)
-						{
-							memcpy(&scope_info, &model->boneInfo[i], sizeof XBoneInfo);
-							found_bone = true;
-							break;
-						}
-					}
+					//XBoneInfo scope_info = {};
+					//auto found_bone = false;
+					//
+					//for (auto i = 0u; i < model->numBones; i++)
+					//{
+					//	if (SL_ConvertToString(model->boneNames[i]) == "tag_scope"s)
+					//	{
+					//		memcpy(&scope_info, &model->boneInfo[i], sizeof XBoneInfo);
+					//		found_bone = true;
+					//		break;
+					//	}
+					//}
 
-					if (found_bone)
-					{
-						model->numBones = 0;
-						model->numRootBones = 0;
-						memcpy(&model->boneInfo[0], &scope_info, sizeof XBoneInfo);
-						model->boneNames[0] = SL_AllocString("tag_scope");
-					}
-					else
-					{
-						ZONETOOL_FATAL("You dun goofed");
-					}
+					//if (found_bone)
+					//{
+					//	model->numBones = 0;
+					//	model->numRootBones = 0;
+					//	memcpy(&model->boneInfo[0], &scope_info, sizeof XBoneInfo);
+					//	model->boneNames[0] = SL_AllocString("tag_scope");
+					//}
+					//else
+					//{
+					//	ZONETOOL_FATAL("You dun goofed");
+					//}
+					model->numBones = 0;
+					model->numRootBones = 0;
 
 					// test
 					model->numColSurfs = 0;
@@ -252,7 +214,7 @@ namespace ZoneTool
 		void IXModel::prepare(ZoneBuffer* buf, ZoneMemory* mem)
 		{
 			// fixup scriptstrings
-			auto xmodel = mem->Alloc<XModel>();
+			auto* xmodel = mem->Alloc<XModel>();
 			memcpy(xmodel, this->asset_, sizeof XModel);
 
 			// allocate bonenames
@@ -276,14 +238,10 @@ namespace ZoneTool
 
 		void IXModel::load_depending(IZone* zone)
 		{
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW5::IXModel::load_depending");
-#endif
-
-			auto data = this->asset_;
+			auto* data = this->asset_;
 
 			// Materials
-			for (std::int32_t i = 0; i < data->numSurfaces; i++)
+			for (auto i = 0u; i < data->numSurfaces; i++)
 			{
 				if (data->materials[i])
 				{
@@ -319,10 +277,6 @@ namespace ZoneTool
 			{
 				zone->add_asset_of_type(physpreset, data->physPreset->name);
 			}
-
-#ifdef USE_VMPROTECT
-			VMProtectEnd();
-#endif
 		}
 
 		std::string IXModel::name()
@@ -337,10 +291,6 @@ namespace ZoneTool
 
 		void IXModel::write(IZone* zone, ZoneBuffer* buf)
 		{
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW5::IXModel::write");
-#endif
-
 			assert(sizeof XModel, 308);
 
 			auto data = this->asset_;
@@ -355,56 +305,56 @@ namespace ZoneTool
 			{
 				buf->align(1);
 				buf->write(data->boneNames, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->boneNames);
+				ZoneBuffer::clear_pointer(&dest->boneNames);
 			}
 
 			if (data->parentList)
 			{
 				buf->align(0);
 				buf->write(data->parentList, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->parentList);
+				ZoneBuffer::clear_pointer(&dest->parentList);
 			}
 
 			if (data->tagAngles)
 			{
 				buf->align(1);
 				buf->write(data->tagAngles, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->tagAngles);
+				ZoneBuffer::clear_pointer(&dest->tagAngles);
 			}
 
 			if (data->tagPositions)
 			{
 				buf->align(3);
 				buf->write(data->tagPositions, data->numBones - data->numRootBones);
-				ZoneBuffer::ClearPointer(&dest->tagPositions);
+				ZoneBuffer::clear_pointer(&dest->tagPositions);
 			}
 
 			if (data->partClassification)
 			{
 				buf->align(0);
 				buf->write(data->partClassification, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->partClassification);
+				ZoneBuffer::clear_pointer(&dest->partClassification);
 			}
 
 			if (data->animMatrix)
 			{
 				buf->align(3);
 				buf->write(data->animMatrix, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->animMatrix);
+				ZoneBuffer::clear_pointer(&dest->animMatrix);
 			}
 
 			if (data->materials)
 			{
 				buf->align(3);
 
-				auto destMaterials = buf->write(data->materials, data->numSurfaces);
+				auto* dest_materials = buf->write(data->materials, data->numSurfaces);
 				for (int i = 0; i < data->numSurfaces; i++)
 				{
-					destMaterials[i] = reinterpret_cast<Material*>(zone->get_asset_pointer(
+					dest_materials[i] = reinterpret_cast<Material*>(zone->get_asset_pointer(
 						material, data->materials[i]->name));
 				}
 
-				ZoneBuffer::ClearPointer(&dest->materials);
+				ZoneBuffer::clear_pointer(&dest->materials);
 			}
 
 			for (int i = 0; i < 4; i++)
@@ -424,14 +374,14 @@ namespace ZoneTool
 					destSurf[i].tris = buf->write_s(3, data->colSurf[i].tris, data->colSurf[i].numCollTris);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->colSurf);
+				ZoneBuffer::clear_pointer(&dest->colSurf);
 			}
 
 			if (data->boneInfo)
 			{
 				buf->align(3);
 				buf->write(data->boneInfo, data->numBones);
-				ZoneBuffer::ClearPointer(&dest->boneInfo);
+				ZoneBuffer::clear_pointer(&dest->boneInfo);
 			}
 
 			if (data->physPreset)
@@ -448,18 +398,10 @@ namespace ZoneTool
 
 			END_LOG_STREAM;
 			buf->pop_stream();
-
-#ifdef USE_VMPROTECT
-			VMProtectEnd();
-#endif
 		}
 
 		void IXModel::dump(XModel* asset, const std::function<const char* (std::uint16_t)>& convertToString)
 		{
-#ifdef USE_VMPROTECT
-			VMProtectBeginUltra("IW5::IXModel::dump");
-#endif
-
 			AssetDumper dump;
 			dump.open("XModel\\"s + asset->name + ".xme6");
 
@@ -505,10 +447,6 @@ namespace ZoneTool
 			dump.dump_asset(asset->physCollmap);
 
 			dump.close();
-
-#ifdef USE_VMPROTECT
-			VMProtectEnd();
-#endif
 		}
 	}
 }

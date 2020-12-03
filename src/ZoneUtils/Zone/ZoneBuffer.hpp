@@ -127,7 +127,7 @@ namespace ZoneTool
 			};
 
 			// The game needs it to be incremented
-			std::uint32_t getPackedValue() { return this->packed + 1; };
+			std::uint32_t get_packed_value() { return this->packed + 1; };
 		};
 
 		void write_data(const void* _data, std::size_t size, std::size_t count);
@@ -165,7 +165,7 @@ namespace ZoneTool
 		{
 			return reinterpret_cast<T*>(((this->m_stream & 0x0F) << this->m_shiftsize) | ((m_zonestreams[m_stream] + 1)
 				& 0x0FFFFFFF));
-			// auto pointer = Offset(this->m_stream, this->m_zonestreams[this->m_stream]).getPackedValue();
+			// auto pointer = Offset(this->m_stream, this->m_zonestreams[this->m_stream]).get_packed_value();
 			// return reinterpret_cast<T*>(pointer);
 		}
 
@@ -338,7 +338,7 @@ namespace ZoneTool
 		std::size_t scriptstring_count();
 
 		template <typename T>
-		static void ClearPointer(T* ptr)
+		static void clear_pointer(T* ptr)
 		{
 			*reinterpret_cast<std::uintptr_t*>(ptr) = -1;
 		}

@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			XModelSurfs* asset_;
+			XModelSurfs* asset_ = nullptr;
 
 		public:
 			XModelSurfs* parse(const std::string& name, ZoneMemory* mem);

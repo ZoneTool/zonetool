@@ -16,12 +16,9 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			GlassWorld* asset_;
+			GlassWorld* asset_ = nullptr;
 
 		public:
-			IGlassWorld();
-			~IGlassWorld();
-
 			static GlassWorld* parse(const std::string& name, ZoneMemory* mem);
 
 			void init(const std::string& name, ZoneMemory* mem) override;

@@ -16,13 +16,11 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			MapEnts* asset_;
+			MapEnts* asset_ = nullptr;
 
 		public:
 			MapEnts* parse(std::string name, ZoneMemory* mem);
-			IMapEnts();
-			~IMapEnts();
-
+			
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
 			void load_depending(IZone* zone) override;

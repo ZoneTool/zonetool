@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			Font_s* asset_;
+			Font_s* asset_ = nullptr;
 
 		public:
 			IFontDef();

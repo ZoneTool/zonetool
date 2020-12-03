@@ -1096,7 +1096,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->gunXModel);
+				ZoneBuffer::clear_pointer(&dest->gunXModel);
 			}
 
 			// Seems to be writting NULL, should fix at some point
@@ -1120,7 +1120,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->szXAnimsRightHanded);
+				ZoneBuffer::clear_pointer(&dest->szXAnimsRightHanded);
 			}
 
 			if (data->szXAnimsLeftHanded)
@@ -1136,7 +1136,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->szXAnimsLeftHanded);
+				ZoneBuffer::clear_pointer(&dest->szXAnimsLeftHanded);
 			}
 
 			if (data->szModeName)
@@ -1149,7 +1149,7 @@ namespace ZoneTool
 			{ \
 				buf->align(1); \
 				buf->write(data->__field__,__count__); \
-				ZoneBuffer::ClearPointer(&dest->__field__); \
+				ZoneBuffer::clear_pointer(&dest->__field__); \
 			}
 
 			WEAPON_SCRIPTSTRING_ARRAY(notetrackSoundMapKeys, 24);
@@ -1175,7 +1175,7 @@ namespace ZoneTool
 				buf->align(3);
 				buf->write(&ptr);
 				buf->write_str(data->sounds[i]->name);
-				ZoneBuffer::ClearPointer(&dest->sounds[i]);
+				ZoneBuffer::clear_pointer(&dest->sounds[i]);
 			}
 
 			if (data->bounceSound)
@@ -1193,7 +1193,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->bounceSound);
+				ZoneBuffer::clear_pointer(&dest->bounceSound);
 			}
 
 			if (data->rollingSound)
@@ -1211,7 +1211,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->rollingSound);
+				ZoneBuffer::clear_pointer(&dest->rollingSound);
 			}
 
 			WEAPON_SUBASSET(viewShellEjectEffect, fx, FxEffectDef);
@@ -1236,7 +1236,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->worldModel);
+				ZoneBuffer::clear_pointer(&dest->worldModel);
 			}
 
 			WEAPON_SUBASSET(worldClipModel, xmodel, XModel);
@@ -1284,14 +1284,14 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->parallelBounce, 124);
-				ZoneBuffer::ClearPointer(&dest->parallelBounce);
+				ZoneBuffer::clear_pointer(&dest->parallelBounce);
 			}
 
 			if (data->perpendicularBounce)
 			{
 				buf->align(3);
 				buf->write(data->perpendicularBounce, 124);
-				ZoneBuffer::ClearPointer(&dest->perpendicularBounce);
+				ZoneBuffer::clear_pointer(&dest->perpendicularBounce);
 			}
 
 			WEAPON_SUBASSET(projTrailEffect, fx, FxEffectDef);
@@ -1309,7 +1309,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->accuracyGraphKnots, data->accuracyGraphKnotCount);
-				ZoneBuffer::ClearPointer(&dest->accuracyGraphKnots);
+				ZoneBuffer::clear_pointer(&dest->accuracyGraphKnots);
 			}
 
 			if (data->accuracyGraphName[1])
@@ -1321,7 +1321,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->originalAccuracyGraphKnots, data->originalAccuracyGraphKnotCount);
-				ZoneBuffer::ClearPointer(&dest->originalAccuracyGraphKnots);
+				ZoneBuffer::clear_pointer(&dest->originalAccuracyGraphKnots);
 			}
 
 			if (data->szUseHintString)
@@ -1343,7 +1343,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->locationDamageMultipliers, 20);
-				ZoneBuffer::ClearPointer(&dest->locationDamageMultipliers);
+				ZoneBuffer::clear_pointer(&dest->locationDamageMultipliers);
 			}
 
 			if (data->fireRumble)
@@ -1392,7 +1392,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				write_WeaponDef(zone, buf, data, data->weapDef);
-				ZoneBuffer::ClearPointer(&dest->weapDef);
+				ZoneBuffer::clear_pointer(&dest->weapDef);
 			}
 
 			if (data->szDisplayName)
@@ -1404,7 +1404,7 @@ namespace ZoneTool
 			{
 				buf->align(1);
 				buf->write(data->hideTags, 32);
-				ZoneBuffer::ClearPointer(&dest->hideTags);
+				ZoneBuffer::clear_pointer(&dest->hideTags);
 			}
 
 #define WEAPON_ATTACHMENT(__field__,__max__) \
@@ -1423,7 +1423,7 @@ namespace ZoneTool
 					} \
 				} \
  \
-				ZoneBuffer::ClearPointer(&dest->__field__); \
+				ZoneBuffer::clear_pointer(&dest->__field__); \
 			}
 
 			WEAPON_ATTACHMENT(scopes, 6);
@@ -1443,7 +1443,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->szXAnims);
+				ZoneBuffer::clear_pointer(&dest->szXAnims);
 			}
 
 			if (data->animOverrides)
@@ -1464,7 +1464,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->animOverrides);
+				ZoneBuffer::clear_pointer(&dest->animOverrides);
 			}
 
 			if (data->soundOverrides)
@@ -1480,7 +1480,7 @@ namespace ZoneTool
 						buf->align(3);
 						buf->write(&ptr);
 						buf->write_str(destSoundOverrides[i].overrideSound->name);
-						ZoneBuffer::ClearPointer(&destSoundOverrides[i].overrideSound);
+						ZoneBuffer::clear_pointer(&destSoundOverrides[i].overrideSound);
 					}
 
 					if (destSoundOverrides[i].altmodeSound)
@@ -1489,11 +1489,11 @@ namespace ZoneTool
 						buf->align(3);
 						buf->write(&ptr);
 						buf->write_str(destSoundOverrides[i].altmodeSound->name);
-						ZoneBuffer::ClearPointer(&destSoundOverrides[i].altmodeSound);
+						ZoneBuffer::clear_pointer(&destSoundOverrides[i].altmodeSound);
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->soundOverrides);
+				ZoneBuffer::clear_pointer(&dest->soundOverrides);
 			}
 
 			if (data->fxOverrides)
@@ -1518,14 +1518,14 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->fxOverrides);
+				ZoneBuffer::clear_pointer(&dest->fxOverrides);
 			}
 
 			if (data->reloadOverrides)
 			{
 				buf->align(3);
 				buf->write(data->reloadOverrides, data->numReloadStateTimerOverrides);
-				ZoneBuffer::ClearPointer(&dest->reloadOverrides);
+				ZoneBuffer::clear_pointer(&dest->reloadOverrides);
 			}
 
 			if (data->notetrackOverrides)
@@ -1539,18 +1539,18 @@ namespace ZoneTool
 					{
 						buf->align(1);
 						buf->write(destNoteTrackOverrides[i].notetrackSoundMapKeys, 24);
-						ZoneBuffer::ClearPointer(&destNoteTrackOverrides[i].notetrackSoundMapKeys);
+						ZoneBuffer::clear_pointer(&destNoteTrackOverrides[i].notetrackSoundMapKeys);
 					}
 
 					if (destNoteTrackOverrides[i].notetrackSoundMapValues)
 					{
 						buf->align(1);
 						buf->write(destNoteTrackOverrides[i].notetrackSoundMapValues, 24);
-						ZoneBuffer::ClearPointer(&destNoteTrackOverrides[i].notetrackSoundMapValues);
+						ZoneBuffer::clear_pointer(&destNoteTrackOverrides[i].notetrackSoundMapValues);
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->notetrackOverrides);
+				ZoneBuffer::clear_pointer(&dest->notetrackOverrides);
 			}
 
 			if (data->szAltWeaponName)
@@ -1576,14 +1576,14 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->accuracyGraphKnots[0], data->accuracyGraphKnotCount[0]);
-				ZoneBuffer::ClearPointer(&dest->accuracyGraphKnots[0]);
+				ZoneBuffer::clear_pointer(&dest->accuracyGraphKnots[0]);
 			}
 
 			if (data->accuracyGraphKnots[1])
 			{
 				buf->align(3);
 				buf->write(data->accuracyGraphKnots[1], data->accuracyGraphKnotCount[1]);
-				ZoneBuffer::ClearPointer(&dest->accuracyGraphKnots[1]);
+				ZoneBuffer::clear_pointer(&dest->accuracyGraphKnots[1]);
 			}
 
 			END_LOG_STREAM;

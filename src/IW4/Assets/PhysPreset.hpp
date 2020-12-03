@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			PhysPreset* asset_;
+			PhysPreset* asset_ = nullptr;
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

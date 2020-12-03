@@ -63,13 +63,13 @@ namespace ZoneTool
 
 		void IFxEffectDef::load_depending(IZone* zone)
 		{
-			auto data = this->asset_;
+			auto* data = this->asset_;
 
-			auto load_FxElemVisuals = [zone](FxElemDef* def, FxElemDefVisuals* vis)
+			auto load_fx_elem_visuals = [zone](FxElemDef* def, FxElemDefVisuals* vis)
 			{
 				if (def->elemType == 11)
 				{
-					for (int i = 0; i < def->visualCount; i++)
+					for (auto i = 0; i < def->visualCount; i++)
 					{
 						if (vis->markArray[i])
 						{
@@ -86,7 +86,7 @@ namespace ZoneTool
 				}
 				else if (def->visualCount > 1)
 				{
-					for (int i = 0; i < def->visualCount; i++)
+					for (auto i = 0; i < def->visualCount; i++)
 					{
 						if (def->elemType == 12 && vis->array[i].effectDef)
 						{
@@ -134,20 +134,26 @@ namespace ZoneTool
 			};
 
 			// Loop through frames
-			for (int i = 0; i < data->elemDefCountEmission + data->elemDefCountLooping + data->elemDefCountOneShot; i++)
+			for (auto i = 0; i < data->elemDefCountEmission + data->elemDefCountLooping + data->elemDefCountOneShot; i++)
 			{
-				FxElemDef& def = data->elemDefs[i];
+				auto* def = &data->elemDefs[i];
 
 				// Sub-FX effects
-				if (def.effectEmitted)
-					zone->add_asset_of_type(fx, def.effectEmitted->name);
-				if (def.effectOnDeath)
-					zone->add_asset_of_type(fx, def.effectOnDeath->name);
-				if (def.effectOnImpact)
-					zone->add_asset_of_type(fx, def.effectOnImpact->name);
+				if (def->effectEmitted)
+				{
+					zone->add_asset_of_type(fx, def->effectEmitted->name);
+				}
+				if (def->effectOnDeath)
+				{
+					zone->add_asset_of_type(fx, def->effectOnDeath->name);
+				}
+				if (def->effectOnImpact)
+				{
+					zone->add_asset_of_type(fx, def->effectOnImpact->name);
+				}
 
 				// Visuals
-				load_FxElemVisuals(&def, &def.visuals);
+				load_fx_elem_visuals(def, &def->visuals);
 			}
 		}
 
@@ -161,17 +167,17 @@ namespace ZoneTool
 			return fx;
 		}
 
-		void IFxEffectDef::write_FxElemVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+		void IFxEffectDef::write_fx_elem_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                       FxElemVisuals* dest)
 		{
-			auto data = dest;
+			auto* data = dest;
 
 			switch (def->elemType)
 			{
 			case FX_ELEM_TYPE_RUNNER:
 				{
 					buf->write_str(data->effectDef->name);
-					ZoneBuffer::ClearPointer(&dest->effectDef);
+					ZoneBuffer::clear_pointer(&dest->effectDef);
 					break;
 				}
 			case FX_ELEM_TYPE_SOUND:
@@ -179,7 +185,7 @@ namespace ZoneTool
 					if (data->soundName)
 					{
 						buf->write_str(data->soundName);
-						ZoneBuffer::ClearPointer(&dest->soundName);
+						ZoneBuffer::clear_pointer(&dest->soundName);
 					}
 					break;
 				}
@@ -210,10 +216,10 @@ namespace ZoneTool
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDefVisuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+		void IFxEffectDef::write_fx_elem_def_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
 		                                          FxElemDefVisuals* dest)
 		{
-			auto data = dest;
+			auto* data = dest;
 
 			if (def->elemType == FX_ELEM_TYPE_DECAL)
 			{
@@ -236,55 +242,55 @@ namespace ZoneTool
 			}
 			else if (def->visualCount > 1)
 			{
-				auto vis = buf->write(data->array, def->visualCount);
+				auto* vis = buf->write(data->array, def->visualCount);
 
-				for (int i = 0; i < def->visualCount; i++)
+				for (auto i = 0; i < def->visualCount; i++)
 				{
-					write_FxElemVisuals(zone, buf, def, &vis[i]);
+					write_fx_elem_visuals(zone, buf, def, &vis[i]);
 				}
 			}
 			else
 			{
-				write_FxElemVisuals(zone, buf, def, &dest->instance);
+				write_fx_elem_visuals(zone, buf, def, &dest->instance);
 			}
 		}
 
-		void IFxEffectDef::write_FxElemDef(IZone* zone, ZoneBuffer* buf, FxElemDef* dest)
+		void IFxEffectDef::write_fx_elem_def(IZone* zone, ZoneBuffer* buf, FxElemDef* dest)
 		{
-			auto data = dest;
+			auto* data = dest;
 
 			if (data->velSamples)
 			{
 				buf->align(3);
 				buf->write(data->velSamples, data->velIntervalCount + 1);
-				ZoneBuffer::ClearPointer(&dest->velSamples);
+				ZoneBuffer::clear_pointer(&dest->velSamples);
 			}
 
 			if (data->visSamples)
 			{
 				buf->align(3);
 				buf->write(data->visSamples, data->visStateIntervalCount + 1);
-				ZoneBuffer::ClearPointer(&dest->visSamples);
+				ZoneBuffer::clear_pointer(&dest->visSamples);
 			}
 
-			write_FxElemDefVisuals(zone, buf, data, &dest->visuals);
+			write_fx_elem_def_visuals(zone, buf, data, &dest->visuals);
 
 			if (data->effectOnImpact)
 			{
 				buf->write_str_raw(data->effectOnImpact->name);
-				ZoneBuffer::ClearPointer(&dest->effectOnImpact);
+				ZoneBuffer::clear_pointer(&dest->effectOnImpact);
 			}
 
 			if (data->effectOnDeath)
 			{
 				buf->write_str_raw(data->effectOnDeath->name);
-				ZoneBuffer::ClearPointer(&dest->effectOnDeath);
+				ZoneBuffer::clear_pointer(&dest->effectOnDeath);
 			}
 
 			if (data->effectEmitted)
 			{
 				buf->write_str_raw(data->effectEmitted->name);
-				ZoneBuffer::ClearPointer(&dest->effectEmitted);
+				ZoneBuffer::clear_pointer(&dest->effectEmitted);
 			}
 
 			if (data->extended.trailDef)
@@ -308,7 +314,7 @@ namespace ZoneTool
 							buf->write(data->extended.trailDef->inds, data->extended.trailDef->indCount);
 						}
 
-						ZoneBuffer::ClearPointer(&dest->extended.trailDef);
+						ZoneBuffer::clear_pointer(&dest->extended.trailDef);
 					}
 				}
 				else if (data->elemType == FX_ELEM_TYPE_SPARKFOUNTAIN)
@@ -317,7 +323,7 @@ namespace ZoneTool
 					{
 						buf->align(3);
 						buf->write(data->extended.sparkFountain);
-						ZoneBuffer::ClearPointer(&dest->extended.sparkFountain);
+						ZoneBuffer::clear_pointer(&dest->extended.sparkFountain);
 					}
 				}
 				else if (data->elemType == FX_ELEM_TYPE_SPOT_LIGHT)
@@ -326,7 +332,7 @@ namespace ZoneTool
 					{
 						buf->align(3);
 						buf->write_stream(data->extended.unknownDef, 24);
-						ZoneBuffer::ClearPointer(&dest->extended.unknownDef);
+						ZoneBuffer::clear_pointer(&dest->extended.unknownDef);
 					}
 				}
 				else
@@ -335,7 +341,7 @@ namespace ZoneTool
 					{
 						buf->align(1);
 						buf->write_stream(data->extended.unknownDef, sizeof(BYTE));
-						ZoneBuffer::ClearPointer(&dest->extended.unknownDef);
+						ZoneBuffer::clear_pointer(&dest->extended.unknownDef);
 					}
 				}
 			}
@@ -343,8 +349,8 @@ namespace ZoneTool
 
 		void IFxEffectDef::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -354,17 +360,17 @@ namespace ZoneTool
 			if (data->elemDefs)
 			{
 				buf->align(3);
-				auto destdef = buf->write(data->elemDefs,
+				auto* fx_elem_def = buf->write(data->elemDefs,
 				                          data->elemDefCountEmission + data->elemDefCountLooping + data->
 				                          elemDefCountOneShot);
 
 				for (std::int32_t i = 0; i < (data->elemDefCountEmission + data->elemDefCountLooping + data->
 					     elemDefCountOneShot); i++)
 				{
-					write_FxElemDef(zone, buf, &destdef[i]);
+					write_fx_elem_def(zone, buf, &fx_elem_def[i]);
 				}
 
-				ZoneBuffer::ClearPointer(&dest->elemDefs);
+				ZoneBuffer::clear_pointer(&dest->elemDefs);
 			}
 
 			END_LOG_STREAM;
@@ -373,7 +379,7 @@ namespace ZoneTool
 
 		void IFxEffectDef::dump(FxEffectDef* asset)
 		{
-			const auto iw5_fx = new IW5::FxEffectDef;
+			auto* iw5_fx = new IW5::FxEffectDef;
 			memcpy(iw5_fx, asset, sizeof FxEffectDef);
 			memset(iw5_fx->pad, 0, sizeof iw5_fx->pad);
 

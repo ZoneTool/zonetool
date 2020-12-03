@@ -18,7 +18,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			XAnimParts* asset_;
+			XAnimParts* asset_ = nullptr;
 
 		public:
 			void init(const std::string& name, ZoneMemory* mem) override;

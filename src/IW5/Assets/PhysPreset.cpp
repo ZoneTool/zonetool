@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IPhysPreset::IPhysPreset()
-		{
-		}
-
-		IPhysPreset::~IPhysPreset()
-		{
-		}
-
 		void IPhysPreset::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;

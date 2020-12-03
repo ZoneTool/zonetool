@@ -25,8 +25,12 @@ namespace ZoneTool
 
 			if (!this->asset_)
 			{
-				ZONETOOL_FATAL("VertexShader %s not found.", &name[0]);
 				this->asset_ = DB_FindXAssetHeader(this->type(), this->name().data()).vertexshader;
+
+				if (DB_IsXAssetDefault(this->type(), this->name().data()))
+				{
+					ZONETOOL_FATAL("VertexShader %s not found.", &name[0]);
+				}
 			}
 		}
 
@@ -50,8 +54,8 @@ namespace ZoneTool
 
 		void IVertexShader::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;
@@ -62,7 +66,7 @@ namespace ZoneTool
 			{
 				buf->align(3);
 				buf->write(data->bytecode, data->codeLen);
-				ZoneBuffer::ClearPointer(&dest->bytecode);
+				ZoneBuffer::clear_pointer(&dest->bytecode);
 			}
 
 			END_LOG_STREAM;

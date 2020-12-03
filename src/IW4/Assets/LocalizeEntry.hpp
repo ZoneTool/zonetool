@@ -16,7 +16,7 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			LocalizeEntry* asset_;
+			LocalizeEntry* asset_ = nullptr;
 
 		public:
 			ILocalizeEntry();

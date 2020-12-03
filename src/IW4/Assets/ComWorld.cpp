@@ -15,7 +15,7 @@ namespace ZoneTool
 	{
 		ComWorld* IComWorld::parse(const std::string& name, ZoneMemory* mem)
 		{
-			auto iw5_comworld = IW5::IComWorld::parse(name, mem);
+			auto* iw5_comworld = IW5::IComWorld::parse(name, mem);
 
 			if (!iw5_comworld)
 			{
@@ -23,28 +23,20 @@ namespace ZoneTool
 			}
 
 			// fixup data
-			auto lightArray = mem->Alloc<ComPrimaryLight>(iw5_comworld->primaryLightCount);
+			auto* light_array = mem->Alloc<ComPrimaryLight>(iw5_comworld->primaryLightCount);
 
 			// convert structure
-			for (int i = 0; i < iw5_comworld->primaryLightCount; i++)
+			for (auto i = 0u; i < iw5_comworld->primaryLightCount; i++)
 			{
-				memcpy(lightArray[i]._portpad0, iw5_comworld->primaryLights[i]._portpad0, 28);
-				memcpy(lightArray[i]._portpad1, iw5_comworld->primaryLights[i]._portpad1, 40);
+				memcpy(light_array[i]._portpad0, iw5_comworld->primaryLights[i]._portpad0, 28);
+				memcpy(light_array[i]._portpad1, iw5_comworld->primaryLights[i]._portpad1, 40);
 			}
 
 			// set pointer
-			iw5_comworld->primaryLights = (IW5::ComPrimaryLight*)lightArray;
+			iw5_comworld->primaryLights = (IW5::ComPrimaryLight*)light_array;
 
 			// asset is the exact same so just cast to the correct type here
 			return (ComWorld*)iw5_comworld;
-		}
-
-		IComWorld::IComWorld()
-		{
-		}
-
-		IComWorld::~IComWorld()
-		{
 		}
 
 		void IComWorld::init(const std::string& name, ZoneMemory* mem)
@@ -64,9 +56,9 @@ namespace ZoneTool
 
 		void IComWorld::load_depending(IZone* zone)
 		{
-			auto asset = this->asset_;
+			auto* asset = this->asset_;
 
-			for (int i = 0; i < asset->primaryLightCount; i++)
+			for (auto i = 0u; i < asset->primaryLightCount; i++)
 			{
 				if (asset->primaryLights[i].defName)
 				{
@@ -87,8 +79,8 @@ namespace ZoneTool
 
 		void IComWorld::write(IZone* zone, ZoneBuffer* buf)
 		{
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			
@@ -97,47 +89,15 @@ namespace ZoneTool
 			if (data->primaryLights)
 			{
 				buf->align(3);
-				auto destlight = buf->write(data->primaryLights, data->primaryLightCount);
+				auto* primary_light = buf->write(data->primaryLights, data->primaryLightCount);
 				
-				for (std::uint32_t i = 0; i < data->primaryLightCount; i++)
+				for (auto i = 0u; i < data->primaryLightCount; i++)
 				{
 					if (data->primaryLights[i].defName)
 					{
-						destlight[i].defName = buf->write_str(data->primaryLights[i].defName);
-					}
-
-					if (zone->get_target() != zone_target::pc)
-					{
-						endian_convert(&destlight[i].defName);
-						endian_convert(&destlight[i].type);
-						endian_convert(&destlight[i].canUseShadowMap);
-						endian_convert(&destlight[i].exponent);
-						endian_convert(&destlight[i].unused);
-						endian_convert(&destlight[i].color[0]);
-						endian_convert(&destlight[i].color[1]);
-						endian_convert(&destlight[i].color[2]);
-						endian_convert(&destlight[i].dir[0]);
-						endian_convert(&destlight[i].dir[1]);
-						endian_convert(&destlight[i].dir[2]);
-						endian_convert(&destlight[i].origin[0]);
-						endian_convert(&destlight[i].origin[1]);
-						endian_convert(&destlight[i].origin[2]);
-						endian_convert(&destlight[i].radius);
-						endian_convert(&destlight[i].cosHalfFovOuter);
-						endian_convert(&destlight[i].cosHalfFovInner);
-						endian_convert(&destlight[i].cosHalfFovExpanded);
-						endian_convert(&destlight[i].rotationLimit);
-						endian_convert(&destlight[i].translationLimit);
+						primary_light[i].defName = buf->write_str(data->primaryLights[i].defName);
 					}
 				}
-			}
-
-			if (zone->get_target() != zone_target::pc)
-			{
-				endian_convert(&dest->name);
-				endian_convert(&dest->primaryLights);
-				endian_convert(&dest->primaryLightCount);
-				endian_convert(&dest->isInUse);
 			}
 
 			buf->pop_stream();
@@ -146,7 +106,7 @@ namespace ZoneTool
 		void IComWorld::dump(ComWorld* asset)
 		{
 			// alloc comworld
-			auto iw5_comworld = new IW5::ComWorld;
+			auto* iw5_comworld = new IW5::ComWorld;
 			memcpy(iw5_comworld, asset, sizeof ComWorld);
 
 			// alloc lights

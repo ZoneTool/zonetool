@@ -434,7 +434,7 @@ namespace ZoneTool
 					}
 				}
 
-				ZoneBuffer::ClearPointer(&dest->maps);
+				ZoneBuffer::clear_pointer(&dest->maps);
 			}
 
 			if (data->constantTable)

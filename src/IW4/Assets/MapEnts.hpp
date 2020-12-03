@@ -16,14 +16,14 @@ namespace ZoneTool
 		{
 		private:
 			std::string name_;
-			MapEnts* asset_;
+			MapEnts* asset_ = nullptr;
 
 		public:
-			static void ConvertEnts(MapEnts* ents, ZoneMemory* mem);
-
+#ifdef CONVERT_IW5_MAPENTS
+			static void convert_ents(MapEnts* ents, ZoneMemory* mem);
+#endif
+			
 			MapEnts* parse(std::string name, ZoneMemory* mem);
-			IMapEnts();
-			~IMapEnts();
 
 			void init(const std::string& name, ZoneMemory* mem) override;
 			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;

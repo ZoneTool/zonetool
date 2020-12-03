@@ -346,9 +346,9 @@ namespace ZoneTool
 
 				if (partdata->quat2)
 				{
-					ZONETOOL_INFO("Write - Delta:Quat2");
 					buf->align(3);
 					buf->write_stream(partdata->quat2, 4, 1); // not full struct
+					
 					if (partdata->quat2->size)
 					{
 						buf->write_stream(&partdata->quat2->u, 0x4, 1); // not full struct

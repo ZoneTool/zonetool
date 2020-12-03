@@ -121,7 +121,7 @@ namespace ZoneTool
 			return xmodelsurfs;
 		}
 
-		template <typename T> void write_xsurfaces(IZone* zone, ZoneBuffer* buf, T* data, T* dest, std::uint16_t count, bool is_console)
+		void IXSurface::write_xsurfaces(IZone* zone, ZoneBuffer* buf, XSurface* data, std::uint16_t count)
 		{
 			assert(sizeof XSurface, 64);
 			assert(sizeof Face, 6);
@@ -133,57 +133,25 @@ namespace ZoneTool
 			assert(sizeof GfxPackedVertex, 32);
 			assert(sizeof XSurfaceVertexInfo, 12);
 
+			auto* dest = buf->write(data, count);
+			
 			for (auto surf = 0u; surf < count; surf++)
 			{
 				if (data[surf].vertexInfo.vertsBlend)
 				{
-					unsigned __int16* destverts = nullptr;
-					const auto vertcount = data[surf].vertexInfo.vertCount[0] +
-						(data[surf].vertexInfo.vertCount[1] * 3) + 
-						(data[surf].vertexInfo.vertCount[2] * 5) + 
-						(data[surf].vertexInfo.vertCount[3] * 7);
-					
-					dest[surf].vertexInfo.vertsBlend = buf->write_s(1, data[surf].vertexInfo.vertsBlend, count, sizeof (unsigned __int16), &destverts);
-
-					if (is_console && dest[surf].vertexInfo.vertsBlend == reinterpret_cast<unsigned __int16*>(-1))
-					{
-						for (auto a = 0u; a < vertcount; a++)
-						{
-							endian_convert(&destverts[a]);
-						}
-					}
+					dest[surf].vertexInfo.vertsBlend = buf->write_s(1, data[surf].vertexInfo.vertsBlend,
+						data[surf].vertexInfo.vertCount[0] +
+						(data[surf].vertexInfo.vertCount[1] * 3) + (data[
+							surf].vertexInfo.vertCount[2] * 5) + (data[
+								surf].vertexInfo.vertCount[3] * 7));
 				}
 
-				if (!is_console)
-				{
-					buf->push_stream(6);
-				}
-				
+				buf->push_stream(6);
 				if (data[surf].verticies)
 				{
-					GfxPackedVertex* destverticies = nullptr;
-					dest[surf].verticies = buf->write_s(15, data[surf].verticies, data[surf].vertCount, sizeof GfxPackedVertex, &destverticies);
-
-					if (is_console && dest[surf].verticies == reinterpret_cast<GfxPackedVertex*>(-1))
-					{
-						for (auto a = 0; a < data[surf].vertCount; a++)
-						{
-							endian_convert(&destverticies[a].xyz[0]);
-							endian_convert(&destverticies[a].xyz[1]);
-							endian_convert(&destverticies[a].xyz[2]);
-							endian_convert(&destverticies[a].binormalSign);
-							// packed data probably consists of single bytes?
-							//endian_convert(&destverticies[a].texCoord.packed);
-							//endian_convert(&destverticies[a].normal.packed);
-							//endian_convert(&destverticies[a].tangent.packed);
-						}
-					}
+					dest[surf].verticies = buf->write_s(15, data[surf].verticies, data[surf].vertCount);
 				}
-				
-				if (!is_console)
-				{
-					buf->pop_stream();
-				}
+				buf->pop_stream();
 
 				if (data[surf].rigidVertLists)
 				{
@@ -193,7 +161,7 @@ namespace ZoneTool
 
 					if (dest[surf].rigidVertLists == reinterpret_cast<XRigidVertList*>(-1))
 					{
-						for (int k = 0; k < data[surf].vertListCount; k++)
+						for (auto k = 0; k < data[surf].vertListCount; k++)
 						{
 							if (ct[k].collisionTree)
 							{
@@ -205,195 +173,49 @@ namespace ZoneTool
 								{
 									if (entry->nodes)
 									{
-										XSurfaceCollisionNode* destnode = nullptr;
-										entry->nodes = buf->write_s(15, entry->nodes, entry->nodeCount, sizeof (XSurfaceCollisionNode), &destnode);
-
-										if (entry->nodes == reinterpret_cast<XSurfaceCollisionNode*>(-1) && is_console)
-										{
-											for (auto a = 0u; a < entry->leafCount; a++)
-											{
-												for (auto b = 0; b < 3; b++)
-												{
-													endian_convert(&destnode[a].aabb.mins[b]);
-													endian_convert(&destnode[a].aabb.maxs[b]);
-												}
-
-												endian_convert(&destnode[a].childBeginIndex);
-												endian_convert(&destnode[a].childCount);
-											}
-										}
+										entry->nodes = buf->write_s(15, entry->nodes, entry->nodeCount);
 									}
 
 									if (entry->leafs)
 									{
-										XSurfaceCollisionLeaf* destleaf = nullptr;
-										entry->leafs = buf->write_s(1, entry->leafs, entry->leafCount, sizeof (XSurfaceCollisionLeaf), &destleaf);
-
-										if (entry->leafs == reinterpret_cast<XSurfaceCollisionLeaf *>(-1) && is_console)
-										{
-											for (auto a = 0u; a < entry->leafCount; a++)
-											{
-												endian_convert(&destleaf[a].triangleBeginIndex);
-											}
-										}
-									}
-
-									if (is_console)
-									{
-										for (auto a = 0; a < 3; a++)
-										{
-											endian_convert(&entry->trans[a]);
-											endian_convert(&entry->scale[a]);
-										}
-										endian_convert(&entry->nodeCount);
-										endian_convert(&entry->nodes);
-										endian_convert(&entry->leafCount);
-										endian_convert(&entry->leafs);
+										entry->leafs = buf->write_s(1, entry->leafs, entry->leafCount);
 									}
 								}
 							}
-
-							if (is_console)
-							{
-								endian_convert(&ct[k].boneOffset);
-								endian_convert(&ct[k].vertCount);
-								endian_convert(&ct[k].triOffset);
-								endian_convert(&ct[k].triCount);
-								endian_convert(&ct[k].collisionTree);
-							}
 						}
 					}
 				}
 
-				if (!is_console)
-				{
-					buf->push_stream(7);
-				}
-				
+				buf->push_stream(7);
 				if (data[surf].triIndices)
 				{
-					Face* dest_tris = nullptr;
-					dest[surf].triIndices = buf->write_s(15, data[surf].triIndices, data[surf].triCount, sizeof(unsigned __int16), &dest_tris);
-
-					if (is_console && dest[surf].triIndices == reinterpret_cast<Face*>(-1))
-					{
-						for (auto a = 0u; a < data[surf].triCount; a++)
-						{
-							endian_convert(&dest_tris[a].v1);
-							endian_convert(&dest_tris[a].v2);
-							endian_convert(&dest_tris[a].v3);
-						}
-					}
+					dest[surf].triIndices = buf->write_s(15, data[surf].triIndices, data[surf].triCount);
 				}
-
-				if (!is_console)
-				{
-					buf->pop_stream();
-				}
-
-				if (is_console)
-				{
-					endian_convert(&dest[surf].vertCount);
-					endian_convert(&dest[surf].triCount);
-					endian_convert(&dest[surf].triIndices);
-					endian_convert(&dest[surf].vertexInfo.vertCount[0]);
-					endian_convert(&dest[surf].vertexInfo.vertCount[1]);
-					endian_convert(&dest[surf].vertexInfo.vertCount[2]);
-					endian_convert(&dest[surf].vertexInfo.vertCount[3]);
-					endian_convert(&dest[surf].verticies);
-					endian_convert(&dest[surf].vertListCount);
-					endian_convert(&dest[surf].rigidVertLists);
-					for (auto a = 0; a < 5; a++)
-					{
-						endian_convert(&dest[surf].partBits[a]);
-					}
-				}
+				buf->pop_stream();
 			}
 		}
 
 		void IXSurface::write(IZone* zone, ZoneBuffer* buf)
 		{
-			if (zone->get_target() == zone_target::pc)
+			auto* data = this->asset_;
+			auto* dest = buf->write<XModelSurfs>(data);
+
+			assert(sizeof XModelSurfs, 36);
+
+			buf->push_stream(3);
+			START_LOG_STREAM;
+
+			dest->name = buf->write_str(this->name());
+
+			if (data->surfs)
 			{
-				auto data = this->asset_;
-				auto dest = buf->write<XModelSurfs>(data);
-
-				assert(sizeof XModelSurfs, 36);
-
-				buf->push_stream(3);
-				START_LOG_STREAM;
-
-				dest->name = buf->write_str(this->name());
-
-				if (data->surfs)
-				{
-					buf->align(3);
-					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
-					write_xsurfaces<XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, false);
-					ZoneBuffer::clear_pointer(&dest->surfs);
-				}
-
-				END_LOG_STREAM;
-				buf->pop_stream();
+				buf->align(3);
+				write_xsurfaces(zone, buf, data->surfs, data->numsurfs);
+				ZoneBuffer::clear_pointer(&dest->surfs);
 			}
-			else
-			{
-				std::vector<alpha::XSurface> surfs;
-				surfs.resize(this->asset_->numsurfs);
 
-				for (auto i = 0u; i < this->asset_->numsurfs; i++)
-				{
-					// 
-					surfs[i].tileMode = this->asset_->surfs[i].tileMode;
-					surfs[i].deformed = this->asset_->surfs[i].deformed;
-					surfs[i].vertCount = this->asset_->surfs[i].vertCount;
-					surfs[i].triCount = this->asset_->surfs[i].triCount;
-					surfs[i].triIndices = this->asset_->surfs[i].triIndices;
-					surfs[i].verticies = this->asset_->surfs[i].verticies;
-					surfs[i].vertListCount = this->asset_->surfs[i].vertListCount;
-					surfs[i].rigidVertLists = this->asset_->surfs[i].rigidVertLists;
-					memcpy(&surfs[i].vertexInfo, &this->asset_->surfs[i].vertexInfo, sizeof XSurfaceVertexInfo);
-					memcpy(surfs[i].partBits, this->asset_->surfs[i].partBits, sizeof(int) * 5);
-					
-					// memset console shit to 0
-					memset(&surfs[i].vb0, 0, sizeof alpha::D3DVertexBuffer);
-					memset(&surfs[i].indexBuffer, 0, sizeof alpha::D3DIndexBuffer);
-				}
-				
-				alpha::XModelSurfs alpha_surfs = {};
-				memcpy(&alpha_surfs, this->asset_, sizeof alpha::XModelSurfs);
-				alpha_surfs.surfs = surfs.data();
-				
-				auto data = &alpha_surfs;
-				auto dest = buf->write(data);
-
-				assert(sizeof alpha::XModelSurfs, 32);
-
-				buf->push_stream(3);
-				START_LOG_STREAM;
-
-				dest->name = buf->write_str(this->name());
-
-				if (data->surfs)
-				{
-					buf->align(3);
-					auto destsurfaces = buf->write(data->surfs, data->numsurfs);
-					write_xsurfaces<alpha::XSurface>(zone, buf, data->surfs, destsurfaces, data->numsurfs, true);
-					ZoneBuffer::clear_pointer(&dest->surfs);
-				}
-
-				END_LOG_STREAM;
-				buf->pop_stream();
-
-				endian_convert(&dest->name);
-				endian_convert(&dest->surfs);
-				endian_convert(&dest->numsurfs);
-				for (auto a = 0; a < 5; a++)
-				{
-					endian_convert(&dest->partBits[a]);
-				}
-			}
-			
+			END_LOG_STREAM;
+			buf->pop_stream();
 		}
 
 		void IXSurface::dump(XModelSurfs* asset)
@@ -409,14 +231,14 @@ namespace ZoneTool
 			dump.dump_array(asset, 1);
 			dump.dump_string(asset->name);
 
-			for (int i = 0; i < asset->numsurfs; i++)
+			for (auto i = 0u; i < asset->numsurfs; i++)
 			{
 				dump.dump_int(asset->surfs[i].tileMode);
 				dump.dump_int(asset->surfs[i].deformed);
 				dump.dump_int(asset->surfs[i].baseTriIndex);
 				dump.dump_int(asset->surfs[i].baseVertIndex);
 
-				for (int j = 0; j < 6; j++)
+				for (auto j = 0; j < 6; j++)
 				{
 					dump.dump_int(asset->surfs[i].partBits[j]);
 				}
@@ -438,7 +260,7 @@ namespace ZoneTool
 
 				dump.dump_int(asset->surfs[i].vertListCount);
 				dump.dump_array(asset->surfs[i].rigidVertLists, asset->surfs[i].vertListCount);
-				for (int vert = 0; vert < asset->surfs[i].vertListCount; vert++)
+				for (auto vert = 0; vert < asset->surfs[i].vertListCount; vert++)
 				{
 					if (asset->surfs[i].rigidVertLists[vert].collisionTree)
 					{

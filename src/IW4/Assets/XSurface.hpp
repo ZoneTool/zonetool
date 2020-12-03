@@ -30,6 +30,7 @@ namespace ZoneTool
 			void* pointer() override { return asset_; }
 			std::string name() override;
 			std::int32_t type() override;
+			void write_xsurfaces(IZone* zone, ZoneBuffer* buf, XSurface* data, std::uint16_t count);
 			void write(IZone* zone, ZoneBuffer* buffer) override;
 
 			static void dump(XModelSurfs* asset);

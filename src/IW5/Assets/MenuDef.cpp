@@ -12,14 +12,6 @@ namespace ZoneTool
 {
 	namespace IW5
 	{
-		IMenuDef::IMenuDef()
-		{
-		}
-
-		IMenuDef::~IMenuDef()
-		{
-		}
-
 		void IMenuDef::init(const std::string& name, ZoneMemory* mem)
 		{
 			this->name_ = name;
@@ -44,7 +36,7 @@ namespace ZoneTool
 			return menu;
 		}
 
-		void IMenuDef::write_MenuData(IZone* zone, ZoneBuffer* buf, menuData_t* data)
+		void IMenuDef::write_menu_data(IZone* zone, ZoneBuffer* buf, menuData_t* data)
 		{
 			auto* dest = buf->write(data);
 			memset(dest, 0, sizeof menuData_t);
@@ -66,7 +58,7 @@ namespace ZoneTool
 			if (data->data)
 			{
 				buf->align(3);
-				write_MenuData(zone, buf, data->data);
+				write_menu_data(zone, buf, data->data);
 				ZoneBuffer::clear_pointer(&dest->data);
 			}
 

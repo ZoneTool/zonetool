@@ -117,14 +117,14 @@ namespace ZoneTool
 			return xmodelsurfs;
 		}
 
-		void IXSurface::write_xsurfices(IZone* zone, ZoneBuffer* buf, XSurface* data,
+		void IXSurface::write_xsurfaces(IZone* zone, ZoneBuffer* buf, XSurface* data,
 		                                std::int16_t count)
 		{
 			assert(sizeof Face, 6);
 			assert(sizeof XRigidVertList, 12);
 			assert(sizeof XSurfaceCollisionTree, 40);
 
-			auto dest = buf->write(data, count);
+			auto* dest = buf->write(data, count);
 
 			for (std::int16_t surf = 0; surf < count; surf++)
 			{
@@ -152,7 +152,7 @@ namespace ZoneTool
 
 					if (dest[surf].rigidVertLists == reinterpret_cast<XRigidVertList*>(-1))
 					{
-						for (int k = 0; k < data[surf].vertListCount; k++)
+						for (auto k = 0; k < data[surf].vertListCount; k++)
 						{
 							if (ct[k].collisionTree)
 							{
@@ -190,8 +190,8 @@ namespace ZoneTool
 		{
 			assert(sizeof ModelSurface, 36);
 
-			auto dest = buf->at<ModelSurface>();
-			auto data = this->asset_;
+			auto* dest = buf->at<ModelSurface>();
+			auto* data = this->asset_;
 
 			buf->write<ModelSurface>(data);
 			buf->push_stream(3);
@@ -202,7 +202,7 @@ namespace ZoneTool
 			if (data->xSurficies)
 			{
 				buf->align(3);
-				this->write_xsurfices(zone, buf, data->xSurficies, data->xSurficiesCount);
+				this->write_xsurfaces(zone, buf, data->xSurficies, data->xSurficiesCount);
 				ZoneBuffer::clear_pointer(&dest->xSurficies);
 			}
 

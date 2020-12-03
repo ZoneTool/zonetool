@@ -46,15 +46,15 @@ namespace ZoneTool
 
 		void IMenuDef::write_MenuData(IZone* zone, ZoneBuffer* buf, menuData_t* data)
 		{
-			auto dest = buf->write(data);
+			auto* dest = buf->write(data);
 			memset(dest, 0, sizeof menuData_t);
 		}
 
 		void IMenuDef::write(IZone* zone, ZoneBuffer* buf)
 		{
 			// the only purpose for this is to decrease load time of the game...
-			auto data = this->asset_;
-			auto dest = buf->write(data);
+			auto* data = this->asset_;
+			auto* dest = buf->write(data);
 
 			buf->push_stream(3);
 			START_LOG_STREAM;

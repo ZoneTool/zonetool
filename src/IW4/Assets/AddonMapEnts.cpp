@@ -1,0 +1,147 @@
+// ======================= ZoneTool =======================
+// zonetool, a fastfile linker for various
+// Call of Duty titles. 
+//
+// Project: https://github.com/ZoneTool/zonetool
+// Author: RektInator (https://github.com/RektInator)
+// License: GNU GPL v3.0
+// ========================================================
+#include "stdafx.hpp"
+#include "ZoneUtils/Utils/BinaryDumper.hpp"
+
+namespace ZoneTool
+{
+	namespace IW4
+	{
+		AddonMapEnts* IAddonMapEnts::parse(std::string name, ZoneMemory* mem)
+		{
+			// check if we can open a filepointer
+			if (!FileSystem::FileExists(name))
+			{
+				return nullptr;
+			}
+
+			auto file = FileSystem::FileOpen(name, "rb");
+
+			// let them know that we're parsing a custom mapents file
+			ZONETOOL_INFO("Parsing addon mapents \"%s\"...", name.c_str());
+
+			// alloc mapents
+			auto ents = mem->Alloc<AddonMapEnts>();
+
+			ents->name = mem->StrDup(name);
+			ents->numEntityChars = FileSystem::FileSize(file) + 1;
+
+			ents->entityString = mem->Alloc<char>(ents->numEntityChars);
+			memset((char*)ents->entityString, 0, ents->numEntityChars);
+			fread((char*)ents->entityString, ents->numEntityChars - 1, 1, file);
+
+#ifdef CONVERT_IW5_MAPENTS
+			// convert the mapents!
+			IMapEnts::convert_ents(reinterpret_cast<MapEnts*>(ents), mem);
+#endif
+			
+			// close filepointer
+			FileSystem::FileClose(file);
+
+			AssetReader triggerReader(mem);
+			AssetReader stageReader(mem);
+
+			if (triggerReader.open(name + ".triggers"))
+			{
+				ents->trigger.modelCount = triggerReader.read_int();
+				ents->trigger.models = triggerReader.read_array<TriggerModel>();
+
+				ents->trigger.hullCount = triggerReader.read_int();
+				ents->trigger.hulls = triggerReader.read_array<TriggerHull>();
+
+				ents->trigger.slabCount = triggerReader.read_int();
+				ents->trigger.slabs = triggerReader.read_array<TriggerSlab>();
+			}
+
+			triggerReader.close();
+
+			// return mapents
+			return ents;
+		}
+
+		void IAddonMapEnts::init(const std::string& name, ZoneMemory* mem)
+		{
+			this->name_ = "maps/"s + (currentzone.substr(0, 3) == "mp_" ? "mp/" : "") + currentzone + ".mapents"; // name;
+			this->asset_ = this->parse(name, mem);
+
+			if (!this->asset_)
+			{
+				this->asset_ = DB_FindXAssetHeader(this->type(), name.data()).addon_map_ents;
+			}
+		}
+
+		void IAddonMapEnts::prepare(ZoneBuffer* buf, ZoneMemory* mem)
+		{
+		}
+
+		void IAddonMapEnts::load_depending(IZone* zone)
+		{
+			
+		}
+
+		std::string IAddonMapEnts::name()
+		{
+			return this->name_;
+		}
+
+		std::int32_t IAddonMapEnts::type()
+		{
+			return addon_map_ents;
+		}
+
+		void IAddonMapEnts::write(IZone* zone, ZoneBuffer* buf)
+		{
+			auto data = this->asset_;
+			auto dest = buf->write(data);
+
+			buf->push_stream(3);
+			START_LOG_STREAM;
+
+			dest->name = buf->write_str(this->name());
+
+			if (data->entityString)
+			{
+				buf->align(0);
+				buf->write(data->entityString, data->numEntityChars);
+				ZoneBuffer::clear_pointer(&dest->entityString);
+			}
+
+			IMapEnts::write_triggers(zone, buf, &dest->trigger);
+
+			END_LOG_STREAM;
+			buf->pop_stream();
+		}
+
+		void IAddonMapEnts::dump(AddonMapEnts* asset)
+		{
+			auto* file = FileSystem::FileOpen(asset->name, "wb");
+
+			if (file)
+			{
+				fwrite(asset->entityString, asset->numEntityChars, 1, file);
+				FileSystem::FileClose(file);
+			}
+
+			AssetDumper trigger_dumper;
+			if (trigger_dumper.open(asset->name + ".triggers"s))
+			{
+				trigger_dumper.dump_int(asset->trigger.modelCount);
+				trigger_dumper.dump_array<TriggerModel>(asset->trigger.models, asset->trigger.modelCount);
+
+				trigger_dumper.dump_int(asset->trigger.hullCount);
+				trigger_dumper.dump_array<TriggerHull>(asset->trigger.hulls, asset->trigger.hullCount);
+
+				trigger_dumper.dump_int(asset->trigger.slabCount);
+				trigger_dumper.dump_array<TriggerSlab>(asset->trigger.slabs, asset->trigger.slabCount);
+
+				trigger_dumper.close();
+			}
+		}
+	}
+}

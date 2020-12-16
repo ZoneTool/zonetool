@@ -1,0 +1,20 @@
+version: 1.0.{build}
+skip_tags: true
+image: Visual Studio 2019
+configuration: release
+before_build:
+- git submodule update --init --recursive
+- ps: tools\premake5.exe vs2019 --set-version="$env:APPVEYOR_BUILD_VERSION"
+build:
+  project: build/zonetool.sln
+  verbosity: minimal
+test: off
+artifacts:
+- path: build/bin/*.dll
+- path: build/bin/*.pdb
+deploy:
+- provider: GitHub
+  auth_token:
+    secure: IyUTCaq8tOpcOwDfqa2bH2UCEgPNoLpgqZtJOetSchzZcs1rJT8b/oQ/DTq2ecwc
+  on:
+    branch: master

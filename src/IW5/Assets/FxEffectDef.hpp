@@ -1,0 +1,42 @@
+// ======================= ZoneTool =======================
+// zonetool, a fastfile linker for various
+// Call of Duty titles. 
+//
+// Project: https://github.com/ZoneTool/zonetool
+// Author: RektInator (https://github.com/RektInator)
+// License: GNU GPL v3.0
+// ========================================================
+#pragma once
+
+namespace ZoneTool
+{
+	namespace IW5
+	{
+		class IFxEffectDef : public IAsset
+		{
+		private:
+			std::string name_;
+			FxEffectDef* asset_ = nullptr;
+
+			static void write_fx_elem_def_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+			                                   FxElemDefVisuals* dest);
+			static void write_fx_elem_def(IZone* zone, ZoneBuffer* buf, FxElemDef* dest);
+			static void write_fx_elem_visuals(IZone* zone, ZoneBuffer* buf, FxElemDef* def,
+			                                FxElemVisuals* dest);
+
+		public:
+			static FxEffectDef* parse(const std::string& name, ZoneMemory* mem);
+			
+			void init(const std::string& name, ZoneMemory* mem) override;
+			void prepare(ZoneBuffer* buf, ZoneMemory* mem) override;
+			void load_depending(IZone* zone) override;
+
+			std::string name() override;
+			std::int32_t type() override;
+			void write(IZone* zone, ZoneBuffer* buffer) override;
+
+			static void dumpToLegacyFormat(FxEffectDef* asset);
+			static void dump(FxEffectDef* asset);
+		};
+	}
+}

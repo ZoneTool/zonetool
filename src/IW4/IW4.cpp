@@ -294,6 +294,7 @@ char**>(0x00799278)[type]);
 					DECLARE_ASSET(weapon, IWeaponDef);
 					DECLARE_ASSET(addon_map_ents, IAddonMapEnts);
 					DECLARE_ASSET(font, IFontDef);
+					DECLARE_ASSET(menu, IMenuDef);
 				}
 			}
 		}

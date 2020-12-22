@@ -2160,6 +2160,636 @@ namespace ZoneTool
 		};
 #pragma pack(pop)
 
+#pragma pack(push, 4)
+		struct rectDef_s
+		{
+			float x;
+			float y;
+			float w;
+			float h;
+			char horzAlign;
+			char vertAlign;
+		};
+#pragma pack(pop)
+
+		struct expression_s;
+		struct statement_s;
+		struct menuDef_t;
+		//enum operationEnum;
+		struct MenuEventHandlerSet;
+		struct Statement_s;
+
+		enum operationEnum
+		{
+			OP_NOOP = 0x0,
+			OP_RIGHTPAREN = 0x1,
+			OP_MULTIPLY = 0x2,
+			OP_DIVIDE = 0x3,
+			OP_MODULUS = 0x4,
+			OP_ADD = 0x5,
+			OP_SUBTRACT = 0x6,
+			OP_NOT = 0x7,
+			OP_LESSTHAN = 0x8,
+			OP_LESSTHANEQUALTO = 0x9,
+			OP_GREATERTHAN = 0xA,
+			OP_GREATERTHANEQUALTO = 0xB,
+			OP_EQUALS = 0xC,
+			OP_NOTEQUAL = 0xD,
+			OP_AND = 0xE,
+			OP_OR = 0xF,
+			OP_LEFTPAREN = 0x10,
+			OP_COMMA = 0x11,
+			OP_BITWISEAND = 0x12,
+			OP_BITWISEOR = 0x13,
+			OP_BITWISENOT = 0x14,
+			OP_BITSHIFTLEFT = 0x15,
+			OP_BITSHIFTRIGHT = 0x16,
+			OP_FIRSTFUNCTIONCALL = 0x17,
+			OP_STATICDVARINT = 0x17,
+			OP_STATICDVARBOOL = 0x18,
+			OP_STATICDVARFLOAT = 0x19,
+			OP_STATICDVARSTRING = 0x1A,
+			OP_INT = 0x1B,
+			OP_STRING = 0x1C,
+			OP_FLOAT = 0x1D,
+			OP_SIN = 0x1E,
+			OP_COS = 0x1F,
+			OP_MIN = 0x20,
+			OP_MAX = 0x21,
+			OP_MILLISECONDS = 0x22,
+			OP_DVARINT = 0x23,
+			OP_DVARBOOL = 0x24,
+			OP_DVARFLOAT = 0x25,
+			OP_DVARSTRING = 0x26,
+			OP_STAT = 0x27,
+			OP_UIACTIVE = 0x28,
+			OP_FLASHBANGED = 0x29,
+			OP_USINGVEHICLE = 0x2A,
+			OP_MISSILECAM = 0x2B,
+			OP_SCOPED = 0x2C,
+			OP_SCOPEDTHERMAL = 0x2D,
+			OP_SCOREBOARDVISIBLE = 0x2E,
+			OP_INKILLCAM = 0x2F,
+			OP_INKILLCAMNPC = 0x30,
+			OP_PLAYERFIELD = 0x31,
+			OP_GETPERK = 0x32,
+			OP_SELECTINGLOCATION = 0x33,
+			OP_SELECTINGDIRECTION = 0x34,
+			OP_TEAMFIELD = 0x35,
+			OP_OTHERTEAMFIELD = 0x36,
+			OP_MARINESFIELD = 0x37,
+			OP_OPFORFIELD = 0x38,
+			OP_MENUISOPEN = 0x39,
+			OP_WRITINGDATA = 0x3A,
+			OP_INLOBBY = 0x3B,
+			OP_INPRIVATEPARTY = 0x3C,
+			OP_PRIVATEPARTYHOST = 0x3D,
+			OP_PRIVATEPARTYHOSTINLOBBY = 0x3E,
+			OP_ALONEINPARTY = 0x3F,
+			OP_ADSJAVELIN = 0x40,
+			OP_WEAPLOCKBLINK = 0x41,
+			OP_WEAPATTACKTOP = 0x42,
+			OP_WEAPATTACKDIRECT = 0x43,
+			OP_WEAPLOCKING = 0x44,
+			OP_WEAPLOCKED = 0x45,
+			OP_WEAPLOCKTOOCLOSE = 0x46,
+			OP_WEAPLOCKSCREENPOSX = 0x47,
+			OP_WEAPLOCKSCREENPOSY = 0x48,
+			OP_SECONDSASTIME = 0x49,
+			OP_TABLELOOKUP = 0x4A,
+			OP_TABLELOOKUPBYROW = 0x4B,
+			OP_TABLEGETROWNUM = 0x4C,
+			OP_LOCALIZESTRING = 0x4D,
+			OP_LOCALVARINT = 0x4E,
+			OP_LOCALVARBOOL = 0x4F,
+			OP_LOCALVARFLOAT = 0x50,
+			OP_LOCALVARSTRING = 0x51,
+			OP_TIMELEFT = 0x52,
+			OP_SECONDSASCOUNTDOWN = 0x53,
+			OP_GAMEMSGWNDACTIVE = 0x54,
+			OP_GAMETYPENAME = 0x55,
+			OP_GAMETYPE = 0x56,
+			OP_GAMETYPEDESCRIPTION = 0x57,
+			OP_SCORE = 0x58,
+			OP_FRIENDSONLINE = 0x59,
+			OP_SPECTATINGCLIENT = 0x5A,
+			OP_SPECTATINGFREE = 0x5B,
+			OP_STATRANGEBITSSET = 0x5C,
+			OP_KEYBINDING = 0x5D,
+			OP_ACTIONSLOTUSABLE = 0x5E,
+			OP_HUDFADE = 0x5F,
+			OP_MAXRECOMMENDEDPLAYERS = 0x60,
+			OP_ACCEPTINGINVITE = 0x61,
+			OP_ISINTERMISSION = 0x62,
+			OP_GAMEHOST = 0x63,
+			OP_PARTYISMISSINGMAPPACK = 0x64,
+			OP_PARTYMISSINGMAPPACKERROR = 0x65,
+			OP_ANYNEWMAPPACKS = 0x66,
+			OP_AMISELECTED = 0x67,
+			OP_PARTYSTATUSSTRING = 0x68,
+			OP_ATTACHEDCONTROLLERCOUNT = 0x69,
+			OP_ISSPLITSCREENONLINEPOSSIBLE = 0x6A,
+			OP_SPLITSCREENPLAYERCOUNT = 0x6B,
+			OP_GETPLAYERDATA = 0x6C,
+			OP_GETPLAYERDATASPLITSCREEN = 0x6D,
+			OP_EXPERIENCEFORLEVEL = 0x6E,
+			OP_LEVELFOREXPERIENCE = 0x6F,
+			OP_ISITEMUNLOCKED = 0x70,
+			OP_ISITEMUNLOCKEDSPLITSCREEN = 0x71,
+			OP_DEBUGPRINT = 0x72,
+			OP_GETPLAYERDATAANYBOOLTRUE = 0x73,
+			OP_WEAPONCLASSNEW = 0x74,
+			OP_WEAPONNAME = 0x75,
+			OP_ISRELOADING = 0x76,
+			OP_SAVEGAMEAVAILABLE = 0x77,
+			OP_UNLOCKEDITEMCOUNT = 0x78,
+			OP_UNLOCKEDITEMCOUNTSPLITSCREEN = 0x79,
+			OP_UNLOCKEDITEM = 0x7A,
+			OP_UNLOCKEDITEMSPLITSCREEN = 0x7B,
+			OP_MAILSUBJECT = 0x7C,
+			OP_MAILFROM = 0x7D,
+			OP_MAILRECEIVED = 0x7E,
+			OP_MAILBODY = 0x7F,
+			OP_MAILLOOTLOCALIZED = 0x80,
+			OP_MAILGIVESLOOT = 0x81,
+			OP_ANYNEWMAIL = 0x82,
+			OP_MAILTIMETOFOLLOWUP = 0x83,
+			OP_MAILLOOTTYPE = 0x84,
+			OP_MAILRANLOTTERY = 0x85,
+			OP_LOTTERYLOOTLOCALIZED = 0x86,
+			OP_RADARISJAMMED = 0x87,
+			OP_RADARJAMINTENSITY = 0x88,
+			OP_RADARISENABLED = 0x89,
+			OP_ISEMPJAMMED = 0x8A,
+			OP_PLAYERADS = 0x8B,
+			OP_WEAPONHEATACTIVE = 0x8C,
+			OP_WEAPONHEATVALUE = 0x8D,
+			OP_WEAPONHEATOVERHEATED = 0x8E,
+			OP_GETSPLASHTEXT = 0x8F,
+			OP_GETSPLASHDESCRIPTION = 0x90,
+			OP_GETSPLASHMATERIAL = 0x91,
+			OP_SPLASHHASICON = 0x92,
+			OP_SPLASHROWNUM = 0x93,
+			OP_GETFOCUSEDITEMNAME = 0x94,
+			OP_GETFOCUSEDITEMX = 0x95,
+			OP_GETFOCUSEDITEMY = 0x96,
+			OP_GETFOCUSEDITEMWIDTH = 0x97,
+			OP_GETFOCUSEDITEMHEIGHT = 0x98,
+			OP_GETITEMX = 0x99,
+			OP_GETITEMY = 0x9A,
+			OP_GETITEMWIDTH = 0x9B,
+			OP_GETITEMHEIGHT = 0x9C,
+			OP_PLAYLIST = 0x9D,
+			OP_SCOREBOARDEXTERNALMUTENOTICE = 0x9E,
+			OP_GETCLIENTMATCHDATA = 0x9F,
+			OP_GETCLIENTMATCHDATADEF = 0xA0,
+			OP_GETMAPNAME = 0xA1,
+			OP_GETMAPIMAGE = 0xA2,
+			OP_GETMAPCUSTOM = 0xA3,
+			OP_GETMIGRATIONSTATUS = 0xA4,
+			OP_GETPLAYERCARDINFO = 0xA5,
+			OP_ISOFFLINEPROFILESELECTED = 0xA6,
+			OP_COOPPLAYER = 0xA7,
+			OP_ISCOOP = 0xA8,
+			OP_GETPARTYSTATUS = 0xA9,
+			OP_GETSEARCHPARAMS = 0xAA,
+			OP_GETTIMEPLAYED = 0xAB,
+			OP_ISSELECTEDPLAYERFRIEND = 0xAC,
+			OP_GETCHARBYINDEX = 0xAD,
+			OP_GETPROFILEDATA = 0xAE,
+			OP_ISPROFILESIGNEDIN = 0xAF,
+			OP_GETWAITPOPUPSTATUS = 0xB0,
+			OP_GETNATTYPE = 0xB1,
+			OP_GETLOCALIZEDNATTYPE = 0xB2,
+			OP_GETADJUSTEDSAFEAREAHORIZONTAL = 0xB3,
+			OP_GETADJUSTEDSAFEAREAVERTICAL = 0xB4,
+			OP_CONNECTIONINFO = 0xB5,
+			OP_OFFLINEPROFILECANSAVE = 0xB6,
+			OP_ALLSPLITSCREENPROFILESCANSAVE = 0xB7,
+			OP_ALLSPLITSCREENPROFILESARESIGNEDIN = 0xB8,
+			OP_DOWEHAVEMAPPACK = 0xB9,
+		};
+
+		/* windowDef_t->dynamicFlags */
+		// 0x1
+		#define WINDOWDYNAMIC_HASFOCUS		0x00000002
+		#define WINDOWDYNAMIC_VISIBLE		0x00000004
+		#define WINDOWDYNAMIC_FADEOUT		0x00000010
+		#define WINDOWDYNAMIC_FADEIN		0x00000020
+		// 0x40
+		// 0x80
+		#define WINDOWDYNAMIC_CLOSED		0x00000800
+		// 0x2000
+		#define WINDOWDYNAMIC_BACKCOLOR		0x00008000
+		#define WINDOWDYNAMIC_FORECOLOR		0x00010000
+
+		/* windowDef_t->staticFlags */
+		#define WINDOWSTATIC_DECORATION				0x00100000
+		#define WINDOWSTATIC_HORIZONTALSCROLL			0x00200000
+		#define WINDOWSTATIC_SCREENSPACE				0x00400000
+		#define WINDOWSTATIC_AUTOWRAPPED				0x00800000
+		#define WINDOWSTATIC_POPUP						0x01000000
+		#define WINDOWSTATIC_OUTOFBOUNDSCLICK			0x02000000
+		#define WINDOWSTATIC_LEGACYSPLITSCREENSCALE	0x04000000
+		#define WINDOWSTATIC_HIDDENDURINGFLASH			0x10000000
+		#define WINDOWSTATIC_HIDDENDURINGSCOPE			0x20000000
+		#define WINDOWSTATIC_HIDDENDURINGUI			0x40000000
+		#define WINDOWSTATIC_TEXTONLYFOCUS				0x80000000
+
+		#define ITEM_TYPE_TEXT				0		// simple text
+		#define ITEM_TYPE_BUTTON			1		// button, basically text with a border
+		#define ITEM_TYPE_RADIOBUTTON		2		// toggle button, may be grouped
+		#define ITEM_TYPE_CHECKBOX			3		// check box
+		#define ITEM_TYPE_EDITFIELD 		4		// editable text, associated with a dvar
+		#define ITEM_TYPE_COMBO 			5		// drop down list
+		#define ITEM_TYPE_LISTBOX			6		// scrollable list
+		#define ITEM_TYPE_MODEL 			7		// model
+		#define ITEM_TYPE_OWNERDRAW 		8		// owner draw, name specs what it is
+		#define ITEM_TYPE_NUMERICFIELD		9		// editable text, associated with a dvar
+		#define ITEM_TYPE_SLIDER			10		// mouse speed, volume, etc.
+		#define ITEM_TYPE_YESNO 			11		// yes no dvar setting
+		#define ITEM_TYPE_MULTI 			12		// multiple list setting, enumerated
+		#define ITEM_TYPE_DVARENUM 			13		// multiple list setting, enumerated from a dvar
+		#define ITEM_TYPE_BIND				14		// bind
+		#define ITEM_TYPE_MENUMODEL 		15		// special menu model
+		#define ITEM_TYPE_VALIDFILEFIELD	16		// text must be valid for use in a dos filename
+		#define ITEM_TYPE_DECIMALFIELD		17		// editable text, associated with a dvar, which allows decimal input
+		#define ITEM_TYPE_UPREDITFIELD		18		// editable text, associated with a dvar
+		#define ITEM_TYPE_GAME_MESSAGE_WINDOW 19	// game message window
+		#define ITEM_TYPE_NEWSTICKER		20		// horizontal scrollbox
+		#define ITEM_TYPE_TEXTSCROLL		21		// vertical scrollbox
+		#define ITEM_TYPE_EMAILFIELD		22
+		#define ITEM_TYPE_PASSWORDFIELD		23
+
+		struct UIFunctionList
+		{
+			int totalFunctions;
+			Statement_s** functions;
+		};
+
+		struct StaticDvar
+		{
+			/*dvar_t*/
+			void* dvar;
+			const char* dvarName;
+		};
+
+		struct StaticDvarList
+		{
+			int numStaticDvars;
+			StaticDvar** staticDvars;
+		};
+
+		struct StringList
+		{
+			int totalStrings;
+			const char** strings;
+		};
+
+		struct ExpressionSupportingData
+		{
+			UIFunctionList uifunctions;
+			StaticDvarList staticDvarList;
+			StringList uiStrings;
+		};
+
+		enum expDataType : int
+		{
+			VAL_INT = 0x0,
+			VAL_FLOAT = 0x1,
+			VAL_STRING = 0x2,
+			VAL_FUNCTION = 0x3,
+		};
+
+		struct ExpressionString
+		{
+			const char* string;
+		};
+
+		union operandInternalDataUnion
+		{
+			int intVal;
+			float floatVal;
+			ExpressionString stringVal;
+			Statement_s* function;
+		};
+
+		struct Operand
+		{
+			expDataType dataType;
+			operandInternalDataUnion internals;
+		};
+
+		union entryInternalData
+		{
+			operationEnum op; /* operationEnum */
+			Operand operand;
+		};
+
+		/* expressionEntry->type */
+		#define OPERATOR	0
+		#define OPERAND		1
+
+		struct expressionEntry	// 0xC
+		{
+			int type;
+			entryInternalData data;
+		};
+
+		struct Statement_s	// 0x18
+		{
+			int numEntries;
+			expressionEntry* entries;
+			ExpressionSupportingData* supportingData;
+			int lastExecuteTime;
+			Operand lastResult;
+		};
+
+		struct SetLocalVarData
+		{
+			const char* localVarName;
+			Statement_s* expression;
+		};
+
+		struct ConditionalScript
+		{
+			MenuEventHandlerSet* eventHandlerSet;
+			Statement_s* eventExpression;  // loads this first
+		};
+
+		union EventData
+		{
+			const char* unconditionalScript;
+			ConditionalScript* conditionalScript;
+			MenuEventHandlerSet* elseScript;
+			SetLocalVarData* setLocalVarData;
+		};
+
+		enum EventType
+		{
+			EVENT_UNCONDITIONAL = 0x0,
+			EVENT_IF = 0x1,
+			EVENT_ELSE = 0x2,
+			EVENT_SET_LOCAL_VAR_BOOL = 0x3,
+			EVENT_SET_LOCAL_VAR_INT = 0x4,
+			EVENT_SET_LOCAL_VAR_FLOAT = 0x5,
+			EVENT_SET_LOCAL_VAR_STRING = 0x6,
+			EVENT_COUNT = 0x7,
+		};
+
+		struct MenuEventHandler
+		{
+			EventData eventData;
+			EventType eventType;
+		};
+
+		struct MenuEventHandlerSet
+		{
+			int eventHandlerCount;
+			MenuEventHandler** eventHandlers;
+		};
+
+		struct ItemKeyHandler
+		{
+			int key;
+			MenuEventHandlerSet* action;
+			ItemKeyHandler* next;
+		};
+
+		struct windowDef_t // 0xA4
+		{
+			const char* name;	// 0x00
+			rectDef_s rect;
+			rectDef_s rectClient;
+			char* group;		// 0x2C
+			int style;			// 0x30
+			int border;			// 0x34
+			int ownerDraw;		// 0x38
+			int ownerDrawFlags;	// 0x3C
+			float borderSize;	// 0x40
+			int staticFlags;	// 0x44
+			int dynamicFlags;	// 0x48
+			int nextTime;		// 0x4C
+			float foreColor[4];	// 0x50
+			float backColor[4];	// 0x60
+			float borderColor[4];// 0x70
+			float outlineColor[4];// 0x80
+			float disableColor[4];// 0x90
+			Material* background;	// 0xA0
+		};
+
+		enum ItemFloatExpressionTarget
+		{
+			ITEM_FLOATEXP_TGT_RECT_X = 0x0,
+			ITEM_FLOATEXP_TGT_RECT_Y = 0x1,
+			ITEM_FLOATEXP_TGT_RECT_W = 0x2,
+			ITEM_FLOATEXP_TGT_RECT_H = 0x3,
+			ITEM_FLOATEXP_TGT_FORECOLOR_R = 0x4,
+			ITEM_FLOATEXP_TGT_FORECOLOR_G = 0x5,
+			ITEM_FLOATEXP_TGT_FORECOLOR_B = 0x6,
+			ITEM_FLOATEXP_TGT_FORECOLOR_RGB = 0x7,
+			ITEM_FLOATEXP_TGT_FORECOLOR_A = 0x8,
+			ITEM_FLOATEXP_TGT_GLOWCOLOR_R = 0x9,
+			ITEM_FLOATEXP_TGT_GLOWCOLOR_G = 0xA,
+			ITEM_FLOATEXP_TGT_GLOWCOLOR_B = 0xB,
+			ITEM_FLOATEXP_TGT_GLOWCOLOR_RGB = 0xC,
+			ITEM_FLOATEXP_TGT_GLOWCOLOR_A = 0xD,
+			ITEM_FLOATEXP_TGT_BACKCOLOR_R = 0xE,
+			ITEM_FLOATEXP_TGT_BACKCOLOR_G = 0xF,
+			ITEM_FLOATEXP_TGT_BACKCOLOR_B = 0x10,
+			ITEM_FLOATEXP_TGT_BACKCOLOR_RGB = 0x11,
+			ITEM_FLOATEXP_TGT_BACKCOLOR_A = 0x12,
+			ITEM_FLOATEXP_TGT__COUNT = 0x13,
+		};
+
+		struct ItemFloatExpression
+		{
+			ItemFloatExpressionTarget target;
+			Statement_s* expression;
+		};
+
+		struct editFieldDef_s
+		{
+			float minVal;
+			float maxVal;
+			float defVal;
+			float range;
+			int maxChars;
+			int maxCharsGotoNext;
+			int maxPaintChars;
+			int paintOffset;
+		};
+
+		struct multiDef_s	// 0x188
+		{
+			const char* dvarList[32];
+			const char* dvarStr[32];
+			float dvarValue[32];
+			int count;
+			int strDef;
+		};
+
+		struct columnInfo_s
+		{
+			int xpos;
+			int width;
+			int maxChars;
+			int alignment;
+		};
+
+		struct listBoxDef_s	// 0x144
+		{
+			int mousePos;
+			int startPos[1];
+			int endPos[1];
+			int drawPadding;
+			float elementWidth;
+			float elementHeight;
+			int elementStyle;
+			int numColumns;
+			columnInfo_s columnInfo[16];
+			MenuEventHandlerSet* doubleClick;	// 0xC8
+			int notselectable;
+			int noscrollbars;
+			int usepaging;
+			float selectBorder[4];
+			Material* selectIcon;
+		};
+
+		struct newsTickerDef_s
+		{
+			int feedId;
+			int speed;
+			int spacing;
+			int lastTime;
+			int start;
+			int end;
+			float x;
+		};
+
+		struct textScrollDef_s
+		{
+			int startTime;
+		};
+
+		union itemDefData_t
+		{
+			listBoxDef_s* listBox;
+			editFieldDef_s* editField;
+			newsTickerDef_s* ticker;
+			multiDef_s* multiDef;
+			const char* enumDvarName;
+			textScrollDef_s* scroll;
+			void* data;
+		};
+
+		struct itemDef_t
+		{
+			windowDef_t window;
+			rectDef_s textRect[1];
+			int type;
+			int dataType;
+			int alignment;
+			int fontEnum;
+			int textAlignMode;
+			float textAlignX;
+			float textAlignY;
+			float textScale;
+			int textStyle;
+			int gameMsgWindowIndex;
+			int gameMsgWindowMode;
+			const char* text;
+			int textSaveGameInfo;
+			int parent;
+			MenuEventHandlerSet* mouseEnterText;
+			MenuEventHandlerSet* mouseExitText;
+			MenuEventHandlerSet* mouseEnter;
+			MenuEventHandlerSet* mouseExit;
+			MenuEventHandlerSet* action;
+			MenuEventHandlerSet* accept;
+			MenuEventHandlerSet* onFocus;
+			MenuEventHandlerSet* leaveFocus;
+			const char* dvar;
+			const char* dvarTest;
+			ItemKeyHandler* onKey;
+			const char* enableDvar;
+			const char* localVar;
+			int dvarFlags;
+			const char* focusSound;
+			float special;
+			int cursorPos[1];
+			itemDefData_t typeData;
+			int imageTrack;
+			int floatExpressionCount;
+			ItemFloatExpression* floatExpressions;
+			Statement_s* visibleExp;
+			Statement_s* disabledExp;
+			Statement_s* textExp;
+			Statement_s* materialExp;
+			float glowColor[4];
+			bool decayActive;
+			int fxBirthTime;
+			int fxLetterTime;
+			int fxDecayStartTime;
+			int fxDecayDuration;
+			int lastSoundPlayedTime;
+		};
+
+		struct menuTransition	// 0x1C
+		{
+			int transitionType;
+			int targetField;
+			int startTime;
+			float startVal;
+			float endVal;
+			float time;
+			int endTriggerType;
+		};
+
+		struct menuDef_t
+		{
+			windowDef_t window;
+			int font;
+			int fullscreen;
+			int itemCount;
+			int fontIndex;
+			int cursorItems;
+			int fadeCycle;
+			float fadeClamp;
+			float fadeAmount;
+			float fadeInAmount;
+			float blurRadius;
+			MenuEventHandlerSet* onOpen;
+			MenuEventHandlerSet* onRequestClose;
+			MenuEventHandlerSet* onClose;
+			MenuEventHandlerSet* onEsc;
+			ItemKeyHandler* onKey;
+			Statement_s* visibleExp;
+			const char* allowedBinding;
+			const char* soundLoop;
+			int imageTrack;
+			float focusColor[4];
+			Statement_s* rectXExp;
+			Statement_s* rectYExp;
+			Statement_s* rectHExp;
+			Statement_s* rectWExp;
+			Statement_s* openSoundExp;
+			Statement_s* closeSoundExp;
+			itemDef_t** items;
+			menuTransition scaleTransition[1];
+			menuTransition alphaTransition[1];
+			menuTransition xTransition[1];
+			menuTransition yTransition[1];
+			ExpressionSupportingData* expressionData;
+		};
+
+		struct MenuList
+		{
+			const char* name;
+			int menuCount;
+			menuDef_t** menus;
+		};
+
 		// Localized Strings
 		struct LocalizeEntry
 		{
@@ -3482,6 +4112,7 @@ namespace ZoneTool
 			StringTable* stringtable;
 			ComWorld* comworld;
 			ComWorld* com_map;
+			menuDef_t* menu;
 			LocalizeEntry* localize;
 			SndCurve* soundcurve;
 			SndCurve* sndcurve;

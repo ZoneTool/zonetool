@@ -128,6 +128,7 @@ namespace ZoneTool
 			DECLARE_ASSET(lightdef, ILightDef);
 			DECLARE_ASSET(structureddatadef, IStructuredDataDef);
 			DECLARE_ASSET(addon_map_ents, IAddonMapEnts);
+			DECLARE_ASSET(menu, IMenuDef);
 		}
 
 		void Zone::add_asset_of_type(const std::string& type, const std::string& name)

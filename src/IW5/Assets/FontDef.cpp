@@ -126,16 +126,16 @@ namespace ZoneTool
 
 			for (int i = 0; i < font->glyphCount; i++)
 			{
-				font->glyphs[i].letter = fontdata["glyphs"][i].get<unsigned __int16>();
-				font->glyphs[i].x0 = fontdata["glyphs"][i].get<char>();
-				font->glyphs[i].y0 = fontdata["glyphs"][i].get<char>();
-				font->glyphs[i].dx = fontdata["glyphs"][i].get<char>();
-				font->glyphs[i].pixelWidth = fontdata["glyphs"][i].get<char>();
-				font->glyphs[i].pixelHeight = fontdata["glyphs"][i].get<char>();
-				font->glyphs[i].s0, fontdata["glyphs"][i].get<float>();
-				font->glyphs[i].t0, fontdata["glyphs"][i].get<float>();
-				font->glyphs[i].s1, fontdata["glyphs"][i].get<float>();
-				font->glyphs[i].t1, fontdata["glyphs"][i].get<float>();
+				font->glyphs[i].letter = fontdata["glyphs"][i]["letter"].get<unsigned __int16>();
+				font->glyphs[i].x0 = fontdata["glyphs"][i]["x0"].get<char>();
+				font->glyphs[i].y0 = fontdata["glyphs"][i]["y0"].get<char>();
+				font->glyphs[i].dx = fontdata["glyphs"][i]["dx"].get<char>();
+				font->glyphs[i].pixelWidth = fontdata["glyphs"][i]["pixelWidth"].get<char>();
+				font->glyphs[i].pixelHeight = fontdata["glyphs"][i]["pixelHeight"].get<char>();
+				font->glyphs[i].s0, fontdata["glyphs"][i]["s0"].get<float>();
+				font->glyphs[i].t0, fontdata["glyphs"][i]["t0"].get<float>();
+				font->glyphs[i].s1, fontdata["glyphs"][i]["s1"].get<float>();
+				font->glyphs[i].t1, fontdata["glyphs"][i]["t1"].get<float>();
 			}
 
 			return font;

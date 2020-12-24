@@ -132,10 +132,10 @@ namespace ZoneTool
 				font->glyphs[i].dx = fontdata["glyphs"][i]["dx"].get<char>();
 				font->glyphs[i].pixelWidth = fontdata["glyphs"][i]["pixelWidth"].get<char>();
 				font->glyphs[i].pixelHeight = fontdata["glyphs"][i]["pixelHeight"].get<char>();
-				font->glyphs[i].s0, fontdata["glyphs"][i]["s0"].get<float>();
-				font->glyphs[i].t0, fontdata["glyphs"][i]["t0"].get<float>();
-				font->glyphs[i].s1, fontdata["glyphs"][i]["s1"].get<float>();
-				font->glyphs[i].t1, fontdata["glyphs"][i]["t1"].get<float>();
+				font->glyphs[i].s0 = fontdata["glyphs"][i]["s0"].get<float>();
+				font->glyphs[i].t0 = fontdata["glyphs"][i]["t0"].get<float>();
+				font->glyphs[i].s1 = fontdata["glyphs"][i]["s1"].get<float>();
+				font->glyphs[i].t1 = fontdata["glyphs"][i]["t1"].get<float>();
 			}
 
 			return font;

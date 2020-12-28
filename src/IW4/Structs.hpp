@@ -2784,7 +2784,7 @@ namespace ZoneTool
 			char flags;
 		};
 
-		struct GfxCullGroup
+		struct GfxSurfaceBounds
 		{
 			union
 			{
@@ -2872,7 +2872,7 @@ namespace ZoneTool
 			unsigned __int16* sortedSurfIndex;
 			GfxStaticModelInst* smodelInsts;
 			GfxSurface* surfaces;
-			GfxCullGroup* surfacesBounds;
+			GfxSurfaceBounds* surfacesBounds;
 			GfxStaticModelDrawInst* smodelDrawInsts;
 			GfxDrawSurf* surfaceMaterials;
 			unsigned int* surfaceCastsSunShadow;
@@ -3010,7 +3010,7 @@ namespace ZoneTool
 				unsigned __int16* sortedSurfIndex;
 				GfxStaticModelInst* smodelInsts;
 				GfxSurface* surfaces;
-				GfxCullGroup* surfacesBounds;
+				GfxSurfaceBounds* surfacesBounds;
 				GfxStaticModelDrawInst* smodelDrawInsts;
 				GfxDrawSurf* surfaceMaterials;
 				unsigned int* surfaceCastsSunShadow;

@@ -81,7 +81,7 @@ namespace ZoneTool
 			{
 				asset->dpvs.surfaces[i].material = read.read_asset<Material>();
 			}
-			asset->dpvs.cullGroups = read.read_array<GfxCullGroup>();
+			asset->dpvs.surfacesBounds = read.read_array<GfxSurfaceBounds>();
 			asset->dpvs.smodelDrawInsts = read.read_array<GfxStaticModelDrawInst>();
 			for (unsigned int i = 0; i < asset->dpvs.smodelCount; i++)
 			{
@@ -947,11 +947,11 @@ namespace ZoneTool
 			assert(data->indexCount > 0);
 			assert(data->dpvs.surfaces != nullptr);
 
-			if (data->dpvs.cullGroups)
+			if (data->dpvs.surfacesBounds)
 			{
 				buf->align(3);
-				buf->write(data->dpvs.cullGroups, data->indexCount);
-				ZoneBuffer::clear_pointer(&dest->dpvs.cullGroups);
+				buf->write(data->dpvs.surfacesBounds, data->indexCount);
+				ZoneBuffer::clear_pointer(&dest->dpvs.surfacesBounds);
 			}
 
 			if (data->dpvs.smodelDrawInsts)
@@ -1115,7 +1115,7 @@ namespace ZoneTool
 				write.dump_asset(asset->dpvs.surfaces[i].material);
 			}
 
-			write.dump_array(asset->dpvs.cullGroups, asset->indexCount);
+			write.dump_array(asset->dpvs.surfacesBounds, asset->indexCount);
 			write.dump_array(asset->dpvs.smodelDrawInsts, asset->dpvs.smodelCount);
 
 			for (unsigned int i = 0; i < asset->dpvs.smodelCount; i++)

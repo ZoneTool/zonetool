@@ -241,7 +241,7 @@ namespace ZoneTool
 			if (world->dpvs.surfaces)
 			{
 				map.dpvs.surfaces = mem->Alloc<IW4::GfxSurface>(world->surfaceCount);
-				map.dpvs.surfacesBounds = mem->Alloc<IW4::GfxCullGroup>(world->surfaceCount);
+				map.dpvs.surfacesBounds = mem->Alloc<IW4::GfxSurfaceBounds>(world->surfaceCount);
 
 				assert(sizeof(IW3::srfTriangles_t) == sizeof(IW4::srfTriangles_t));
 				

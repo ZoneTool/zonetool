@@ -320,15 +320,31 @@ namespace ZoneTool
 
 						const auto material_name = std::string(patched_material->name).substr(0, strlen(patched_material->name) - 10).append(camo);
 						patched_material->name = _strdup(material_name.data());
-
-						assert(patched_material->maps[patched_material->numMaps - 1].firstCharacter == 'd');
 						
 						if (camo == "gold"s)
 						{
+							std::vector<MaterialImage> stored_maps;
+							stored_maps.resize(patched_material->numMaps - 1);
+
+							// filter out detailmap
+							auto target_index = 0;
+							for (auto map = 0; map < patched_material->numMaps; map++)
+							{
+								if (patched_material->maps[map].firstCharacter == 'd')
+								{
+									continue;
+								}
+
+								memcpy(&stored_maps[target_index], &patched_material->maps[map], sizeof MaterialImage);
+								target_index++;
+							}
+							
 							patched_material->numMaps -= 1;
 							patched_material->techniqueSet = new MaterialTechniqueSet;
 							memcpy(patched_material->techniqueSet, model->materials[i]->techniqueSet, sizeof MaterialTechniqueSet);
 
+							memcpy(patched_material->maps, stored_maps.data(), sizeof MaterialImage * patched_material->numMaps);
+							
 							auto technique_name = std::string(patched_material->techniqueSet->name);
 							const auto detail_pos = technique_name.find_first_of("d0");
 							technique_name.replace(detail_pos + 2, 2, "");

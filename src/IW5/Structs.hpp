@@ -3033,17 +3033,25 @@ namespace ZoneTool
 			bool castsSunShadow;
 		};
 
-		struct GfxCullGroup
+		struct GfxSurfaceBounds
 		{
-			float mins[3];
-			float maxs[3];
-			//int surfaceCount;
-			//int startSurfIndex;
+			Bounds bounds;
 		};
 
 		struct GfxDrawSurfFields
 		{
-			__int64 _bf0;
+			unsigned __int64 objectId : 15;
+			unsigned __int64 reflectionProbeIndex : 8;
+			unsigned __int64 hasGfxEntIndex : 1;
+			unsigned __int64 customIndex : 5;
+			unsigned __int64 materialSortedIndex : 12;
+			unsigned __int64 prepass : 2;
+			unsigned __int64 useHeroLighting : 1;
+			unsigned __int64 sceneLightIndex : 8;
+			unsigned __int64 viewModelRender : 1;
+			unsigned __int64 surfType : 4;
+			unsigned __int64 primarySortKey : 6;
+			unsigned __int64 unused : 1;
 		};
 
 		union GfxDrawSurf
@@ -3099,7 +3107,7 @@ namespace ZoneTool
 			unsigned __int16* sortedSurfIndex;
 			GfxStaticModelInst* smodelInsts;
 			GfxSurface* surfaces;
-			GfxCullGroup* cullGroups;
+			GfxSurfaceBounds* surfacesBounds;
 			GfxStaticModelDrawInst* smodelDrawInsts;
 			GfxDrawSurf* surfaceMaterials;
 			unsigned int* surfaceCastsSunShadow;

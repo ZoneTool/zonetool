@@ -376,7 +376,7 @@ namespace ZoneTool
 
 			if (max_state_index >= mat->stateBitsCount)
 			{
-				ZONETOOL_FATAL("Material %s is referencing more statebit entries than it has!", mat->name);
+				// ZONETOOL_FATAL("Material %s is referencing more statebit entries than it has!", mat->name);
 			}
 			
 			if (max_state_index != mat->stateBitsCount - 1)

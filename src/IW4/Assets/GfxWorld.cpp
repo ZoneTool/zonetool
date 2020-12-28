@@ -839,10 +839,29 @@ namespace ZoneTool
 			memcpy(&iw5_asset->lightGrid, &asset->lightGrid,
 			       Difference(&iw5_asset->fogTypesAllowed + 1, &iw5_asset->lightGrid));
 
+			// fix GfxDrawSurfs
+			iw5_asset->dpvs.surfaceMaterials = new IW5::GfxDrawSurf[iw5_asset->indexCount];
+			memset(iw5_asset->dpvs.surfaceMaterials, 0, sizeof IW5::GfxDrawSurf * iw5_asset->indexCount);
+			for (auto i = 0u; i < iw5_asset->indexCount; i++)
+			{
+				iw5_asset->dpvs.surfaceMaterials[i].fields.reflectionProbeIndex = asset->dpvs.surfaceMaterials[i].fields.reflectionProbeIndex;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.hasGfxEntIndex = asset->dpvs.surfaceMaterials[i].fields.hasGfxEntIndex;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.customIndex = asset->dpvs.surfaceMaterials[i].fields.customIndex;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.materialSortedIndex = asset->dpvs.surfaceMaterials[i].fields.materialSortedIndex;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.prepass = asset->dpvs.surfaceMaterials[i].fields.prepass;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.useHeroLighting = asset->dpvs.surfaceMaterials[i].fields.useHeroLighting;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.sceneLightIndex = asset->dpvs.surfaceMaterials[i].fields.sceneLightIndex;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.viewModelRender = 0;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.surfType = asset->dpvs.surfaceMaterials[i].fields.surfType;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.primarySortKey = asset->dpvs.surfaceMaterials[i].fields.primarySortKey;
+				iw5_asset->dpvs.surfaceMaterials[i].fields.unused = asset->dpvs.surfaceMaterials[i].fields.unused;
+			}
+			
 			// dump asset
 			IW5::IGfxWorld::dump(iw5_asset);
 
 			// free memory_
+			delete[] iw5_asset->dpvs.surfaceMaterials;
 			delete[] iw5_asset->cells;
 			delete iw5_asset;
 		}

@@ -114,10 +114,14 @@ namespace ZoneTool
 			memset(iw5_comworld->primaryLights, 0, sizeof(IW5::ComPrimaryLight) * iw5_comworld->primaryLightCount);
 
 			// copy data
-			for (unsigned int i = 0; i < iw5_comworld->primaryLightCount; i++)
+			for (auto i = 0u; i < iw5_comworld->primaryLightCount; i++)
 			{
 				memcpy(iw5_comworld->primaryLights[i]._portpad0, asset->primaryLights[i]._portpad0, 28);
 				memcpy(iw5_comworld->primaryLights[i]._portpad1, asset->primaryLights[i]._portpad1, 40);
+
+				iw5_comworld->primaryLights[i].up[0] = 0.0f;
+				iw5_comworld->primaryLights[i].up[1] = 0.0f;
+				iw5_comworld->primaryLights[i].up[2] = 0.0f;
 			}
 
 			// dump comworld
@@ -125,7 +129,7 @@ namespace ZoneTool
 
 			// free memory_
 			delete[] iw5_comworld->primaryLights;
-			delete[] iw5_comworld;
+			delete iw5_comworld;
 		}
 	}
 }

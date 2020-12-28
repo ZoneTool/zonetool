@@ -41,6 +41,7 @@ extern std::string currentzone;
 #include "Assets/LightDef.hpp"
 #include "Assets/StructuredDataDef.hpp"
 #include "Assets/AddonMapEnts.hpp"
+#include "Assets/MenuDef.hpp"
 
 namespace ZoneTool
 {

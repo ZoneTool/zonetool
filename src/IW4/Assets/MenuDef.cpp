@@ -3,7 +3,7 @@
 // Call of Duty titles. 
 //
 // Project: https://github.com/ZoneTool/zonetool
-// Author: aerosoul (https://github.com/RektInator)
+// Author: aerosoul (https://github.com/aerosoul94)
 // License: GNU GPL v3.0
 // ========================================================
 #include "stdafx.hpp"

@@ -372,8 +372,8 @@ namespace ZoneTool
 			emit_statement("visible when", asset->visibleExp);
 			emit_statement("exp rect x", asset->rectXExp);
 			emit_statement("exp rect y", asset->rectYExp);
-			emit_statement("exp rect h", asset->rectHExp);
 			emit_statement("exp rect w", asset->rectWExp);
+			emit_statement("exp rect h", asset->rectHExp);
 			emit_statement("exp openSound", asset->openSoundExp);
 			emit_statement("exp closeSound", asset->closeSoundExp);
 			emit_item_key_handler("execKeyInt", asset->onKey);
@@ -672,7 +672,8 @@ namespace ZoneTool
 		{
 			if (handler)
 			{
-				emit_menu_event_handler_set("", handler->action);
+				std::string keyName = std::string(name) + " "s + std::to_string(handler->key);
+				emit_menu_event_handler_set(keyName.c_str(), handler->action);
 				emit_item_key_handler("execKeyInt", handler->next);
 			}
 		}
@@ -969,6 +970,7 @@ namespace ZoneTool
 
 			// clean indentation and semi colons
 			out += "\n";
+			replace_all(out, "\"", "");		// Remove all quotes
 			replace_all(out, "\t;", "\t");
 			replace_all(out, tabs + "\n", "");
 			replace_all(out, " ; \n", ";\n");

@@ -2771,8 +2771,8 @@ namespace ZoneTool
 			float focusColor[4];
 			Statement_s* rectXExp;
 			Statement_s* rectYExp;
-			Statement_s* rectHExp;
 			Statement_s* rectWExp;
+			Statement_s* rectHExp;
 			Statement_s* openSoundExp;
 			Statement_s* closeSoundExp;
 			itemDef_t** items;

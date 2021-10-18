@@ -153,9 +153,23 @@ namespace ZoneTool
 
 			if (data->partClassification)
 			{
+				char *shieldAdjustedPartClassification = new char[data->numBones];
+
+				for (int i = 0; i < data->numBones; i++)
+				{
+					uint16_t boneNameIndex = data->boneNames[i];
+					std::string boneNameString = buf->get_scriptstring(boneNameIndex);
+					if (boneNameString == "tag_shield_back" || boneNameString == "tag_weapon_left")
+						shieldAdjustedPartClassification[i] = 0x13;
+					else
+						shieldAdjustedPartClassification[i] = data->partClassification[i];
+				}
+
 				buf->align(0);
-				buf->write(data->partClassification, data->numBones);
+				buf->write(shieldAdjustedPartClassification, data->numBones);
+
 				ZoneBuffer::clear_pointer(&dest->partClassification);
+				delete[] shieldAdjustedPartClassification;
 			}
 
 			if (data->animMatrix)

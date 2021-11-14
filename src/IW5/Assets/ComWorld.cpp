@@ -31,7 +31,7 @@ namespace ZoneTool
 
 			PARSE_INT(type);
 			PARSE_INT(canUseShadowMap);
-			PARSE_INT(canUseShadowMap);
+			PARSE_INT(exponent);
 
 			PARSE_FLOAT_ARRAY(color, 3);
 			PARSE_FLOAT_ARRAY(dir, 3);
